@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/0.5.62-alpha">
+  <PropertyGroup>
+    <StartupCommand></StartupCommand>
+    <!-- Command to run on project build -->
+    <BuildCommand>
+    </BuildCommand>
+  </PropertyGroup>
+</Project>
