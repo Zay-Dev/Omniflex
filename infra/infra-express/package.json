@@ -1,0 +1,12 @@
+{
+  "name": "@omniflex/infra-express",
+  "version": "0.1.0",
+  "exports": "./index.ts",
+  "dependencies": {
+    "@omniflex/core": "0.1.0",
+    "express": "^4.21.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "@omniflex/root",
+  "private": true,
+  "license": "SEE LICENSE IN LICENSE",
+  "scripts": {
+    "tsc": "yarn workspaces run tsc --noEmit"
+  },
+  "workspaces": [
+    "core",
+    "infra/**/*",
+    "modules/**/*",
+    "apps/**/*",
+    "common/**/*"
+  ],
+  "dependencies": {
+    "awilix": "^12.0.3",
+    "dotenv": "^16.4.5",
+    "moment": "^2.30.1",
+    "nodemon": "^3.1.7",
+    "tsx": "^4.19.2",
+    "uuid": "^11.0.2"
+  },
+  "devDependencies": {
+    "@types/uuid": "^10.0.0",
+    "tsc": "^2.0.4",
+    "typescript": "^5.6.3"
+  }
+}
