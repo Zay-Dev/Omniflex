@@ -1,0 +1,65 @@
+Copyright (c) 2024 Omniflex
+
+This license applies to all code, files, and workspaces contained within this repository and its subdirectories, including but not limited to all packages, modules, and applications under the @omniflex namespace.
+
+Definitions:
+- "Commercial use" refers to any use intended to generate revenue, either directly 
+  or indirectly, including but not limited to:
+  * Use by a business, corporation, or commercial entity
+  * Integration into products or services that are sold
+  * Use in revenue-generating activities
+  * Use in business operations
+- "Non-commercial use" refers to:
+  * Personal projects without any revenue generation
+  * Academic research and education
+  * Open source projects that do not generate revenue
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to use
+the Software for personal and non-commercial purposes only, subject to the
+following conditions:
+
+1. The Software may only be used for:
+   a) Personal projects (defined as projects for individual, non-revenue generating use)
+   b) Non-commercial open source projects (projects that do not generate revenue through donations, sponsorships, or other means)
+   c) Educational purposes (including teaching, learning, and academic research)
+
+2. The Software may not be used for:
+   a) Commercial purposes (including but not limited to: paid services, products for sale, or use within a commercial organization)
+   b) Generating revenue directly or indirectly
+   c) Commercial products or services
+
+3. Any distribution of the Software must:
+   a) Retain this license notice
+   b) Retain all copyright notices
+   c) Include attribution to the original author
+
+4. Modified versions must:
+   a) Be clearly marked as modified
+   b) Not misrepresent the original source
+   c) Retain this license terms
+
+5. Attribution requirements:
+   a) Include the copyright notice
+   b) Include this license
+   c) State changes if modified
+   d) Include a link to the original source
+
+Commercial Licensing:
+For commercial use of this software, please contact:
+- Email: licensing@omniflex.io (monitored Monday-Friday)
+- Website: https://omniflex.io/licensing
+
+Commercial licenses are available for:
+- Business and enterprise use
+- Integration into commercial products
+- Use within commercial organizations
+- Revenue-generating applications
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE. 
