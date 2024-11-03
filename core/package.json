@@ -2,8 +2,8 @@
   "name": "@omniflex/core",
   "version": "0.1.0",
   "exports": {
-    "./types/*": "./types/*.ts",
-    ".": "./index.ts"
+    "./types/*": "./dist/types/*.js",
+    ".": "./dist/index.js"
   },
   "dependencies": {
   },

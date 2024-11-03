@@ -4,8 +4,11 @@
   "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "tsc": "yarn workspaces run tsc --noEmit",
+    "ws-run": "yarn workspace",
+    "build:all": "yarn workspaces run tsc",
     "dev:server": "yarn workspace apps-server dev",
-    "ws-run": "yarn workspace"
+    "build:server": "yarn workspace apps-server build",
+    "start:server": "yarn workspace apps-server start"
   },
   "workspaces": [
     "core",

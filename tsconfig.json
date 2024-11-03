@@ -12,7 +12,6 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "allowJs": true,
-    "noEmit": true,
     "forceConsistentCasingInFileNames": true,
     "sourceMap": true,
     "declaration": true

@@ -1,7 +1,7 @@
 {
   "name": "@omniflex/infra-winston",
   "version": "0.1.0",
-  "exports": "./index.ts",
+  "exports": "./dist/index.js",
   "dependencies": {
     "@omniflex/core": "0.1.0",
     "winston": "^3.16.0"
