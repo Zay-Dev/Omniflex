@@ -1,23 +1,23 @@
 import {
   Router,
   Express,
-  RequestHandler
+  RequestHandler,
+  Locals as BaseLocals,
+  Response as BaseResponse,
 } from 'express';
 
-export type TServerOptions = {
-  middleware?: {
-    beforeRoutes?: Array<RequestHandler>;
-    fallbacks?: Array<RequestHandler>;
-  };
-
-  auth?: RequestHandler;
+export type TServerMiddlewares = {
+  before?: Array<RequestHandler>;
+  after?: Array<RequestHandler>;
 };
 
 export type TBaseServer = {
   port: number;
   type: string;
 
-  options?: TServerOptions;
+  options?: {
+    middlewares?: TServerMiddlewares;
+  };
 };
 
 export type TServer = TBaseServer & {
@@ -25,23 +25,25 @@ export type TServer = TBaseServer & {
   getRouters: () => Record<string, Router>;
 };
 
-export type TOptions = {
+export type TStartOptions = {
   servers: TServer[];
-  middleware?: TServerOptions['middleware'];
+  middlewares?: TServerMiddlewares;
 };
 
-export type Locals<TUser = any> = {
-  user?: TUser;
+export type TLocals = BaseLocals & {
+  user?: any;
   appType: string;
   requestId: string;
 };
 
+export type Response = BaseResponse & {
+  locals: TLocals;
+};
+
+export { Router } from 'express';
+export type { Request, NextFunction, RequestHandler } from 'express';
+export type { PathParams, RequestHandlerParams } from 'express-serve-static-core';
+
 export type THydratedRouter = Router & {
-  useAuthRouter: () => {
-    get: (path: string, ...args: any[]) => Router;
-    post: (path: string, ...args: any[]) => Router;
-    put: (path: string, ...args: any[]) => Router;
-    delete: (path: string, ...args: any[]) => Router;
-    patch: (path: string, ...args: any[]) => Router;
-  };
+  useMiddlewares: (middlewares: RequestHandler[]) => Router;
 };
