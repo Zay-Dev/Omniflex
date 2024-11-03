@@ -3,7 +3,9 @@
   "private": true,
   "license": "SEE LICENSE IN LICENSE",
   "scripts": {
-    "tsc": "yarn workspaces run tsc --noEmit"
+    "tsc": "yarn workspaces run tsc --noEmit",
+    "dev:server": "yarn workspace apps-server dev",
+    "ws-run": "yarn workspace"
   },
   "workspaces": [
     "core",

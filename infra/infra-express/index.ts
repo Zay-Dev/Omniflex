@@ -1,1 +1,1 @@
-console.log("Hello World!");
+export { AutoServer } from './auto-server';
