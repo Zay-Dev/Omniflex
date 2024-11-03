@@ -10,3 +10,12 @@ if (!appContainer.hasRegistration('errorFactory')) {
 
 export const logger = appContainer.resolve('logger');
 export const errors = appContainer.resolve('errorFactory');
+
+export const handleUncaughtException = () => {
+  process.on('uncaughtException', error => {
+    console.error(`\
+Uncaught Exception (${error?.message || 'N/a'}):
+${error}
+`);
+  });
+};

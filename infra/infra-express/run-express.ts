@@ -4,7 +4,7 @@ import { ILogger } from '@omniflex/core/types/logger';
 import { bindAsyncFunctionDefaultErrorHandler } from './helpers/routers';
 
 import express, { Express, Router } from 'express';
-//import { beforeRoutes, fallbacks } from './middlewares/index.mts';
+import { applyMiddlewares } from './middlewares/index';
 
 export const createServer = express;
 
@@ -15,9 +15,12 @@ export const runExpress = ({
   return Promise.all(servers.map(server => {
     const app = server.server;
 
-    //beforeRoutes.apply(app, server, middleware);
-    useRouters(app, server.getRouters());
-    //fallbacks.apply(app, server, middleware);
+    applyMiddlewares(
+      app,
+      server,
+      middlewares,
+      () => useRouters(app, server.getRouters()),
+    );
 
     startServer({
       app,
@@ -25,8 +28,6 @@ export const runExpress = ({
 
       type: server.type,
       port: server.port,
-      fallbackMiddlewares: () => {
-      },
     });
   }));
 };
@@ -51,7 +52,7 @@ const startServer = async ({
   app: Express;
   port: number;
   type: string;
-  fallbackMiddlewares: () => Promise<void> | void;
+  fallbackMiddlewares?: () => Promise<void> | void;
 }) => {
   const { createServer } = await import('http');
   const logError = (reason: string) => {
@@ -80,6 +81,6 @@ const startServer = async ({
     logger.info(`Listening on ${port}`, { tags: type });
   });
 
-  await fallbackMiddlewares();
+  await fallbackMiddlewares?.();
   return listen();
 };

@@ -1,4 +1,4 @@
-import { logger } from '@omniflex/core';
+import { logger, handleUncaughtException } from '@omniflex/core';
 
 import { getExpressRouter } from './helpers/routers';
 import { createServer, runExpress } from './run-express';
@@ -116,6 +116,8 @@ const start = (options?: Omit<TStartOptions, "servers">) => {
     ...(options || {}),
     servers: parsedServers,
   });
+
+  handleUncaughtException();
 };
 
 export const AutoServer = {
