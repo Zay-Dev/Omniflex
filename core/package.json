@@ -1,7 +1,10 @@
 {
   "name": "@omniflex/core",
   "version": "0.1.0",
-  "exports": "./index.ts",
+  "exports": {
+    "./types/*": "./types/*.ts",
+    ".": "./index.ts"
+  },
   "dependencies": {
   },
   "devDependencies": {
