@@ -1,5 +1,5 @@
 import { TStartOptions } from './types';
-import { getLogger } from '@omniflex/core';
+import { logger } from '@omniflex/core';
 import { ILogger } from '@omniflex/core/types/logger';
 import { bindAsyncFunctionDefaultErrorHandler } from './helpers/routers';
 
@@ -12,8 +12,6 @@ export const runExpress = ({
   servers = [],
   middlewares = {},
 }: TStartOptions = {} as any) => {
-  const logger = getLogger();
-
   return Promise.all(servers.map(server => {
     const app = server.server;
 

@@ -1,4 +1,4 @@
-import { getLogger } from '@omniflex/core';
+import { logger } from '@omniflex/core';
 
 import { getExpressRouter } from './helpers/routers';
 import { createServer, runExpress } from './run-express';
@@ -79,8 +79,6 @@ const getOrCreateRouter = (
 };
 
 const start = (options?: Omit<TStartOptions, "servers">) => {
-  const logger = getLogger();
-
   const parsedServers = Array.from(servers.values())
     .map(({ server, getRouters, type, ...rest }) => {
       const tags = type;

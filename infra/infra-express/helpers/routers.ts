@@ -1,5 +1,5 @@
 //import config from '@/config';
-import { getLogger } from '@omniflex/core';
+import { logger } from '@omniflex/core';
 //import { CustomError } from '@omniflex/core/types/error';
 
 import { THydratedRouter } from '../types';
@@ -50,8 +50,6 @@ export const nextRouteIf = (
 };
 
 export const bindAsyncFunctionDefaultErrorHandler = (router: Router) => {
-  const logger = getLogger();
-
   const handleLayer = (layer: ILayer) => {
     switch (layer.name.toLowerCase()) {
       case 'bound dispatch':
