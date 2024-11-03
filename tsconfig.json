@@ -2,8 +2,8 @@
   "compilerOptions": {
     "target": "ES2022",
     "lib": [ "ES2022" ],
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "baseUrl": ".",
     "strict": true,
     "noImplicitAny": false,
@@ -15,6 +15,9 @@
     "forceConsistentCasingInFileNames": true,
     "sourceMap": true,
     "declaration": true
+  },
+  "tsc-alias": {
+    "resolveFullPaths": true
   },
   "exclude": [
     "node_modules",

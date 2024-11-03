@@ -1,12 +1,18 @@
 {
   "name": "@omniflex/infra-express",
   "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && tsc-alias"
+  },
   "exports": {
+    "./types": {
+      "development": "./types.ts",
+      "import": "./dist/types.js"
+    },
     ".": {
-      "types": "./index.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "default": "./index.ts"
+      "development": "./index.ts",
+      "import": "./dist/index.js"
     }
   },
   "dependencies": {

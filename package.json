@@ -5,9 +5,8 @@
   "scripts": {
     "tsc": "yarn workspaces run tsc --noEmit",
     "ws-run": "yarn workspace",
-    "build:all": "yarn workspaces run tsc",
+    "build": "yarn workspaces run build",
     "dev:server": "yarn workspace apps-server dev",
-    "build:server": "yarn workspace apps-server build",
     "start:server": "yarn workspace apps-server start"
   },
   "workspaces": [
@@ -28,6 +27,7 @@
   "devDependencies": {
     "@types/uuid": "^10.0.0",
     "tsc": "^2.0.4",
+    "tsc-alias": "^1.8.10",
     "typescript": "^5.6.3"
   }
 }

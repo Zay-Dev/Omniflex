@@ -5,7 +5,7 @@ export const configAs = <T extends TBaseConfig>() => {
   return appContainer.resolve<T>('config');
 };
 
-export const bindConfig = (config: TBaseConfig) => {
+export const registerConfig = (config: TBaseConfig) => {
   if (!appContainer.hasRegistration('config')) {
     appContainer.register({
       config: Awilix.asValue(config),
