@@ -1,6 +1,8 @@
 import * as Transport from 'winston-transport';
 import { WinstonLogger } from './winston-logger';
+
 import { ILogger } from '@omniflex/core/types/logger';
+import { appContainer, Awilix } from '@omniflex/core/containers';
 
 import {
   format,
@@ -20,8 +22,10 @@ const myFormat = printf(({ level, message, timestamp }) => {
 
 export const createLogger = ({
   transports = [],
+  noInject = false,
   noConsole = false,
 }: {
+  noInject?: boolean;
   noConsole?: boolean;
   transports?: Transport[];
 } = {}): ILogger => {
@@ -39,6 +43,12 @@ export const createLogger = ({
       ].filter(Boolean) as any,
     })
   );
+
+  if (!noInject) {
+    appContainer.register({
+      logger: Awilix.asValue(logger),
+    });
+  }
 
   return logger;
 };

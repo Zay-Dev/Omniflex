@@ -1,19 +1,10 @@
 import { TStartOptions } from './types';
+import { getLogger } from '@omniflex/core';
+import { ILogger } from '@omniflex/core/types/logger';
 import { bindAsyncFunctionDefaultErrorHandler } from './helpers/routers';
 
 import express, { Express, Router } from 'express';
 //import { beforeRoutes, fallbacks } from './middlewares/index.mts';
-
-const _logger = (() => {
-  const logger = console.log.bind(null, '[TODO]');
-
-  return {
-    info: logger,
-    debug: logger,
-    warn: logger,
-    error: logger,
-  };
-})();
 
 export const createServer = express;
 
@@ -21,7 +12,7 @@ export const runExpress = ({
   servers = [],
   middlewares = {},
 }: TStartOptions = {} as any) => {
-  const logger = global.logger;
+  const logger = getLogger();
 
   return Promise.all(servers.map(server => {
     const app = server.server;
@@ -55,11 +46,10 @@ const startServer = async ({
   app,
   port,
   type,
-  logger = _logger,
+  logger,
   fallbackMiddlewares,
 }: {
-  //logger: ILogger;
-  logger: any;
+  logger: ILogger;
   app: Express;
   port: number;
   type: string;

@@ -1,1 +1,3 @@
-console.log("Hello World!");
+import { appContainer } from './containers';
+
+export const getLogger = () => appContainer.resolve('logger');

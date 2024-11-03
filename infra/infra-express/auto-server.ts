@@ -1,4 +1,4 @@
-//import { getLogger } from '@omniflex/core';
+import { getLogger } from '@omniflex/core';
 
 import { getExpressRouter } from './helpers/routers';
 import { createServer, runExpress } from './run-express';
@@ -8,17 +8,6 @@ import {
   TStartOptions,
   THydratedRouter,
 } from './types';
-
-const logger = (() => {
-  const logger = console.log.bind(null, '[TODO]');
-
-  return {
-    info: logger,
-    debug: logger,
-    warn: logger,
-    error: logger,
-  };
-})();
 
 interface IBaseServer extends Omit<TServer, 'server' | 'getRouters'> {
   server?: TServer['server'];
@@ -90,7 +79,7 @@ const getOrCreateRouter = (
 };
 
 const start = (options?: Omit<TStartOptions, "servers">) => {
-  //const logger = getLogger();
+  const logger = getLogger();
 
   const parsedServers = Array.from(servers.values())
     .map(({ server, getRouters, type, ...rest }) => {
