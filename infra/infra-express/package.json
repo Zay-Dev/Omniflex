@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "exports": {
     ".": {
+      "types": "./index.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.js",
       "default": "./index.ts"

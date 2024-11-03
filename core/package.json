@@ -3,21 +3,25 @@
   "version": "0.1.0",
   "exports": {
     "./types/*": {
+      "types": "./types/*.ts",
       "import": "./dist/types/*.js",
       "require": "./dist/types/*.js",
       "default": "./types/*.ts"
     },
     "./containers": {
+      "types": "./containers.ts",
       "import": "./dist/containers.js",
       "require": "./dist/containers.js",
       "default": "./containers.ts"
     },
     "./config": {
+      "types": "./config.ts",
       "import": "./dist/config.js",
       "require": "./dist/config.js",
       "default": "./config.ts"
     },
     ".": {
+      "types": "./index.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.js",
       "default": "./index.ts"

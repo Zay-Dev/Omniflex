@@ -1,8 +1,8 @@
 import { BaseError } from '@omniflex/core/types/error';
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '@omniflex/core';
-
-const EXPOSE_ERROR_DETAILS = process.env.EXPOSE_ERROR_DETAILS === 'true';
+import { configAs } from '@omniflex/core/config';
+import { TBaseConfig } from '@omniflex/core/types/config';
 
 export const errorHandler = (
   error: Error | BaseError,
@@ -18,6 +18,7 @@ export const errorHandler = (
 };
 
 const handleGeneralError = (error: any = {}, req: Request, res: Response) => {
+  const config = configAs<TBaseConfig>();
   const status = error.code || 500;
   const timestamp = new Date().toISOString();
 
@@ -31,10 +32,10 @@ const handleGeneralError = (error: any = {}, req: Request, res: Response) => {
   });
 
   res.status(status).json({
+    code: status,
     status,
     timestamp,
-    code: status,
-    ...(EXPOSE_ERROR_DETAILS ? { data: error.data } : {}),
+    ...(config.logging.exposeErrorDetails ? { data: error.data } : {}),
     path: req.path || 'Unknown path',
     method: req.method || 'Unknown method',
     message: error.message || 'Internal Server Error',
@@ -43,6 +44,7 @@ const handleGeneralError = (error: any = {}, req: Request, res: Response) => {
 };
 
 const handleBaseError = (error: BaseError, req: Request, res: Response) => {
+  const config = configAs<TBaseConfig>();
   const status = error.code || 500;
   const timestamp = new Date().toISOString();
 
@@ -60,7 +62,7 @@ const handleBaseError = (error: BaseError, req: Request, res: Response) => {
     code: error.code,
     status,
     timestamp,
-    ...(EXPOSE_ERROR_DETAILS ? { data: error.data } : {}),
+    ...(config.logging.exposeErrorDetails ? { data: error.data } : {}),
     path: req.path || 'Unknown path',
     method: req.method || 'Unknown method',
     message: error.message,
