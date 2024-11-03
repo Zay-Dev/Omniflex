@@ -1,6 +1,6 @@
-//import config from '@/config';
-import { logger } from '@omniflex/core';
-//import { CustomError } from '@omniflex/core/types/error';
+import { logger, errors } from '@omniflex/core';
+import { configAs } from '@omniflex/core/config';
+import { TBaseConfig } from '@omniflex/core/types/config';
 
 import { THydratedRouter } from '../types';
 import { IRoute, ILayer } from 'express-serve-static-core';
@@ -104,20 +104,17 @@ body:
 ${handle.toString()}`
           );
 
-          //return next(new CustomError({
-          return next(({
-            code: 500,
-            message: 'Unexpected Error.',
-          }));
+          return next(errors.custom('Unexpected Error.', 500));
         });
 
         if (!promise) {
+          const config = configAs<TBaseConfig>();
+
           setTimeout(() => {
             if (!res.headersSent) {
-              next(new Error('Timed out'));
+              return next(errors.custom('Timed out.', 500));
             }
-          }, 1000 * 30);
-          //}, 1000 * config.requestTimeoutInSeconds);
+          }, 1000 * config.server.requestTimeoutInSeconds);
         }
       };
     }

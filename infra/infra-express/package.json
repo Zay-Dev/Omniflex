@@ -2,10 +2,11 @@
   "name": "@omniflex/infra-express",
   "version": "0.1.0",
   "exports": {
-    ".": [
-      "./index.ts",
-      "./dist/index.js"
-    ]
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./index.ts"
+    }
   },
   "dependencies": {
     "@omniflex/core": "0.1.0",

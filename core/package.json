@@ -2,18 +2,26 @@
   "name": "@omniflex/core",
   "version": "0.1.0",
   "exports": {
-    "./types/*": [
-      "./types/*.ts",
-      "./dist/types/*.js"
-    ],
-    "./containers": [
-      "./containers.ts",
-      "./dist/containers.js"
-    ],
-    ".": [
-      "./index.ts",
-      "./dist/index.js"
-    ]
+    "./types/*": {
+      "import": "./dist/types/*.js",
+      "require": "./dist/types/*.js",
+      "default": "./types/*.ts"
+    },
+    "./containers": {
+      "import": "./dist/containers.js",
+      "require": "./dist/containers.js",
+      "default": "./containers.ts"
+    },
+    "./config": {
+      "import": "./dist/config.js",
+      "require": "./dist/config.js",
+      "default": "./config.ts"
+    },
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./index.ts"
+    }
   },
   "dependencies": {
   },
