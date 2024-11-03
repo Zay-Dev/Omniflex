@@ -36,10 +36,13 @@ export const getExpressRouter = () => {
 
     methods
       .forEach((method) => {
-        const fn = nestedRouter[method];
+        const fn = nestedRouter[method].bind(nestedRouter);
 
         nestedRouter[method] = (path: PathParams, ...handlers: RequestHandlerParams[]) => {
-          return fn(path, ...middlewares, ...handlers);
+          return fn(path,
+            ...(middlewares || []).filter(Boolean),
+            ...(handlers || []).filter(Boolean),
+          );
         };
       });
 
