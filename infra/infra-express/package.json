@@ -22,6 +22,7 @@
     "express-fileupload": "^1.5.1",
     "express-useragent": "^1.0.15",
     "helmet": "^8.0.0",
+    "morgan": "^1.10.0",
     "response-time": "^2.3.3"
   },
   "devDependencies": {
@@ -29,6 +30,7 @@
     "@types/express": "^5.0.0",
     "@types/express-fileupload": "^1.5.1",
     "@types/express-useragent": "^1.0.5",
+    "@types/morgan": "^1.9.9",
     "@types/node": "^22.8.7",
     "@types/response-time": "^2.3.8"
   }
