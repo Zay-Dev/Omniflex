@@ -7,7 +7,7 @@ type TContainer = {
   logger: ILogger;
   config: TBaseConfig;
   errorFactory: IErrorFactory;
-};
+} & Record<string, any>;
 
 export * as Awilix from 'awilix';
 

@@ -30,13 +30,15 @@ export const applyMiddlewares = (
   app.use(useragent.express());
   app.use(cors({ origin }));
 
-  (middleware.before || []).forEach(middleware => app.use(middleware));
-  (server.options?.middlewares?.before || []).forEach(middleware => app.use(middleware));
+  (middleware.before || [])
+    .concat(server.options?.middlewares?.before || [])
+    .forEach(middleware => app.use(middleware));
 
   setupRoutes();
 
-  (server.options?.middlewares?.after || []).forEach(middleware => app.use(middleware));
-  (middleware.after || []).forEach(middleware => app.use(middleware));
+  (server.options?.middlewares?.after || [])
+    .concat(middleware.after || [])
+    .forEach(middleware => app.use(middleware));
 
   app.use((_, __, next) => next(errors.notFound()));
   app.use(errorHandler);

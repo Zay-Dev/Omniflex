@@ -1,14 +1,12 @@
 import { TBaseConfig } from './types/config';
 import { appContainer, Awilix } from './containers';
 
-export const configAs = <T extends TBaseConfig>() => {
+export const configAs = <T extends TBaseConfig = TBaseConfig>() => {
   return appContainer.resolve<T>('config');
 };
 
 export const registerConfig = (config: TBaseConfig) => {
-  if (!appContainer.hasRegistration('config')) {
-    appContainer.register({
-      config: Awilix.asValue(config),
-    });
-  }
+  appContainer.register({
+    config: Awilix.asValue(config),
+  });
 };

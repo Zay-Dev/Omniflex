@@ -2,13 +2,12 @@ import { BaseError } from '@omniflex/core/types/error';
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '@omniflex/core';
 import { configAs } from '@omniflex/core/config';
-import { TBaseConfig } from '@omniflex/core/types/config';
 
 export const errorHandler = (
   error: Error | BaseError,
   req: Request,
   res: Response,
-  next: NextFunction,
+  _next: NextFunction,
 ) => {
   if (error instanceof BaseError) {
     return handleBaseError(error, req, res);
@@ -18,7 +17,6 @@ export const errorHandler = (
 };
 
 const handleGeneralError = (error: any = {}, req: Request, res: Response) => {
-  const config = configAs<TBaseConfig>();
   const status = error.code || 500;
   const timestamp = new Date().toISOString();
 
@@ -32,19 +30,12 @@ const handleGeneralError = (error: any = {}, req: Request, res: Response) => {
   });
 
   res.status(status).json({
-    code: status,
-    status,
-    timestamp,
-    ...(config.logging.exposeErrorDetails ? { data: error.data } : {}),
-    path: req.path || 'Unknown path',
-    method: req.method || 'Unknown method',
-    message: error.message || 'Internal Server Error',
-    error: error.error || error.name || 'UnknownError',
+    ...getBasicResponse(req, status, status, timestamp),
+    ...getErrorResponseBody(error),
   });
 };
 
 const handleBaseError = (error: BaseError, req: Request, res: Response) => {
-  const config = configAs<TBaseConfig>();
   const status = error.code || 500;
   const timestamp = new Date().toISOString();
 
@@ -59,14 +50,41 @@ const handleBaseError = (error: BaseError, req: Request, res: Response) => {
   });
 
   res.status(status).json({
-    code: error.code,
-    status,
-    timestamp,
-    ...(config.logging.exposeErrorDetails ? { data: error.data } : {}),
-    path: req.path || 'Unknown path',
-    method: req.method || 'Unknown method',
-    message: error.message,
-    errorCode: error.errorCode,
-    error: error.error || error.name,
+    ...getBasicResponse(req, error.code, status, timestamp),
+    ...getErrorResponseBody(error),
   });
 };
+
+const getErrorResponseBody = (error: Error | BaseError) => {
+  const config = configAs();
+  const exposeData = error instanceof BaseError &&
+    config.logging.exposeErrorDetails;
+
+  const body = {
+    message: error.message,
+    errorCode: (error as any).errorCode || undefined,
+    error: ((error as any).error || undefined) || error.name,
+  };
+
+  if (exposeData) {
+    return {
+      ...body,
+      data: error.data || null,
+    };
+  }
+
+  return body;
+};
+
+const getBasicResponse = (
+  req: Request,
+  code: number,
+  status: number,
+  timestamp: string,
+) => ({
+  code,
+  status,
+  timestamp,
+  path: req.path || 'Unknown path',
+  method: req.method || 'Unknown method',
+});

@@ -1,6 +1,5 @@
 import { logger, errors } from '@omniflex/core';
 import { configAs } from '@omniflex/core/config';
-import { TBaseConfig } from '@omniflex/core/types/config';
 
 import { THydratedRouter } from '../types';
 import { IRoute, ILayer } from 'express-serve-static-core';
@@ -41,10 +40,15 @@ export const getExpressRouter = () => {
   return router;
 };
 
-export const nextRouteIf = (
-  check: (req: Request, res: Response, next: NextFunction) => boolean | Promise<boolean>,
+export const nextRouteIf = <
+  TRequest extends Request = Request,
+  TResponse extends Response = Response,
+  TNextFunction extends NextFunction = NextFunction
+>(
+  check: (req: TRequest, res: TResponse, next: TNextFunction) =>
+    boolean | Promise<boolean>,
 ) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (req: TRequest, res: TResponse, next: TNextFunction) => {
     return await check(req, res, next) ? next('route') : next();
   };
 };
@@ -108,7 +112,7 @@ ${handle.toString()}`
         });
 
         if (!promise) {
-          const config = configAs<TBaseConfig>();
+          const config = configAs();
 
           setTimeout(() => {
             if (!res.headersSent) {
