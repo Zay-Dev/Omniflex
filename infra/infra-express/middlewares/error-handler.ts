@@ -9,6 +9,8 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction,
 ) => {
+  res.locals.error = error;
+
   if (error instanceof BaseError) {
     return handleBaseError(error, req, res);
   }
@@ -20,17 +22,6 @@ const handleGeneralError = (error: any = {}, req: Request, res: Response) => {
   const status = error.code || 500;
   const timestamp = new Date().toISOString();
 
-  logger.error('Unhandled error occurred', {
-    error,
-    data: {
-      timestamp,
-      path: req.path,
-      method: req.method,
-      appType: res.locals.appType,
-      requestId: res.locals.requestId,
-    },
-  });
-
   res.status(status).json({
     ...getBasicResponse(req, res, status, status, timestamp),
     ...getErrorResponseBody(error),
@@ -40,18 +31,6 @@ const handleGeneralError = (error: any = {}, req: Request, res: Response) => {
 const handleBaseError = (error: BaseError, req: Request, res: Response) => {
   const status = error.code || 500;
   const timestamp = new Date().toISOString();
-
-  logger.error('Application error occurred', {
-    error,
-    data: {
-      timestamp,
-      path: req.path,
-      method: req.method,
-      errorCode: error.errorCode,
-      appType: res.locals.appType,
-      requestId: res.locals.requestId,
-    }
-  });
 
   res.status(status).json({
     ...getBasicResponse(req, res, error.code, status, timestamp),

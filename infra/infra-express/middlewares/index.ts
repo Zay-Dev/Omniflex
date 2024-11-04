@@ -9,6 +9,7 @@ import express, { Express } from 'express';
 import fileUpload from 'express-fileupload';
 
 import { errorHandler } from './error-handler';
+import { requestLogger } from './request-logger';
 import { requestProcessor } from './request-processor';
 import { requestPreparation } from './request-preparation';
 
@@ -27,6 +28,7 @@ export const applyMiddlewares = (
 ) => {
   app.use(requestPreparation(server.type));
   app.use(requestProcessor());
+  app.use(requestLogger());
 
   app.use(express.json());
   app.use(fileUpload());

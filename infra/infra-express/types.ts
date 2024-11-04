@@ -1,3 +1,5 @@
+import { BaseError } from '@omniflex/core/types/error';
+
 import {
   Router,
   Express,
@@ -45,6 +47,7 @@ export type TLocals = BaseLocals & {
   appType: string;
   requestId: string;
   request: ProcessedRequest;
+  error?: Error | BaseError;
 };
 
 export type Response = BaseResponse & {
