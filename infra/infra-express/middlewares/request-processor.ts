@@ -28,7 +28,14 @@ const SENSITIVE_KEYS = [
 ];
 
 const deepClone = <T>(obj: T): T => {
-  return JSON.parse(JSON.stringify(obj));
+  if (obj === undefined) return obj;
+
+  try {
+    return JSON.parse(JSON.stringify(obj));
+  } catch (error) {
+    // If JSON parsing fails, return the original object
+    return obj;
+  }
 };
 
 const maskValue = (value: string): string => {
