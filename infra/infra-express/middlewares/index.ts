@@ -9,6 +9,8 @@ import express, { Express } from 'express';
 import fileUpload from 'express-fileupload';
 
 import { errorHandler } from './error-handler';
+import { requestProcessor } from './request-processor';
+import { requestPreparation } from './request-preparation';
 
 export const applyMiddlewares = (
   app: Express,
@@ -23,6 +25,9 @@ export const applyMiddlewares = (
     origin?: cors.CorsOptions['origin'];
   } = {}
 ) => {
+  app.use(requestPreparation(server.type));
+  app.use(requestProcessor());
+
   app.use(express.json());
   app.use(fileUpload());
   app.use(responseTime());

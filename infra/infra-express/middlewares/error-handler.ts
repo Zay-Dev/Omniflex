@@ -26,11 +26,13 @@ const handleGeneralError = (error: any = {}, req: Request, res: Response) => {
       timestamp,
       path: req.path,
       method: req.method,
+      appType: res.locals.appType,
+      requestId: res.locals.requestId,
     },
   });
 
   res.status(status).json({
-    ...getBasicResponse(req, status, status, timestamp),
+    ...getBasicResponse(req, res, status, status, timestamp),
     ...getErrorResponseBody(error),
   });
 };
@@ -46,11 +48,13 @@ const handleBaseError = (error: BaseError, req: Request, res: Response) => {
       path: req.path,
       method: req.method,
       errorCode: error.errorCode,
+      appType: res.locals.appType,
+      requestId: res.locals.requestId,
     }
   });
 
   res.status(status).json({
-    ...getBasicResponse(req, error.code, status, timestamp),
+    ...getBasicResponse(req, res, error.code, status, timestamp),
     ...getErrorResponseBody(error),
   });
 };
@@ -78,6 +82,7 @@ const getErrorResponseBody = (error: Error | BaseError) => {
 
 const getBasicResponse = (
   req: Request,
+  res: Response,
   code: number,
   status: number,
   timestamp: string,
@@ -85,6 +90,8 @@ const getBasicResponse = (
   code,
   status,
   timestamp,
+  appType: res.locals.appType,
+  requestId: res.locals.requestId,
   path: req.path || 'Unknown path',
   method: req.method || 'Unknown method',
 });

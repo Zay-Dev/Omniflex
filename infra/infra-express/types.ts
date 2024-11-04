@@ -30,10 +30,21 @@ export type TStartOptions = {
   middlewares?: TServerMiddlewares;
 };
 
+export type ProcessedRequest = {
+  body: any;
+  query: any;
+  params: any;
+  headers: Record<string, string>;
+  path: string;
+  method: string;
+  url: string;
+};
+
 export type TLocals = BaseLocals & {
   user?: any;
   appType: string;
   requestId: string;
+  request: ProcessedRequest;
 };
 
 export type Response = BaseResponse & {
