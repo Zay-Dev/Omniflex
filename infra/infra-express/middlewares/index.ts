@@ -27,14 +27,15 @@ export const applyMiddlewares = (
   } = {}
 ) => {
   app.use(requestPreparation(server.type));
+  app.use(responseTime());
+  app.use(express.json());
+  app.use(useragent.express());
+
   app.use(requestProcessor());
   app.use(requestLogger());
 
-  app.use(express.json());
   app.use(fileUpload());
-  app.use(responseTime());
   app.use(helmet({ contentSecurityPolicy: !noContentSecurityPolicy }));
-  app.use(useragent.express());
   app.use(cors({ origin }));
 
   (middleware.before || [])

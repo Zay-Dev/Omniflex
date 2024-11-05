@@ -99,6 +99,7 @@ const processRequest = (req: Request) => {
 export const requestProcessor = () => {
   return (req: Request, res: Response, next: NextFunction) => {
     res.locals.request = processRequest(req);
+
     return next();
   };
 };
