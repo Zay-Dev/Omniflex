@@ -1,0 +1,33 @@
+{
+  "name": "@omniflex/module-auth",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && tsc-alias"
+  },
+  "exports": {
+    "./types": {
+      "development": "./types.ts",
+      "import": "./dist/types.js"
+    },
+    "./providers/*": {
+      "development": "./providers/*/index.ts",
+      "import": "./dist/providers/*/index.js"
+    },
+    "./adapters/*": {
+      "development": "./adapters/*.ts",
+      "import": "./dist/adapters/*.js"
+    },
+    ".": {
+      "development": "./index.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@omniflex/core": "0.1.0",
+    "jsonwebtoken": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.0"
+  }
+}

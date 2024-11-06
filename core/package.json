@@ -23,9 +23,8 @@
       "import": "./dist/index.js"
     }
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@types/node": "^20.11.0"
+    "@types/node": "^22.9.0"
   }
 }
