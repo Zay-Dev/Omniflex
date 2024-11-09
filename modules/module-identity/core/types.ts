@@ -1,15 +1,13 @@
-import { IBaseRepository } from '@omniflex/core/types/repository';
+import { IBaseRepository, TSoftDeletable, TWithTimestamps } from '@omniflex/core/types/repository';
 
-export type TUser = {
-  isDeleted: boolean;
+export type TUser = TSoftDeletable & TWithTimestamps & {
   isVerified: boolean;
   identifier: string;
   lastSignInAtUtc?: Date;
 };
 
-export type TUserProfile = {
+export type TUserProfile = TSoftDeletable & TWithTimestamps & {
   user: TUser;
-  isDeleted: boolean;
   profileImage?: string;
   email?: string;
   mobileNumber?: string;
@@ -18,16 +16,14 @@ export type TUserProfile = {
   profile?: any;
 };
 
-export type TUserPassword = {
+export type TUserPassword = TSoftDeletable & TWithTimestamps & {
   user: TUser;
-  isDeleted: boolean;
   username: string;
   hashedPassword: string;
 };
 
-export type TLoginAttempt = {
+export type TLoginAttempt = TSoftDeletable & TWithTimestamps & {
   user: TUser;
-  isDeleted: boolean;
   identifier: string;
   loginType: string;
   appType: string;
