@@ -1,10 +1,10 @@
 {
   "name": "@omniflex/module-identity-prisma",
   "version": "0.1.0",
+  "private": true,
   "type": "module",
   "scripts": {
-    "bbuild": "tsc && tsc-alias",
-    "build": "echo TODO"
+    "build": "tsc && tsc-alias"
   },
   "exports": {
     "./repositories/*": {
