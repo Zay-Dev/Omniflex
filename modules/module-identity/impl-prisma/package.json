@@ -1,0 +1,28 @@
+{
+  "name": "@omniflex/module-identity-prisma",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "bbuild": "tsc && tsc-alias",
+    "build": "echo TODO"
+  },
+  "exports": {
+    "./repositories": {
+      "development": "./repositories/index.ts",
+      "import": "./dist/repositories/index.js"
+    },
+    "./models": {
+      "development": "./models/index.ts",
+      "import": "./dist/models/index.js"
+    },
+    ".": {
+      "development": "./index.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@omniflex/core": "0.1.0",
+    "@omniflex/module-identity-core": "0.1.0",
+    "@omniflex/infra-prisma": "0.1.0"
+  }
+}
