@@ -4,7 +4,7 @@ import { IUserProfileRepository, TUser, TUserProfile } from '@omniflex/module-id
 
 export class UserProfileRepository
   extends MongooseBaseRepository<TUserProfile & Document>
-  implements IUserProfileRepository<string> {
+  implements IUserProfileRepository {
   constructor(model: Model<TUserProfile & Document>) {
     super(model);
   }

@@ -4,7 +4,7 @@ import { IUserPasswordRepository, TUserPassword } from '@omniflex/module-identit
 
 export class UserPasswordRepository
   extends MongooseBaseRepository<TUserPassword & Document>
-  implements IUserPasswordRepository<string> {
+  implements IUserPasswordRepository {
   constructor(model: Model<TUserPassword & Document>) {
     super(model);
   }

@@ -1,12 +1,14 @@
 import { IBaseRepository, TSoftDeletable, TWithTimestamps } from '@omniflex/core/types/repository';
 
 export type TUser = TSoftDeletable & TWithTimestamps & {
+  id: string;
   isVerified: boolean;
   identifier: string;
   lastSignInAtUtc: Date | null;
 };
 
 export type TUserProfile = TSoftDeletable & TWithTimestamps & {
+  id: string;
   user: TUser;
   profileImage?: string;
   email?: string;
@@ -17,12 +19,14 @@ export type TUserProfile = TSoftDeletable & TWithTimestamps & {
 };
 
 export type TUserPassword = TSoftDeletable & TWithTimestamps & {
+  id: string;
   user: TUser;
   username: string;
   hashedPassword: string;
 };
 
 export type TLoginAttempt = TSoftDeletable & TWithTimestamps & {
+  id: string;
   user: TUser;
   identifier: string;
   loginType: string;
@@ -32,25 +36,25 @@ export type TLoginAttempt = TSoftDeletable & TWithTimestamps & {
   remark?: any;
 };
 
-export interface IUserRepository<TPrimaryKey>
-  extends IBaseRepository<TUser, TPrimaryKey> {
+export interface IUserRepository
+  extends IBaseRepository<TUser, string> {
   findByIdentifier(identifier: string): Promise<TUser | null>;
   findByUsername(username: string): Promise<TUser | null>;
   findByEmail(email: string): Promise<TUser | null>;
 }
 
-export interface IUserProfileRepository<TPrimaryKey>
-  extends IBaseRepository<TUserProfile, TPrimaryKey> {
+export interface IUserProfileRepository
+  extends IBaseRepository<TUserProfile, string> {
   findByUser(user: TUser): Promise<TUserProfile | null>;
   findByEmail(email: string): Promise<TUserProfile | null>;
 }
 
-export interface IUserPasswordRepository<TPrimaryKey>
-  extends IBaseRepository<TUserPassword, TPrimaryKey> {
+export interface IUserPasswordRepository
+  extends IBaseRepository<TUserPassword, string> {
   findByUsername(username: string): Promise<TUserPassword | null>;
 }
 
-export interface ILoginAttemptRepository<TPrimaryKey>
-  extends IBaseRepository<TLoginAttempt, TPrimaryKey> {
+export interface ILoginAttemptRepository
+  extends IBaseRepository<TLoginAttempt, string> {
   findByUser(user: TUser): Promise<TLoginAttempt[]>;
 }

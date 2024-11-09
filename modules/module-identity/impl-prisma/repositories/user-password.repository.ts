@@ -8,13 +8,11 @@ import {
   PrismaBaseRepository,
 } from '@omniflex/infra-prisma';
 
-type TPrismaUserPassword = TUserPassword & {
-  id: string;
-};
+type TPrismaUserPassword = TUserPassword & {};
 
 export class UserPasswordRepository
   extends PrismaBaseRepository<TPrismaUserPassword>
-  implements IUserPasswordRepository<string> {
+  implements IUserPasswordRepository {
 
   constructor(prisma: PrismaClient) {
     super(prisma, 'userPassword')

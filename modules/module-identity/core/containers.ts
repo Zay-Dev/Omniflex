@@ -8,10 +8,10 @@ import {
 } from './types';
 
 type TIdentityContainer = {
-  userRepository: IUserRepository<string>;
-  userProfileRepository: IUserProfileRepository<string>;
-  userPasswordRepository: IUserPasswordRepository<string>;
-  loginAttemptRepository: ILoginAttemptRepository<string>;
+  userRepository: IUserRepository;
+  userProfileRepository: IUserProfileRepository;
+  userPasswordRepository: IUserPasswordRepository;
+  loginAttemptRepository: ILoginAttemptRepository;
 };
 
 export const container = Awilix.createContainer<TIdentityContainer>();

@@ -4,7 +4,7 @@ import { ILoginAttemptRepository, TUser, TLoginAttempt } from '@omniflex/module-
 
 export class LoginAttemptRepository
   extends MongooseBaseRepository<TLoginAttempt & Document>
-  implements ILoginAttemptRepository<string> {
+  implements ILoginAttemptRepository {
   constructor(model: Model<TLoginAttempt & Document>) {
     super(model);
   }

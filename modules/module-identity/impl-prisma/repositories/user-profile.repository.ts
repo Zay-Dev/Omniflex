@@ -11,13 +11,12 @@ import {
 } from '@omniflex/infra-prisma';
 
 type TPrismaUserProfile = TUserProfile & {
-  id: string;
   userId: string
 }
 
 export class UserProfileRepository
   extends PrismaBaseRepository<TPrismaUserProfile>
-  implements IUserProfileRepository<string> {
+  implements IUserProfileRepository {
 
   constructor(prisma: PrismaClient) {
     super(prisma, 'userProfile')

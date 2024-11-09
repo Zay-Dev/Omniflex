@@ -17,11 +17,6 @@ type TPaginationQuery = {
   sortOrder?: 'asc' | 'desc';
 };
 
-type TQueryOptions = {
-  pagination?: TPaginationQuery;
-  filter?: Record<string, any>;
-};
-
 export class BaseController<
   TEntity extends { id: TPrimaryKey; },
   TPrimaryKey = string,

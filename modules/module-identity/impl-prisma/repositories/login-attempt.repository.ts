@@ -11,13 +11,12 @@ import {
 } from '@omniflex/infra-prisma';
 
 type TPrismaLoginAttempt = TLoginAttempt & {
-  id: string;
   userId: string;
 };
 
 export class LoginAttemptRepository
   extends PrismaBaseRepository<TPrismaLoginAttempt>
-  implements ILoginAttemptRepository<string> {
+  implements ILoginAttemptRepository {
   constructor(prisma: PrismaClient) {
     super(prisma, 'loginAttempt');
   }
