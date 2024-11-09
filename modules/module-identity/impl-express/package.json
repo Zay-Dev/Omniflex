@@ -1,0 +1,24 @@
+{
+  "name": "@omniflex/module-identity-express",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc && tsc-alias"
+  },
+  "exports": {
+    "./controllers/*": {
+      "development": "./controllers/*.ts",
+      "import": "./dist/controllers/*.js"
+    },
+    ".": {
+      "development": "./index.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@omniflex/core": "0.1.0",
+    "@omniflex/infra-express": "0.1.0",
+    "@omniflex/module-identity-core": "0.1.0"
+  }
+}

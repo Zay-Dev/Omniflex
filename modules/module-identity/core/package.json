@@ -10,13 +10,9 @@
       "development": "./types.ts",
       "import": "./dist/types.js"
     },
-    "./entities": {
-      "development": "./entities/index.ts",
-      "import": "./dist/entities/index.js"
-    },
-    "./interfaces": {
-      "development": "./interfaces/index.ts",
-      "import": "./dist/interfaces/index.js"
+    "./controllers": {
+      "development": "./controllers/index.ts",
+      "import": "./dist/controllers/index.js"
     },
     ".": {
       "development": "./index.ts",
