@@ -1,0 +1,13 @@
+{
+  "name": "@omniflex/infra-prisma",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "bbuild": "tsc && tsc-alias",
+    "build": "echo TODO"
+  },
+  "private": true,
+  "dependencies": {
+    "prisma": "^5.22.0"
+  }
+}
