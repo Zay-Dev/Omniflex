@@ -398,3 +398,7 @@ next-env.d.ts
 
 # Mac files
 .DS_Store
+
+# Prisma auto generated files
+**/prisma-client/
+prisma/schema/module-*.prisma
