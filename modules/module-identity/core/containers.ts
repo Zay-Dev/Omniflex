@@ -1,19 +1,25 @@
-import { appContainer, Awilix } from '@omniflex/core/containers'
-import { IUserRepository, IUserProfileRepository, IUserPasswordRepository } from './types'
+import { Awilix } from '@omniflex/core/containers';
+
+import {
+  IUserRepository,
+  IUserProfileRepository,
+  IUserPasswordRepository,
+  ILoginAttemptRepository,
+} from './types';
 
 type TIdentityContainer = {
-  userRepository: IUserRepository<string>
-  userProfileRepository: IUserProfileRepository<string>
-  userPasswordRepository: IUserPasswordRepository<string>
-}
+  userRepository: IUserRepository<string>;
+  userProfileRepository: IUserProfileRepository<string>;
+  userPasswordRepository: IUserPasswordRepository<string>;
+  loginAttemptRepository: ILoginAttemptRepository<string>;
+};
 
-export const identityContainer = appContainer.createScope<TIdentityContainer>()
+export const container = Awilix.createContainer<TIdentityContainer>();
 
 export const registerRepositories = (repositories: Partial<TIdentityContainer>) => {
-  identityContainer.register({
-    ...Object.entries(repositories).reduce((acc, [key, value]) => ({
-      ...acc,
+  for (const [key, value] of Object.entries(repositories)) {
+    container.register({
       [key]: Awilix.asValue(value)
-    }), {})
-  })
-}
+    });
+  }
+};
