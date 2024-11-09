@@ -33,6 +33,14 @@ class ErrorFactory implements IErrorFactory {
     });
   }
 
+  conflict(message: string = "Conflict", options?: Partial<Omit<TErrorOptions, 'code' | 'message'>>) {
+    return this.create({
+      message,
+      code: 409,
+      ...options
+    });
+  }
+
   custom(message: string, code: number = 500, options?: Partial<Omit<TErrorOptions, 'code' | 'message'>>) {
     return this.create({
       code,

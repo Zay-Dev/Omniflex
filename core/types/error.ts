@@ -11,6 +11,7 @@ export interface IErrorFactory {
   forbidden(options?: Partial<Omit<TErrorOptions, 'code' | 'message'>>): Error;
   notFound(message?: string, options?: Partial<Omit<TErrorOptions, 'code' | 'message'>>): Error;
   badRequest(message?: string, options?: Partial<Omit<TErrorOptions, 'code' | 'message'>>): Error;
+  conflict(message?: string, options?: Partial<Omit<TErrorOptions, 'code' | 'message'>>): Error;
   custom(message: string, code?: number, options?: Partial<Omit<TErrorOptions, 'code' | 'message'>>): Error;
   create(options: TErrorOptions): Error;
 }
