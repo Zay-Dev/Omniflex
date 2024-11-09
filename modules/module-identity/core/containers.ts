@@ -9,8 +9,7 @@ import {
 } from './types';
 
 type TIdentityContainer = {
-    hashProvider: IHashProvider;
-
+  hashProvider: IHashProvider;
   userRepository: IUserRepository;
   userProfileRepository: IUserProfileRepository;
   userPasswordRepository: IUserPasswordRepository;
@@ -18,6 +17,16 @@ type TIdentityContainer = {
 };
 
 export const container = Awilix.createContainer<TIdentityContainer>();
+
+export const resolve = () => ({
+  hashProvider: container.resolve('hashProvider'),
+  repositories: {
+    users: container.resolve('userRepository'),
+    profiles: container.resolve('userProfileRepository'),
+    passwords: container.resolve('userPasswordRepository'),
+    loginAttempts: container.resolve('loginAttemptRepository')
+  }
+});
 
 export const registerRepositories = (repositories: Partial<TIdentityContainer>) => {
   for (const [key, value] of Object.entries(repositories)) {
