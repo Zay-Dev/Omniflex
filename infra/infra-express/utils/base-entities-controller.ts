@@ -1,7 +1,12 @@
 import { errors } from '@omniflex/core';
-import { IBaseRepository } from '@omniflex/core/types/repository';
-import { BaseController } from './base-controller';
+import { BaseExpressController } from './base-controller';
 import { Request, Response, NextFunction, TLocals } from '../types';
+
+import {
+  IRepository,
+  TSoftDeletable,
+  IBaseRepository,
+} from '@omniflex/core/types/repository';
 
 type TBaseLocals = TLocals;
 
@@ -17,16 +22,16 @@ type TQueryOptions = {
   filter?: Record<string, any>;
 };
 
-export class BaseEntitiesController<
+export class BaseController<
   TEntity extends { id: TPrimaryKey; },
   TPrimaryKey = string,
   TLocals extends TBaseLocals = TBaseLocals
-> extends BaseController<TLocals> {
+> extends BaseExpressController<TLocals> {
   constructor(
     req: Request,
     res: Response,
     next: NextFunction,
-    protected readonly repository: IBaseRepository<TEntity, TPrimaryKey>,
+    protected readonly repository: IRepository<TEntity, TPrimaryKey>,
   ) {
     super(req, res, next);
 
@@ -81,19 +86,6 @@ export class BaseEntitiesController<
     });
   }
 
-  trySoftDelete() {
-    return this.tryAction(async () => {
-      const id = this.pathId() as TPrimaryKey;
-      const success = await this.repository.softDelete(id);
-
-      if (!success) {
-        this.throwNotFound();
-      }
-
-      return this.respondOne({ success });
-    });
-  }
-
   tryDelete() {
     return this.tryAction(async () => {
       const id = this.pathId() as TPrimaryKey;
@@ -135,5 +127,33 @@ export class BaseEntitiesController<
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
     return entities.slice(start, end);
+  }
+}
+
+export class BaseEntitiesController<
+  TEntity extends { id: TPrimaryKey; } & TSoftDeletable,
+  TPrimaryKey = string,
+  TLocals extends TBaseLocals = TBaseLocals
+> extends BaseController<TEntity, TPrimaryKey, TLocals> {
+  constructor(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+    protected readonly repository: IBaseRepository<TEntity, TPrimaryKey>,
+  ) {
+    super(req, res, next, repository);
+  }
+
+  trySoftDelete() {
+    return this.tryAction(async () => {
+      const id = this.pathId() as TPrimaryKey;
+      const success = await this.repository.softDelete(id);
+
+      if (!success) {
+        this.throwNotFound();
+      }
+
+      return this.respondOne({ success });
+    });
   }
 }

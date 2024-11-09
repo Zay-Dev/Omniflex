@@ -17,7 +17,7 @@ export interface IRepository<T, TPrimaryKey> {
   delete(id: TPrimaryKey): Promise<boolean>
 }
 
-export interface IBaseRepository<T, TPrimaryKey>
+export interface IBaseRepository<T extends TSoftDeletable, TPrimaryKey>
   extends IRepository<T, TPrimaryKey> {
-    softDelete(id: TPrimaryKey): Promise<boolean>
+  softDelete(id: TPrimaryKey): Promise<boolean>
 }

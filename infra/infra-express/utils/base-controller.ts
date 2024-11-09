@@ -3,7 +3,7 @@ import { Request, Response, NextFunction, TLocals } from '../types';
 
 type TBaseLocals = TLocals;
 
-export class BaseController<TLocals extends TBaseLocals = TBaseLocals> {
+export class BaseExpressController<TLocals extends TBaseLocals = TBaseLocals> {
   protected locals: TLocals;
   public user?: TLocals['user'];
 
@@ -18,7 +18,7 @@ export class BaseController<TLocals extends TBaseLocals = TBaseLocals> {
 
   tryActionWithBody<T>(
     action: (body: T) => Promise<any> | any,
-    options: Parameters<BaseController['tryAction']>[1] & {
+    options: Parameters<BaseExpressController['tryAction']>[1] & {
       getBody?: () => T;
     } = {}
   ) {
