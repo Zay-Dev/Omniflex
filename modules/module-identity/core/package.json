@@ -1,0 +1,29 @@
+{
+  "name": "@omniflex/module-identity-core",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && tsc-alias"
+  },
+  "exports": {
+    "./types": {
+      "development": "./types.ts",
+      "import": "./dist/types.js"
+    },
+    "./entities": {
+      "development": "./entities/index.ts",
+      "import": "./dist/entities/index.js"
+    },
+    "./interfaces": {
+      "development": "./interfaces/index.ts",
+      "import": "./dist/interfaces/index.js"
+    },
+    ".": {
+      "development": "./index.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@omniflex/core": "0.1.0"
+  }
+}
