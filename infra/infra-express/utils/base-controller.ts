@@ -66,11 +66,11 @@ export class BaseExpressController<TLocals extends TBaseLocals = TBaseLocals> {
     throw errors.forbidden();
   }
 
-  protected pathId() {
+  protected get pathId() {
     return +this.req.params.id;
   }
 
-  protected pageSize() {
+  protected get pageSize() {
     const rawPageSize = this.req.query.pageSize;
     const pageSize = rawPageSize ? +rawPageSize : undefined;
 
@@ -81,7 +81,7 @@ export class BaseExpressController<TLocals extends TBaseLocals = TBaseLocals> {
     return 10;
   }
 
-  protected page() {
+  protected get page() {
     const rawPage = this.req.query.page;
     const page = rawPage ? +rawPage : undefined;
 

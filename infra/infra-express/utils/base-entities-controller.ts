@@ -1,23 +1,12 @@
 import { errors } from '@omniflex/core';
+import { IBaseRepository } from '@omniflex/core/types/repository';
+
 import { BaseExpressController } from './base-controller';
 import { Request, Response, NextFunction, TLocals } from '../types';
 
-import {
-  IRepository,
-  TSoftDeletable,
-  IBaseRepository,
-} from '@omniflex/core/types/repository';
-
 type TBaseLocals = TLocals;
 
-type TPaginationQuery = {
-  page?: string | number;
-  pageSize?: string | number;
-  sort?: string;
-  sortOrder?: 'asc' | 'desc';
-};
-
-export class BaseController<
+export class BaseEntitiesController<
   TEntity extends { id: TPrimaryKey; },
   TPrimaryKey = string,
   TLocals extends TBaseLocals = TBaseLocals
@@ -26,7 +15,7 @@ export class BaseController<
     req: Request,
     res: Response,
     next: NextFunction,
-    protected readonly repository: IRepository<TEntity, TPrimaryKey>,
+    protected readonly repository: IBaseRepository<TEntity, TPrimaryKey>,
   ) {
     super(req, res, next);
 
@@ -37,7 +26,7 @@ export class BaseController<
 
   tryGetOne() {
     return this.tryAction(async () => {
-      const id = this.pathId() as TPrimaryKey;
+      const id = this.pathId as TPrimaryKey;
       const entity = await this.repository.findById(id);
 
       if (!entity) {
@@ -50,7 +39,20 @@ export class BaseController<
 
   tryListAll() {
     return this.tryAction(async () => {
-      const entities = await this.repository.find({} as any);
+      const entities = await this.repository.find({});
+
+      return this.respondMany(entities);
+    });
+  }
+
+  tryListPaginated() {
+    return this.tryAction(async () => {
+      const { page, pageSize } = this;
+
+      const entities = await this.repository.find({}, {
+        take: pageSize,
+        skip: page * pageSize,
+      });
 
       return this.respondMany(entities);
     });
@@ -70,7 +72,7 @@ export class BaseController<
 
   tryUpdate<T extends Partial<TEntity> = Partial<TEntity>>() {
     return this.tryActionWithBody<T>(async (body) => {
-      const id = this.pathId() as TPrimaryKey;
+      const id = this.pathId as TPrimaryKey;
       const entity = await this.repository.update(id, body);
 
       if (!entity) {
@@ -83,7 +85,7 @@ export class BaseController<
 
   tryDelete() {
     return this.tryAction(async () => {
-      const id = this.pathId() as TPrimaryKey;
+      const id = this.pathId as TPrimaryKey;
       const success = await this.repository.delete(id);
 
       if (!success) {
@@ -94,54 +96,9 @@ export class BaseController<
     });
   }
 
-  protected getPaginationParams(query: TPaginationQuery = {}) {
-    const page = Number(query.page) || 1;
-    const pageSize = Number(query.pageSize) || this.pageSize();
-    const sort = query.sort || 'createdAt';
-    const sortOrder = query.sortOrder || 'desc';
-
-    return { page, pageSize, sort, sortOrder };
-  }
-
-  protected sortEntities(
-    entities: TEntity[],
-    sort: string,
-    sortOrder: 'asc' | 'desc'
-  ) {
-    return [...entities].sort((a: any, b: any) => {
-      const multiplier = sortOrder === 'asc' ? 1 : -1;
-      return multiplier * (a[sort] > b[sort] ? 1 : -1);
-    });
-  }
-
-  protected paginateEntities(
-    entities: TEntity[],
-    page: number,
-    pageSize: number
-  ) {
-    const start = (page - 1) * pageSize;
-    const end = start + pageSize;
-    return entities.slice(start, end);
-  }
-}
-
-export class BaseEntitiesController<
-  TEntity extends { id: TPrimaryKey; } & TSoftDeletable,
-  TPrimaryKey = string,
-  TLocals extends TBaseLocals = TBaseLocals
-> extends BaseController<TEntity, TPrimaryKey, TLocals> {
-  constructor(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-    protected readonly repository: IBaseRepository<TEntity, TPrimaryKey>,
-  ) {
-    super(req, res, next, repository);
-  }
-
   trySoftDelete() {
     return this.tryAction(async () => {
-      const id = this.pathId() as TPrimaryKey;
+      const id = this.pathId as TPrimaryKey;
       const success = await this.repository.softDelete(id);
 
       if (!success) {
