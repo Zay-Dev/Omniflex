@@ -19,6 +19,12 @@ export class PrismaBaseRepository<
     return this.prisma[this.model];
   }
 
+  async exists(filter: Partial<TEntity>): Promise<boolean> {
+    const count = await this.delegate.count({ where: filter });
+
+    return count > 0;
+  }
+
   async findById(id: TPrimaryKey): Promise<TEntity | null> {
     return this.delegate.findUnique({ where: { id } });
   }

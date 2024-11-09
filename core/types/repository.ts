@@ -1,23 +1,22 @@
 export type TSoftDeletable = {
-  isDeleted: boolean
-}
+  isDeleted: boolean;
+};
 
 export type TWithTimestamps = {
-  createdAt: Date
-  updatedAt: Date
-}
+  createdAt: Date;
+  updatedAt: Date;
+};
 
-export interface IRepository<T, TPrimaryKey> {
-  findById(id: TPrimaryKey): Promise<T | null>
-  findOne(filter: Partial<T>): Promise<T | null>
-  find(filter: Partial<T>, options?: { skip?: number; take?: number }): Promise<T[]>
+export interface IBaseRepository<T, TPrimaryKey> {
+  exists(filter: Partial<T>): Promise<boolean>;
 
-  create(data: Partial<T>): Promise<T>
-  update(id: TPrimaryKey, data: Partial<T>): Promise<T | null>
-  delete(id: TPrimaryKey): Promise<boolean>
-}
+  findById(id: TPrimaryKey): Promise<T | null>;
+  findOne(filter: Partial<T>): Promise<T | null>;
+  find(filter: Partial<T>, options?: { skip?: number; take?: number; }): Promise<T[]>;
 
-export interface IBaseRepository<T extends TSoftDeletable, TPrimaryKey>
-  extends IRepository<T, TPrimaryKey> {
-  softDelete(id: TPrimaryKey): Promise<boolean>
+  create(data: Partial<T>): Promise<T>;
+  update(id: TPrimaryKey, data: Partial<T>): Promise<T | null>;
+
+  delete(id: TPrimaryKey): Promise<boolean>;
+  softDelete(id: TPrimaryKey): Promise<boolean>;
 }
