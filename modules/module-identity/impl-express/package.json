@@ -11,6 +11,10 @@
       "development": "./controllers/*.ts",
       "import": "./dist/controllers/*.js"
     },
+    "./middlewares/*": {
+      "development": "./middlewares/*.ts",
+      "import": "./dist/middlewares/*.js"
+    },
     ".": {
       "development": "./index.ts",
       "import": "./dist/index.js"
