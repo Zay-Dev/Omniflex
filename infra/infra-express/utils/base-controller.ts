@@ -16,13 +16,13 @@ export class BaseController<TLocals extends TBaseLocals = TBaseLocals> {
     this.locals = this.res.locals as TLocals;
   }
 
-  async tryActionWithBody<T>(
+  tryActionWithBody<T>(
     action: (body: T) => Promise<any> | any,
     options: Parameters<BaseController['tryAction']>[1] & {
       getBody?: () => T;
     } = {}
   ) {
-    return await this.tryAction(() => {
+    return this.tryAction(() => {
       const body = options.getBody ?
         options.getBody() : this.req.body;
 
@@ -64,5 +64,20 @@ export class BaseController<TLocals extends TBaseLocals = TBaseLocals> {
 
   protected throwForbidden() {
     throw errors.forbidden();
+  }
+
+  protected pathId() {
+    return +this.req.params.id;
+  }
+
+  protected pageSize() {
+    const rawPageSize = this.req.query.pageSize;
+    const pageSize = rawPageSize ? +rawPageSize : undefined;
+
+    if (pageSize && !isNaN(pageSize)) {
+      return pageSize;
+    }
+
+    return 10;
   }
 }
