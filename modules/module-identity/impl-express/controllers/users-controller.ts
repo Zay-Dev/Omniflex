@@ -1,58 +1,58 @@
-import { Request, Response } from '@omniflex/infra-express/types'
-import { errors } from '@omniflex/core'
-import { identityContainer } from '@omniflex/module-identity-core/containers'
-import { IUserRepository } from '@omniflex/module-identity-core/types'
+import { BaseEntitiesController } from '@omniflex/infra-express/utils/base-entities-controller';
+import { container } from '@omniflex/module-identity-core/containers';
 
-export class UsersController {
-  private readonly _userRepository: IUserRepository<string>
+import { Request, Response, NextFunction } from '@omniflex/infra-express/types';
+import { IUserRepository, TUser } from '@omniflex/module-identity-core/types';
 
-  constructor() {
-    this._userRepository = identityContainer.resolve('userRepository')
+export class UsersController extends BaseEntitiesController<TUser> {
+  protected users: IUserRepository = null as any;
+
+  constructor(req: Request, res: Response, next: NextFunction) {
+    const repository = container.resolve<IUserRepository>('userRepository');
+
+    super(req, res, next, repository);
+    this.users = repository;
   }
 
-  getUser = async (req: Request, res: Response) => {
-    const { id } = req.params
+  getUserByIdentifier = () => {
+    return this.tryAction(async () => {
+      const { identifier } = this.req.params;
 
-    const user = await this._userRepository.findById(id)
-    if (!user) {
-      throw errors.notFound('USER_NOT_FOUND')
-    }
+      const user = await this.users.findByIdentifier(identifier);
+      if (!user) {
+        this.throwNotFound('USER_NOT_FOUND');
+      }
 
-    return res.json(user)
-  }
+      return this.respondOne(user);
+    });
+  };
 
-  getUserByIdentifier = async (req: Request, res: Response) => {
-    const { identifier } = req.params
+  getUserByUsername = () => {
+    return this.tryAction(async () => {
+      const { username } = this.req.params;
 
-    const user = await this._userRepository.findByIdentifier(identifier)
-    if (!user) {
-      throw errors.notFound('USER_NOT_FOUND')
-    }
+      const user = await this.users.findByUsername(username);
+      if (!user) {
+        this.throwNotFound('USER_NOT_FOUND');
+      }
 
-    return res.json(user)
-  }
+      return this.respondOne(user);
+    });
+  };
 
-  getUserByUsername = async (req: Request, res: Response) => {
-    const { username } = req.params
+  getUserByEmail = () => {
+    return this.tryAction(async () => {
+      const { email } = this.req.params;
 
-    const user = await this._userRepository.findByUsername(username)
-    if (!user) {
-      throw errors.notFound('USER_NOT_FOUND')
-    }
+      const user = await this.users.findByEmail(email);
+      if (!user) {
+        this.throwNotFound('USER_NOT_FOUND');
+      }
 
-    return res.json(user)
-  }
-
-  getUserByEmail = async (req: Request, res: Response) => {
-    const { email } = req.params
-
-    const user = await this._userRepository.findByEmail(email)
-    if (!user) {
-      throw errors.notFound('USER_NOT_FOUND')
-    }
-
-    return res.json(user)
-  }
+      return this.respondOne(user);
+    });
+  };
 }
 
-export const create = () => new UsersController() 
+export const create = (req: Request, res: Response, next: NextFunction) =>
+  new UsersController(req, res, next);
