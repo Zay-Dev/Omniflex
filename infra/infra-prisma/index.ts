@@ -1,34 +1,41 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from './prisma-client';
 import { IBaseRepository } from '@omniflex/core/types/repository';
 
-export abstract class PrismaBaseRepository<T extends { id: TPrimaryKey }, TPrimaryKey = string>
-implements IBaseRepository<T, TPrimaryKey> {
+export { PrismaClient } from './prisma-client';
+
+export type TEntityWithId = { id: string; };
+
+export class PrismaBaseRepository<
+  TEntity extends { id: TPrimaryKey; },
+  TPrimaryKey = string
+>
+  implements IBaseRepository<TEntity, TPrimaryKey> {
   constructor(
     protected readonly prisma: PrismaClient,
     protected readonly model: string
-  ) {}
+  ) { }
 
   protected get delegate() {
     return this.prisma[this.model];
   }
 
-  async findById(id: TPrimaryKey): Promise<T | null> {
+  async findById(id: TPrimaryKey): Promise<TEntity | null> {
     return this.delegate.findUnique({ where: { id } });
   }
 
-  async findOne(filter: Partial<T>): Promise<T | null> {
+  async findOne(filter: Partial<TEntity>): Promise<TEntity | null> {
     return this.delegate.findFirst({ where: filter });
   }
 
-  async find(filter: Partial<T>): Promise<T[]> {
+  async find(filter: Partial<TEntity>): Promise<TEntity[]> {
     return this.delegate.findMany({ where: filter });
   }
 
-  async create(data: Partial<T>): Promise<T> {
+  async create(data: Partial<TEntity>): Promise<TEntity> {
     return this.delegate.create({ data });
   }
 
-  async update(id: TPrimaryKey, data: Partial<T>): Promise<T | null> {
+  async update(id: TPrimaryKey, data: Partial<TEntity>): Promise<TEntity | null> {
     return this.delegate.update({
       where: { id },
       data

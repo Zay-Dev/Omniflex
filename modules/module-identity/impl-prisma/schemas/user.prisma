@@ -1,0 +1,57 @@
+model User {
+  id              String          @id @default(uuid())
+  isDeleted       Boolean         @default(false)
+  isVerified      Boolean         @default(false)
+  identifier      String          @unique
+  lastSignInAtUtc DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  profile         UserProfile?
+  password        UserPassword?
+  loginAttempts   LoginAttempt[]
+}
+
+model UserProfile {
+  id            String    @id @default(uuid())
+  userId        String    @unique
+  isDeleted     Boolean   @default(false)
+  profileImage  String?
+  email         String?
+  mobileNumber  String?
+  firstName     String?
+  lastName      String?
+  profile       Json?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user          User      @relation(fields: [userId], references: [id])
+}
+
+model UserPassword {
+  id             String    @id @default(uuid())
+  userId         String    @unique
+  isDeleted      Boolean   @default(false)
+  username       String    @unique
+  hashedPassword String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user           User      @relation(fields: [userId], references: [id])
+}
+
+model LoginAttempt {
+  id          String    @id @default(uuid())
+  userId      String
+  isDeleted   Boolean   @default(false)
+  identifier  String
+  loginType   String
+  appType     String
+  success     Boolean
+  ipAddress   String?
+  remark      Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user        User      @relation(fields: [userId], references: [id])
+}

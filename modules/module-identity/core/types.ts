@@ -3,7 +3,7 @@ import { IBaseRepository, TSoftDeletable, TWithTimestamps } from '@omniflex/core
 export type TUser = TSoftDeletable & TWithTimestamps & {
   isVerified: boolean;
   identifier: string;
-  lastSignInAtUtc?: Date;
+  lastSignInAtUtc: Date | null;
 };
 
 export type TUserProfile = TSoftDeletable & TWithTimestamps & {

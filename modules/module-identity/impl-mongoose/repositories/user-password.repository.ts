@@ -9,7 +9,7 @@ export class UserPasswordRepository
     super(model);
   }
 
-  async findByUsername(username: string): Promise<TUserPassword | null> {
+  async findByUsername(username: string) {
     return this.findOne({ username, isDeleted: false });
   }
 }

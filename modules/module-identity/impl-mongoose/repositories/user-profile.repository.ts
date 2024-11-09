@@ -9,11 +9,11 @@ export class UserProfileRepository
     super(model);
   }
 
-  async findByUser(user: TUser): Promise<TUserProfile | null> {
+  async findByUser(user: TUser) {
     return this.findOne({ user, isDeleted: false });
   }
 
-  async findByEmail(email: string): Promise<TUserProfile | null> {
+  async findByEmail(email: string) {
     return this.findOne({ email, isDeleted: false });
   }
 }

@@ -9,15 +9,15 @@ export class UserRepository
     super(model);
   }
 
-  async findByIdentifier(identifier: string): Promise<TUser | null> {
+  async findByIdentifier(identifier: string) {
     return this.findOne({ identifier, isDeleted: false });
   }
 
-  async findByUsername(username: string): Promise<TUser | null> {
+  async findByUsername(username: string) {
     return this.model.findOne({ 'password.username': username });
   }
 
-  async findByEmail(email: string): Promise<TUser | null> {
+  async findByEmail(email: string) {
     return this.model.findOne({ 'profile.email': email });
   }
 }

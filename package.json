@@ -7,7 +7,8 @@
     "ws-run": "yarn workspace",
     "build": "yarn workspaces run build",
     "dev:server": "yarn workspace apps-server dev",
-    "start:server": "yarn workspace apps-server start"
+    "start:server": "yarn workspace apps-server start",
+    "prisma:schemas": "node scripts/create-prisma-links.mjs"
   },
   "workspaces": [
     "core",

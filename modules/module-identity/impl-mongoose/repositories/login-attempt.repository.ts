@@ -9,7 +9,7 @@ export class LoginAttemptRepository
     super(model);
   }
 
-  async findByUser(user: TUser): Promise<TLoginAttempt[]> {
+  async findByUser(user: TUser) {
     return this.find({ user, isDeleted: false });
   }
 }
