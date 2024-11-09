@@ -27,8 +27,15 @@ export class PrismaBaseRepository<
     return this.delegate.findFirst({ where: filter });
   }
 
-  async find(filter: Partial<TEntity>): Promise<TEntity[]> {
-    return this.delegate.findMany({ where: filter });
+  async find(
+    filter: Partial<TEntity>,
+    options?: { skip?: number; take?: number }
+  ): Promise<TEntity[]> {
+    return this.delegate.findMany({
+      where: filter,
+      skip: options?.skip,
+      take: options?.take
+    });
   }
 
   async create(data: Partial<TEntity>): Promise<TEntity> {

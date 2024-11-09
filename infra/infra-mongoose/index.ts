@@ -13,8 +13,21 @@ export class MongooseBaseRepository<T extends Document, TPrimaryKey = string>
     return this.model.findOne(filter as FilterQuery<T>).exec();
   }
 
-  async find(filter: Partial<T>): Promise<T[]> {
-    return this.model.find(filter as FilterQuery<T>).exec();
+  async find(
+    filter: Partial<T>,
+    options?: { skip?: number; take?: number }
+  ): Promise<T[]> {
+    const query = this.model.find(filter as FilterQuery<T>);
+    
+    if (options?.skip !== undefined) {
+      query.skip(options.skip);
+    }
+    
+    if (options?.take !== undefined) {
+      query.limit(options.take);
+    }
+    
+    return query.exec();
   }
 
   async create(data: Partial<T>): Promise<T> {

@@ -80,4 +80,15 @@ export class BaseExpressController<TLocals extends TBaseLocals = TBaseLocals> {
 
     return 10;
   }
+
+  protected page() {
+    const rawPage = this.req.query.page;
+    const page = rawPage ? +rawPage : undefined;
+
+    if (page && !isNaN(page)) {
+      return page;
+    }
+
+    return 1;
+  }
 }
