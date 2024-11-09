@@ -1,4 +1,5 @@
 import { Awilix } from '@omniflex/core/containers';
+import { IHashProvider } from '@omniflex/core/types/hash';
 
 import {
   IUserRepository,
@@ -8,6 +9,8 @@ import {
 } from './types';
 
 type TIdentityContainer = {
+    hashProvider: IHashProvider;
+
   userRepository: IUserRepository;
   userProfileRepository: IUserProfileRepository;
   userPasswordRepository: IUserPasswordRepository;
@@ -22,4 +25,10 @@ export const registerRepositories = (repositories: Partial<TIdentityContainer>) 
       [key]: Awilix.asValue(value)
     });
   }
+};
+
+export const registerHashProvider = (provider: IHashProvider) => {
+  container.register({
+    hashProvider: Awilix.asValue(provider)
+  });
 };
