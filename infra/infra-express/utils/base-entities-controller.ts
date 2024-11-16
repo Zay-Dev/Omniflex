@@ -1,5 +1,5 @@
 import { errors } from '@omniflex/core';
-import { IBaseRepository } from '@omniflex/core/types/repository';
+import { IBaseRepository } from '@omniflex/core/types';
 
 import { BaseExpressController } from './base-controller';
 import { Request, Response, NextFunction, TLocals } from '../types';

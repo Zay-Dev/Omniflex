@@ -17,6 +17,7 @@
     }
   },
   "dependencies": {
+    "@omniflex/core": "0.1.0",
     "mongoose": "^8.8.0"
   },
   "devDependencies": {}

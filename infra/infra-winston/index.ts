@@ -1,11 +1,8 @@
 import * as Transport from 'winston-transport';
 import { WinstonLogger } from './winston-logger';
 
-import { ILogger } from '@omniflex/core/types/logger';
-import { TBaseConfig } from '@omniflex/core/types/config';
-
-import { configAs } from '@omniflex/core/config';
-import { appContainer, Awilix } from '@omniflex/core/containers';
+import { configAs } from '@omniflex/core/containers';
+import { ILogger, TBaseConfig } from '@omniflex/core/types';
 
 import {
   format,
@@ -25,15 +22,13 @@ const myFormat = printf(({ level, message, timestamp }) => {
 
 export const createLogger = ({
   transports = [],
-  noInject = false,
   noConsole = false,
+  config = configAs<TBaseConfig>(),
 }: {
-  noInject?: boolean;
   noConsole?: boolean;
+  config?: TBaseConfig;
   transports?: Transport[];
 } = {}): ILogger => {
-  const config = configAs<TBaseConfig>();
-
   const logger = new WinstonLogger(
     createWinstonLogger({
       level: config.logging.level,
@@ -50,12 +45,6 @@ export const createLogger = ({
       ].filter(Boolean) as any,
     })
   );
-
-  if (!noInject) {
-    appContainer.register({
-      logger: Awilix.asValue(logger),
-    });
-  }
 
   return logger;
 };

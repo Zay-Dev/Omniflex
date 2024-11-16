@@ -1,6 +1,6 @@
 import morgan from 'morgan';
-import { Request, Response } from '../types';
 import { logger } from '@omniflex/core';
+import { Request, Response } from '../types';
 
 // Constants for request classification
 const SUSPICIOUS_PATHS = [

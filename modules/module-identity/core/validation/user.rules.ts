@@ -1,7 +1,7 @@
 import { errors } from '@omniflex/core';
 import { resolve } from '../containers';
 
-const { repositories } = resolve();
+const repositories = resolve();
 
 export const throwIfConflictingUsername = async ({ username }) => {
   const userExists = await repositories.users.exists({

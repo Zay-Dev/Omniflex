@@ -1,7 +1,7 @@
 import { Awilix } from '@omniflex/core/containers';
-import { IHashProvider } from '@omniflex/core/types/hash';
 
 import {
+  TUser,
   IUserRepository,
   IUserProfileRepository,
   IUserPasswordRepository,
@@ -9,7 +9,6 @@ import {
 } from './types';
 
 type TIdentityContainer = {
-  hashProvider: IHashProvider;
   userRepository: IUserRepository;
   userProfileRepository: IUserProfileRepository;
   userPasswordRepository: IUserPasswordRepository;
@@ -17,16 +16,6 @@ type TIdentityContainer = {
 };
 
 export const container = Awilix.createContainer<TIdentityContainer>();
-
-export const resolve = () => ({
-  hashProvider: container.resolve('hashProvider'),
-  repositories: {
-    users: container.resolve('userRepository'),
-    profiles: container.resolve('userProfileRepository'),
-    passwords: container.resolve('userPasswordRepository'),
-    loginAttempts: container.resolve('loginAttemptRepository')
-  }
-});
 
 export const registerRepositories = (repositories: Partial<TIdentityContainer>) => {
   for (const [key, value] of Object.entries(repositories)) {
@@ -36,8 +25,13 @@ export const registerRepositories = (repositories: Partial<TIdentityContainer>) 
   }
 };
 
-export const registerHashProvider = (provider: IHashProvider) => {
-  container.register({
-    hashProvider: Awilix.asValue(provider)
-  });
+export const resolve = <T extends TUser = TUser>() => {
+  const users = container.resolve<IUserRepository<T>>('userRepository');
+
+  return {
+    users,
+    profiles: container.resolve('userProfileRepository'),
+    passwords: container.resolve('userPasswordRepository'),
+    loginAttempts: container.resolve('loginAttemptRepository'),
+  };
 };

@@ -36,11 +36,11 @@ export type TLoginAttempt = TSoftDeletable & TWithTimestamps & {
   remark?: any;
 };
 
-export interface IUserRepository
-  extends IBaseRepository<TUser, string> {
-  findByIdentifier(identifier: string): Promise<TUser | null>;
-  findByUsername(username: string): Promise<TUser | null>;
-  findByEmail(email: string): Promise<TUser | null>;
+export interface IUserRepository<T extends TUser = TUser>
+  extends IBaseRepository<T, string> {
+  findByIdentifier(identifier: string): Promise<T | null>;
+  findByUsername(username: string): Promise<T | null>;
+  findByEmail(email: string): Promise<T | null>;
 }
 
 export interface IUserProfileRepository

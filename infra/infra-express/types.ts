@@ -1,4 +1,4 @@
-import { BaseError } from '@omniflex/core/types/error';
+import { BaseError } from '@omniflex/core/types';
 
 import {
   Router,

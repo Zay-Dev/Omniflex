@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import jwt from 'jsonwebtoken';
 
 import { errors } from '@omniflex/core';
-import { configAs } from '@omniflex/core/config';
+import { configAs } from '@omniflex/core/containers';
 
 import {
   TJwtConfig,

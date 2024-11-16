@@ -1,6 +1,14 @@
 import { Schema } from 'mongoose';
+import { TBaseConfig } from '@omniflex/core/types';
 
 const toRequired = (type) => ({ ...type, required: true });
+
+export type TMongooseConfig = TBaseConfig & {
+  mongoose: {
+    uri: string;
+    dbName: string;
+  },
+};
 
 export const optionalInteger = {
   type: Number,

@@ -1,5 +1,5 @@
 import { logger, errors } from '@omniflex/core';
-import { configAs } from '@omniflex/core/config';
+import { configAs } from '@omniflex/core/containers';
 
 import { THydratedRouter } from '../types';
 import { IRoute, ILayer } from 'express-serve-static-core';

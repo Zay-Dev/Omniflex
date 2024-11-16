@@ -6,6 +6,10 @@
     "build": "tsc && tsc-alias"
   },
   "exports": {
+    "./types": {
+      "development": "./types/index.ts",
+      "import": "./dist/types/index.js"
+    },
     "./types/*": {
       "development": "./types/*.ts",
       "import": "./dist/types/*.js"
@@ -13,10 +17,6 @@
     "./containers": {
       "development": "./containers.ts",
       "import": "./dist/containers.js"
-    },
-    "./config": {
-      "development": "./config.ts",
-      "import": "./dist/config.js"
     },
     ".": {
       "development": "./index.ts",

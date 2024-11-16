@@ -4,7 +4,7 @@ import { IUserRepository, TUser } from '@omniflex/module-identity-core/types';
 
 export class UserRepository
   extends MongooseBaseRepository<TUser & Document>
-  implements IUserRepository {
+  implements IUserRepository<TUser> {
   constructor(model: Model<TUser & Document>) {
     super(model);
   }

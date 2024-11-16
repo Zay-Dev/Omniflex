@@ -1,7 +1,6 @@
+import { configAs } from '@omniflex/core/containers';
 import { BaseError } from '@omniflex/core/types/error';
-import { Request, Response, NextFunction } from 'express';
-import { logger } from '@omniflex/core';
-import { configAs } from '@omniflex/core/config';
+import { Request, Response, NextFunction } from '../types';
 
 export const errorHandler = (
   error: Error | BaseError,

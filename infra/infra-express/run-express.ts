@@ -1,6 +1,6 @@
 import { TStartOptions } from './types';
 import { logger } from '@omniflex/core';
-import { ILogger } from '@omniflex/core/types/logger';
+import { ILogger } from '@omniflex/core/types';
 import { bindAsyncFunctionDefaultErrorHandler } from './helpers/routers';
 
 import express, { Express, Router } from 'express';

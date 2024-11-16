@@ -11,6 +11,10 @@ if (!appContainer.hasRegistration('errorFactory')) {
 export const logger = appContainer.resolve('logger');
 export const errors = appContainer.resolve('errorFactory');
 
+export const providers = {
+  hash: appContainer.resolve('hashProvider'),
+};
+
 export const handleUncaughtException = () => {
   process.on('uncaughtException', error => {
     console.error(`\

@@ -7,13 +7,9 @@
     "build": "tsc && tsc-alias"
   },
   "exports": {
-    "./repositories/*": {
-      "development": "./repositories/*.ts",
-      "import": "./dist/repositories/*.js"
-    },
-    "./models": {
-      "development": "./models/index.ts",
-      "import": "./dist/models/index.js"
+    "./schemas": {
+      "development": "./schemas.ts",
+      "import": "./dist/schemas.js"
     },
     ".": {
       "development": "./index.ts",
