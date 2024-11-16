@@ -4,10 +4,8 @@ import { IErrorFactory } from './types/error';
 import { ILogger } from './types/logger';
 import { IHashProvider } from './types/hash';
 
-import Awilix, {
-  AwilixContainer,
-  createContainer,
-} from 'awilix';
+import * as Awilix from 'awilix';
+import { AwilixContainer, createContainer } from 'awilix';
 
 type TContainer = {
   logger: ILogger;
