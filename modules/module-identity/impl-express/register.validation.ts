@@ -1,9 +1,8 @@
-import { errors } from '@omniflex/core';
+import { Request, Response, NextFunction } from 'express';
 import { validateRequestBody } from '@omniflex/infra-express/helpers/joi';
-import { Request, Response, NextFunction } from '@omniflex/infra-express/types';
 
-import * as Rules from '@omniflex/module-identity-core/validation/user.rules';
-import { schemas } from '@omniflex/module-identity-core/validation/user.schema';
+import * as Rules from '@omniflex/module-identity-core/user.rules';
+import { schemas } from '@omniflex/module-identity-core/user.schema';
 
 export const validateRegister = [
   async (req: Request, res: Response, next: NextFunction) => {
@@ -28,7 +27,7 @@ export const validateRegister = [
 ];
 
 export const validateRegisterWithEmail = [
-  async (req: Request, res: Response, next: NextFunction) => {
+  (req: Request, res: Response, next: NextFunction) => {
     try {
       validateRequestBody(req, schemas.registerWithEmail);
     } catch (error) {
@@ -40,7 +39,7 @@ export const validateRegisterWithEmail = [
 
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      Rules.throwIfConflictingEmail(req.body);
+      await Rules.throwIfConflictingEmail(req.body);
     } catch (error) {
       return next(error);
     }

@@ -7,13 +7,9 @@
     "build": "tsc && tsc-alias"
   },
   "exports": {
-    "./controllers/*": {
-      "development": "./controllers/*.ts",
-      "import": "./dist/controllers/*.js"
-    },
-    "./middlewares/*": {
-      "development": "./middlewares/*.ts",
-      "import": "./dist/middlewares/*.js"
+    "./*": {
+      "development": "./*.ts",
+      "import": "./*.js"
     },
     ".": {
       "development": "./index.ts",

@@ -1,9 +1,9 @@
 import { errors, providers } from '@omniflex/core';
 
-import { TUser } from '../types';
-import { resolve } from '../containers';
+import { TUser } from './types';
+import { resolve } from './containers';
 
-const { hash, verify } = providers.hash;
+const hashProvider = providers.hash;
 const { users, profiles, passwords, loginAttempts } = resolve();
 
 type TRegisterProfile = {
@@ -40,7 +40,7 @@ export class PasswordAuthService {
   ) {
     const { username, password } = info;
 
-    const hashedPassword = await hash(password);
+    const hashedPassword = await hashProvider.hash(password);
     const user = await users.create({ identifier: username });
 
     await passwords.create({
@@ -94,7 +94,7 @@ export class PasswordAuthService {
       throw errors.unauthorized();
     }
 
-    const isValidPassword = await verify(
+    const isValidPassword = await hashProvider.verify(
       values.password,
       password.hashedPassword
     );

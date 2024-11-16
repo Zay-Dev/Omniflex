@@ -6,13 +6,9 @@
     "build": "tsc && tsc-alias"
   },
   "exports": {
-    "./controllers": {
-      "development": "./controllers/index.ts",
-      "import": "./dist/controllers/index.js"
-    },
-    "./validation": {
-      "development": "./validation/*.ts",
-      "import": "./dist/validation/*.js"
+    "./*": {
+      "development": "./*.ts",
+      "import": "./dist/*.js"
     },
     ".": {
       "development": "./index.ts",

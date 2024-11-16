@@ -1,14 +1,15 @@
-import { container } from '@omniflex/module-identity-core/containers';
+import { Request, Response, NextFunction } from 'express';
 import { BaseEntitiesController } from '@omniflex/infra-express/utils/base-entities-controller';
 
-import { Request, Response, NextFunction } from '@omniflex/infra-express/types';
+import { container } from '@omniflex/module-identity-core/containers';
 import { IUserRepository, TUser } from '@omniflex/module-identity-core/types';
 
-export class UsersController extends BaseEntitiesController<TUser> {
-  protected users: IUserRepository = null as any;
+export class UsersController<T extends TUser = TUser>
+  extends BaseEntitiesController<T> {
+  protected users: IUserRepository<T> = null as any;
 
-  constructor(req: Request, res: Response, next: NextFunction) {
-    const repository = container.resolve<IUserRepository>('userRepository');
+  constructor(req, res, next) {
+    const repository = container.resolve<IUserRepository<T>>('userRepository');
 
     super(req, res, next, repository);
     this.users = repository;
@@ -54,5 +55,9 @@ export class UsersController extends BaseEntitiesController<TUser> {
   };
 }
 
-export const create = (req: Request, res: Response, next: NextFunction) =>
-  new UsersController(req, res, next);
+export const getCreator = <T extends UsersController = UsersController>(
+  constructor: new (req: Request, res: Response, next: NextFunction) => T
+) => {
+  return (req: Request, res: Response, next: NextFunction) =>
+    new constructor(req, res, next);
+};

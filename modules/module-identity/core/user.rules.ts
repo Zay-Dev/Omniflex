@@ -1,5 +1,5 @@
+import { resolve } from './containers';
 import { errors } from '@omniflex/core';
-import { resolve } from '../containers';
 
 const repositories = resolve();
 
@@ -20,5 +20,5 @@ export const throwIfConflictingUsername = async ({ username }) => {
 };
 
 export const throwIfConflictingEmail = async ({ email }) => {
-  throwIfConflictingUsername({ username: email });
+  return await throwIfConflictingUsername({ username: email });
 };
