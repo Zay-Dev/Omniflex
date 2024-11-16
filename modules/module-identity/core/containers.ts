@@ -1,4 +1,4 @@
-import { Awilix } from '@omniflex/core/containers';
+import * as Awilix from 'awilix';
 
 import {
   TUser,

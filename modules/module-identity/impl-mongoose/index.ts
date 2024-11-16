@@ -1,5 +1,5 @@
 import { Connection } from 'mongoose';
-import { appContainerAs } from '@omniflex/core/containers';
+import { Containers } from '@omniflex/core';
 import { registerRepositories } from '@omniflex/module-identity-core';
 
 import * as Schemas from './schemas';
@@ -10,7 +10,7 @@ export * from './repositories';
 
 function get<T>(fn: () => T) { return fn(); }
 
-const appContainer = appContainerAs<{ mongoose: Connection; }>();
+const appContainer = Containers.appContainerAs<{ mongoose: Connection; }>();
 
 export const createRegisteredRepositories = (
   userSchema = get(Schemas.getUserSchema),

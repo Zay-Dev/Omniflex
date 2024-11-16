@@ -1,12 +1,11 @@
-import { appContainer } from './containers';
+import * as Containers from './containers';
 import { errorFactory } from './error-factory';
-import { Awilix } from './containers';
 
-if (!appContainer.hasRegistration('errorFactory')) {
-  appContainer.register({
-    errorFactory: Awilix.asValue(errorFactory)
-  });
-}
+const { appContainer } = Containers;
+
+Containers.asValue('errorFactory', errorFactory);
+
+export * as Containers from './containers';
 
 export const logger = appContainer.resolve('logger');
 export const errors = appContainer.resolve('errorFactory');

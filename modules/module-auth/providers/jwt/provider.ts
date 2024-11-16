@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import jwt from 'jsonwebtoken';
 
 import { errors } from '@omniflex/core';
-import { configAs } from '@omniflex/core/containers';
+import { Containers } from '@omniflex/core';
 
 import {
   TJwtConfig,
@@ -11,7 +11,7 @@ import {
   IJwtProvider,
 } from './types';
 
-const baseConfig = configAs<TAuthConfig>();
+const baseConfig = Containers.configAs<TAuthConfig>();
 const loadKey = (path: string) => fs.readFile(path, 'utf8');
 
 export class JwtProvider implements IJwtProvider {

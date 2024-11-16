@@ -14,10 +14,6 @@
       "development": "./types/*.ts",
       "import": "./dist/types/*.js"
     },
-    "./containers": {
-      "development": "./containers.ts",
-      "import": "./dist/containers.js"
-    },
     ".": {
       "development": "./index.ts",
       "import": "./dist/index.js"

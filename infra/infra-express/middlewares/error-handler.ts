@@ -1,4 +1,4 @@
-import { configAs } from '@omniflex/core/containers';
+import { Containers } from '@omniflex/core';
 import { BaseError } from '@omniflex/core/types/error';
 import { Request, Response, NextFunction } from '../types';
 
@@ -38,7 +38,7 @@ const handleBaseError = (error: BaseError, req: Request, res: Response) => {
 };
 
 const getErrorResponseBody = (error: Error | BaseError) => {
-  const config = configAs();
+  const config = Containers.configAs();
   const exposeData = error instanceof BaseError &&
     config.logging.exposeErrorDetails;
 

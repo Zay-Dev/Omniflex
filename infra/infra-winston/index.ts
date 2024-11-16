@@ -1,7 +1,7 @@
 import * as Transport from 'winston-transport';
 import { WinstonLogger } from './winston-logger';
 
-import { configAs } from '@omniflex/core/containers';
+import { Containers } from '@omniflex/core';
 import { ILogger, TBaseConfig } from '@omniflex/core/types';
 
 import {
@@ -23,7 +23,7 @@ const myFormat = printf(({ level, message, timestamp }) => {
 export const createLogger = ({
   transports = [],
   noConsole = false,
-  config = configAs<TBaseConfig>(),
+  config = Containers.configAs<TBaseConfig>(),
 }: {
   noConsole?: boolean;
   config?: TBaseConfig;

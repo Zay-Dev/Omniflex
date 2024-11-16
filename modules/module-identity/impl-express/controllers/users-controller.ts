@@ -1,5 +1,5 @@
-import { BaseEntitiesController } from '@omniflex/infra-express/utils/base-entities-controller';
 import { container } from '@omniflex/module-identity-core/containers';
+import { BaseEntitiesController } from '@omniflex/infra-express/utils/base-entities-controller';
 
 import { Request, Response, NextFunction } from '@omniflex/infra-express/types';
 import { IUserRepository, TUser } from '@omniflex/module-identity-core/types';

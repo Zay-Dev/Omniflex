@@ -1,5 +1,5 @@
+import { Containers } from '@omniflex/core';
 import { logger, errors } from '@omniflex/core';
-import { configAs } from '@omniflex/core/containers';
 
 import { THydratedRouter } from '../types';
 import { IRoute, ILayer } from 'express-serve-static-core';
@@ -112,7 +112,7 @@ ${handle.toString()}`
         });
 
         if (!promise) {
-          const config = configAs();
+          const config = Containers.configAs();
 
           setTimeout(() => {
             if (!res.headersSent) {

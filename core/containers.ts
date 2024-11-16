@@ -4,8 +4,7 @@ import { IErrorFactory } from './types/error';
 import { ILogger } from './types/logger';
 import { IHashProvider } from './types/hash';
 
-import {
-  asValue,
+import Awilix, {
   AwilixContainer,
   createContainer,
 } from 'awilix';
@@ -18,16 +17,32 @@ type TContainer = {
   hashProvider: IHashProvider;
 } & Record<string, any>;
 
-export * as Awilix from 'awilix';
-
 export const appContainer = createContainer<TContainer>();
+
+export const asValue = (
+  key: string,
+  value: any,
+  { override }: { override?: boolean; } = {},
+) => {
+  if (!override) {
+    if (appContainer.hasRegistration(key)) {
+      return appContainer;
+    }
+  }
+
+  return appContainer.register({
+    [key]: Awilix.asValue(value),
+  });
+};
 
 export const asValues = (services: Partial<TContainer>) => {
   for (const [key, value] of Object.entries(services)) {
     appContainer.register({
-      [key]: asValue(value),
+      [key]: Awilix.asValue(value),
     });
   }
+
+  return appContainer;
 };
 
 export const configAs = <T extends TBaseConfig = TBaseConfig>() => {
