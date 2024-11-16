@@ -1,4 +1,4 @@
-import { BaseError, IErrorFactory, TErrorOptions } from './types/error';
+import { BaseError, IErrorFactory, TErrorOptions } from '../types/error';
 
 class ErrorFactory implements IErrorFactory {
   unauthorized(options?: Partial<Omit<TErrorOptions, 'code' | 'message'>>) {

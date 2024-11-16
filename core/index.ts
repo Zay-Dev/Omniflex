@@ -1,5 +1,5 @@
 import * as Containers from './containers';
-import { errorFactory } from './error-factory';
+import { errorFactory } from './impl/error-factory';
 
 const { appContainer } = Containers;
 
