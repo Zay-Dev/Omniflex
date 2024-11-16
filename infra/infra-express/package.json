@@ -10,6 +10,14 @@
       "development": "./types.ts",
       "import": "./dist/types.js"
     },
+    "./helpers": {
+      "development": "./helpers/*.ts",
+      "import": "./dist/helpers/*.js"
+    },
+    "./utils": {
+      "development": "./utils/*.ts",
+      "import": "./dist/utils/*.js"
+    },
     ".": {
       "development": "./index.ts",
       "import": "./dist/index.js"
