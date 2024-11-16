@@ -112,12 +112,12 @@ const start = (options?: Omit<TStartOptions, "servers">) => {
       return setup;
     });
 
-  runExpress({
+  handleUncaughtException();
+
+  return runExpress({
     ...(options || {}),
     servers: parsedServers,
   });
-
-  handleUncaughtException();
 };
 
 export const AutoServer = {

@@ -29,6 +29,11 @@ export const runExpress = ({
       type: server.type,
       port: server.port,
     });
+
+    return {
+      app,
+      type: server.type,
+    };
   }));
 };
 

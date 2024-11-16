@@ -10,11 +10,11 @@
       "development": "./types.ts",
       "import": "./dist/types.js"
     },
-    "./helpers": {
+    "./helpers/*": {
       "development": "./helpers/*.ts",
       "import": "./dist/helpers/*.js"
     },
-    "./utils": {
+    "./utils/*": {
       "development": "./utils/*.ts",
       "import": "./dist/utils/*.js"
     },
