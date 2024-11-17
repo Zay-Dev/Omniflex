@@ -1,21 +1,28 @@
 import { Request, Response, NextFunction } from 'express';
 import { BaseEntitiesController } from '@omniflex/infra-express/utils/base-entities-controller';
 
-import { container } from '@omniflex/module-identity-core/containers';
-import { IUserRepository, TUser } from '@omniflex/module-identity-core/types';
+import { resolve } from '@omniflex/module-identity-core';
 
 import { PasswordAuthService }
   from '@omniflex/module-identity-core/password-auth.service';
 
+import {
+  TUser,
+  IUserRepository,
+  IUserProfileRepository,
+} from '@omniflex/module-identity-core/types';
+
 export class UsersController<T extends TUser = TUser>
   extends BaseEntitiesController<T> {
-  protected users: IUserRepository<T> = null as any;
+  protected users: IUserRepository<T>;
+  protected profiles: IUserProfileRepository;
 
   constructor(req, res, next) {
-    const repository = container.resolve<IUserRepository<T>>('userRepository');
+    const { users, profiles } = resolve<T>();
+    super(req, res, next, users);
 
-    super(req, res, next, repository);
-    this.users = repository;
+    this.users = users;
+    this.profiles = profiles;
   }
 
   protected async register(
@@ -42,44 +49,12 @@ export class UsersController<T extends TUser = TUser>
       });
   }
 
-  getUserByIdentifier = () => {
-    return this.tryAction(async () => {
-      const { identifier } = this.req.params;
-
-      const user = await this.users.findByIdentifier(identifier);
-      if (!user) {
-        this.throwNotFound('USER_NOT_FOUND');
-      }
-
-      return this.respondOne(user);
+  protected async getProfile(userId: any) {
+    return this.profiles.findOne({
+      user: userId,
+      isDeleted: false,
     });
-  };
-
-  getUserByUsername = () => {
-    return this.tryAction(async () => {
-      const { username } = this.req.params;
-
-      const user = await this.users.findByUsername(username);
-      if (!user) {
-        this.throwNotFound('USER_NOT_FOUND');
-      }
-
-      return this.respondOne(user);
-    });
-  };
-
-  getUserByEmail = () => {
-    return this.tryAction(async () => {
-      const { email } = this.req.params;
-
-      const user = await this.users.findByEmail(email);
-      if (!user) {
-        this.throwNotFound('USER_NOT_FOUND');
-      }
-
-      return this.respondOne(user);
-    });
-  };
+  }
 }
 
 export const getCreator = <T extends UsersController = UsersController>(
