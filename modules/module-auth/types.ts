@@ -9,6 +9,7 @@ export type TAuthenticationResult<TUser = TAuthenticatedUser> = {
 export interface IAuthenticationProvider<TInput = any> {
   get401Error(errorCode?: string): void;
 
+  canAuth(data: TInput): boolean;
   authenticate<TUser = TAuthenticatedUser>(data: TInput): Promise<TAuthenticationResult<TUser>>;
 }
 

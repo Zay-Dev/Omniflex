@@ -11,7 +11,6 @@ import {
   IJwtProvider,
 } from './types';
 
-const baseConfig = Containers.configAs<TAuthConfig>();
 const loadKey = (path: string) => fs.readFile(path, 'utf8');
 
 export class JwtProvider implements IJwtProvider {
@@ -53,16 +52,16 @@ export class JwtProvider implements IJwtProvider {
       ) as TJwtPayload;
     } catch (error) {
       if (error instanceof jwt.TokenExpiredError) {
-        throw this.get401Error("TOKEN_EXPIRED");
+        throw this.get401Error();
       }
 
-      throw this.get401Error("INVALID_TOKEN");
+      throw this.get401Error();
     }
   }
 
   async authenticate(token: string) {
     if (!token) {
-      throw errors.unauthorized({ error: 'NO_TOKEN' });
+      throw this.get401Error();
     }
 
     const payload = await this.verifyToken(
@@ -70,6 +69,12 @@ export class JwtProvider implements IJwtProvider {
     );
 
     return { user: { ...payload } as any };
+  }
+
+  canAuth(token: string) {
+    const sanitized = this.sanitizeToken(token);
+
+    return !!sanitized;
   }
 
   private sanitizeToken(token: string) {
@@ -88,6 +93,8 @@ export class JwtProvider implements IJwtProvider {
 }
 
 export const create = (config?: Partial<TJwtConfig>) => {
+  const baseConfig = Containers.configAs<TAuthConfig>();
+
   return new JwtProvider({
     ...baseConfig.jwt,
     ...(config || {}),
