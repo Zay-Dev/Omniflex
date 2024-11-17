@@ -3,7 +3,10 @@ import { Model, Document, FilterQuery } from 'mongoose';
 
 export class MongooseBaseRepository<T extends Document, TPrimaryKey = string>
   implements IBaseRepository<T, TPrimaryKey> {
-  constructor(protected readonly model: Model<T>) { }
+  constructor(
+    protected readonly model: Model<T>,
+    public noLean: boolean = false,
+  ) { }
 
   async exists(filter: Partial<T>): Promise<boolean> {
     const count = await this.model.countDocuments(filter as FilterQuery<T>);
@@ -12,11 +15,15 @@ export class MongooseBaseRepository<T extends Document, TPrimaryKey = string>
   }
 
   findById(id: TPrimaryKey): Promise<T | null> {
-    return this.model.findById(id).exec();
+    const query = this.model.findById(id);
+
+    return this.noLean ? query : query.lean<T>();
   }
 
   findOne(filter: Partial<T>): Promise<T | null> {
-    return this.model.findOne(filter as FilterQuery<T>).exec();
+    const query = this.model.findOne(filter as FilterQuery<T>);
+
+    return this.noLean ? query : query.lean<T>();
   }
 
   find(
@@ -33,25 +40,30 @@ export class MongooseBaseRepository<T extends Document, TPrimaryKey = string>
       query.limit(options.take);
     }
 
-    return query.exec();
+    return this.noLean ? query : query.lean<T[]>();
   }
 
   create(data: Partial<T>): Promise<T> {
-    return this.model.create(data);
+    const query = this.model.create(data);
+
+    return this.noLean ? query :
+      query.then(result => result.toObject());
   }
 
   update(id: TPrimaryKey, data: Partial<T>): Promise<T | null> {
-    return this.model.findByIdAndUpdate(id, data, { new: true }).exec();
+    const query = this.model.findByIdAndUpdate(id, data, { new: true });
+
+    return this.noLean ? query : query.lean<T>();
   }
 
   async delete(id: TPrimaryKey): Promise<boolean> {
-    const result = await this.model.findByIdAndDelete(id).exec();
+    const result = await this.model.findByIdAndDelete(id);
 
     return !!result;
   }
 
   async softDelete(id: TPrimaryKey): Promise<boolean> {
-    const result = await this.model.findByIdAndUpdate(id, { isDeleted: true }).exec();
+    const result = await this.model.findByIdAndUpdate(id, { isDeleted: true });
 
     return !!result;
   }
