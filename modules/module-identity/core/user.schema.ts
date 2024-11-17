@@ -10,11 +10,23 @@ export type TBodyRegister = {
   mobileNumber?: string;
 };
 
-export type TBodyRegisterWithEmail = TBodyRegister & {
+export type TBodyRegisterWithEmail = Omit<TBodyRegister, "username"> & {
   email: string;
 };
 
-const baseSchema = {
+export type TBodyLogin = {
+  username: string;
+  password: string;
+};
+
+export type TBodyLoginWithEmail = {
+  email: string;
+  password: string;
+};
+
+const email = Joi.string().trim().email().lowercase();
+
+const baseRegisterSchema = {
   password: Joi.string()
     .trim()
     .regex(/[a-z]/)
@@ -37,10 +49,12 @@ const baseSchema = {
   mobileNumber: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/),
 };
 
-const email = Joi.string().trim().email().lowercase();
+const baseLoginSchema = {
+  password: Joi.string().trim().required(),
+};
 
 const schemaRegister = Joi.object<TBodyRegister>({
-  ...baseSchema,
+  ...baseRegisterSchema,
 
   username: Joi.string()
     .trim()
@@ -52,7 +66,19 @@ const schemaRegister = Joi.object<TBodyRegister>({
 }).unknown();
 
 const schemaRegisterWithEmail = Joi.object<TBodyRegisterWithEmail>({
-  ...baseSchema,
+  ...baseRegisterSchema,
+
+  email: email.required(),
+}).unknown();
+
+const schemaLogin = Joi.object<TBodyLogin>({
+  ...baseLoginSchema,
+
+  username: Joi.string().trim().required(),
+}).unknown();
+
+const schemaLoginWithEmail = Joi.object<TBodyLoginWithEmail>({
+  ...baseLoginSchema,
 
   email: email.required(),
 }).unknown();
@@ -60,4 +86,7 @@ const schemaRegisterWithEmail = Joi.object<TBodyRegisterWithEmail>({
 export const schemas = {
   register: schemaRegister,
   registerWithEmail: schemaRegisterWithEmail,
+
+  login: schemaLogin,
+  loginWithEmail: schemaLoginWithEmail,
 };

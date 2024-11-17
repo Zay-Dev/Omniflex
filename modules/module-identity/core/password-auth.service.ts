@@ -1,10 +1,12 @@
+import { v4 as uuid } from 'uuid';
 import { errors, providers } from '@omniflex/core';
 
 import { TUser } from './types';
 import { resolve } from './containers';
 
 const hashProvider = providers.hash;
-const { users, profiles, passwords, loginAttempts } = resolve();
+const repositories = resolve<TUser & { _id: any; }>();
+const { users, profiles, passwords, loginAttempts } = repositories;
 
 type TRegisterProfile = {
   email?: string;
@@ -20,6 +22,17 @@ type TRecordLoginAttemptProps = {
   remark?: any;
   success?: boolean;
   ipAddress?: string;
+};
+
+const hashPassword = async (password: string) => {
+  const salt = uuid();
+  const hashedPassword = await hashProvider.hash(`${password}-${salt}`);
+
+  return { salt, hashedPassword };
+};
+
+const verifyPassword = async ({ password, hashedPassword, salt }) => {
+  return hashProvider.verify(`${password}-${salt}`, hashedPassword);
 };
 
 export class PasswordAuthService {
@@ -40,11 +53,12 @@ export class PasswordAuthService {
   ) {
     const { username, password } = info;
 
-    const hashedPassword = await hashProvider.hash(password);
     const user = await users.create({ identifier: username });
+    const { salt, hashedPassword } = await hashPassword(password);
 
     await passwords.create({
       user,
+      salt,
       username,
       hashedPassword,
     });
@@ -62,19 +76,7 @@ export class PasswordAuthService {
     return user;
   }
 
-  async registerWithEmail(
-    password: string,
-    data: TRegisterProfile & { email: string; },
-  ) {
-    const email = data.email.toLowerCase().trim();
-
-    return this.registerWithUsername(
-      { password, username: email },
-      { ...data, email },
-    );
-  }
-
-  async login(values: {
+  async loginByUsername(values: {
     username: string;
     password: string;
     ipAddress?: string;
@@ -94,17 +96,18 @@ export class PasswordAuthService {
       throw errors.unauthorized();
     }
 
-    const isValidPassword = await hashProvider.verify(
-      values.password,
-      password.hashedPassword
-    );
+    const isValidPassword = await verifyPassword({
+      ...values,
+      salt: password.salt,
+      hashedPassword: password.hashedPassword,
+    });
 
     if (!isValidPassword) {
       await recordFail({ user: password.user });
       throw errors.unauthorized();
     }
 
-    const user = await users.findOne({ id: password.user.id });
+    const user = await users.findOne({ _id: password.user });
     if (!user) {
       await recordFail({ user: password.user });
       throw errors.unauthorized();
@@ -116,16 +119,6 @@ export class PasswordAuthService {
 
     await recordFail({ user, success: true });
     return user;
-  }
-
-  async loginWithEmail(values: {
-    email: string;
-    password: string;
-    ipAddress?: string;
-  }) {
-    const email = values.email.toLowerCase().trim();
-
-    return this.login({ ...values, username: email });
   }
 
   private _recordLoginAttempt(data: TRecordLoginAttemptProps) {

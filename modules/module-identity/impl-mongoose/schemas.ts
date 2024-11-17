@@ -31,7 +31,9 @@ export const profileBaseSchema = {
 
 export const passwordBaseSchema = {
   user: toRequiredObjectId('Users'),
+
   isDeleted,
+  salt: requiredString,
   username: requiredString,
   hashedPassword: requiredString,
 };

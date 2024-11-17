@@ -66,6 +66,11 @@ export class BaseExpressController<TLocals extends TBaseLocals = TBaseLocals> {
     throw errors.forbidden();
   }
 
+  protected get ipAddress() {
+    return `${this.req.headers.forwarded || this.req.ip}`.trim() ||
+      undefined;
+  }
+
   protected get pathId() {
     return +this.req.params.id;
   }

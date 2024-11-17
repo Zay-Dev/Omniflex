@@ -22,6 +22,8 @@ export type TUserPassword = TSoftDeletable & TWithTimestamps & {
   id: string;
   user: TUser;
   username: string;
+
+  salt: string;
   hashedPassword: string;
 };
 
