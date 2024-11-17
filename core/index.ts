@@ -6,6 +6,8 @@ const { appContainer } = Containers;
 
 Containers.asValue('errorFactory', errorFactory);
 
+export const modulesSchemas = {} as any;
+
 export * as Containers from './containers';
 
 export const providers = {

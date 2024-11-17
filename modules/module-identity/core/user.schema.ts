@@ -1,4 +1,6 @@
 import Joi from 'joi';
+import j2s from 'joi-to-swagger';
+import { modulesSchemas } from '@omniflex/core';
 
 export type TBodyRegister = {
   username: string;
@@ -89,4 +91,12 @@ export const schemas = {
 
   login: schemaLogin,
   loginWithEmail: schemaLoginWithEmail,
+};
+
+modulesSchemas.moduleIdentity = {
+  register: j2s(schemaRegister).swagger,
+  registerWithEmail: j2s(schemaRegisterWithEmail).swagger,
+
+  login: j2s(schemaLogin).swagger,
+  loginWithEmail: j2s(schemaLoginWithEmail).swagger,
 };
