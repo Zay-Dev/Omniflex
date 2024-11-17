@@ -54,6 +54,8 @@ export const nextRouteIf = <
 };
 
 export const bindAsyncFunctionDefaultErrorHandler = (router: Router) => {
+  if ((router as any)._unsafeRoutes) return;
+
   const handleLayer = (layer: ILayer) => {
     switch (layer.name.toLowerCase()) {
       case 'bound dispatch':
@@ -63,7 +65,11 @@ export const bindAsyncFunctionDefaultErrorHandler = (router: Router) => {
         bindAsyncFunctionDefaultErrorHandler(layer.handle as Router);
         break;
       default:
-        console.log(layer, 'Unhandled');
+        console.log(
+          layer,
+          layer.name.toLowerCase(),
+          'Unhandled'
+        );
         break;
     }
   };
