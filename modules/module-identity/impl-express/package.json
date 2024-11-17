@@ -9,7 +9,7 @@
   "exports": {
     "./*": {
       "development": "./*.ts",
-      "import": "./*.js"
+      "import": "./dist/*.js"
     },
     ".": {
       "development": "./index.ts",
