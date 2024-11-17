@@ -106,7 +106,9 @@ export const requestLogger = () => {
         logger[level](message.trim());
       }
     },
-    skip: (req: Request) => {
+    skip: (req: Request, res: any) => {
+      if (res.locals._noLogger) return true;
+
       // Skip health checks and OPTIONS requests
       return HEALTH_CHECK_PATHS.some(p => req.path.includes(p)) ||
              req.method === 'OPTIONS';
