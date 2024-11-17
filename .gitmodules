@@ -1,3 +1,4 @@
 [submodule "infra/infra-swagger-autogen"]
 	path = infra/infra-swagger-autogen
 	url = git@github.com:Zay-Dev/omniflex-swagger-autogen.git
+	branch = master
