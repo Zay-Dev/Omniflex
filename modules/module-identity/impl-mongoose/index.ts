@@ -12,6 +12,13 @@ function get<T>(fn: () => T) { return fn(); }
 
 const appContainer = Containers.appContainerAs<{ mongoose: Connection; }>();
 
+export const repositories = {} as {
+  users: Repositories.UserRepository;
+  profiles: Repositories.UserProfileRepository;
+  passwords: Repositories.UserPasswordRepository;
+  loginAttempts: Repositories.LoginAttemptRepository;
+};
+
 export const createRegisteredRepositories = (
   userSchema = get(Schemas.getUserSchema),
   profileSchema = get(Schemas.getProfileSchema),
@@ -25,10 +32,15 @@ export const createRegisteredRepositories = (
   const passwordModel = mongoose.model('UserPasswords', passwordSchema);
   const loginAttemptModel = mongoose.model('LoginAttempts', loginAttemptSchema);
 
+  repositories.users = new Repositories.UserRepository(userModel);
+  repositories.profiles = new Repositories.UserProfileRepository(profileModel);
+  repositories.passwords = new Repositories.UserPasswordRepository(passwordModel);
+  repositories.loginAttempts = new Repositories.LoginAttemptRepository(loginAttemptModel);
+
   registerRepositories({
-    userRepository: new Repositories.UserRepository(userModel),
-    userProfileRepository: new Repositories.UserProfileRepository(profileModel),
-    userPasswordRepository: new Repositories.UserPasswordRepository(passwordModel),
-    loginAttemptRepository: new Repositories.LoginAttemptRepository(loginAttemptModel),
+    userRepository: repositories.users,
+    userProfileRepository: repositories.profiles,
+    userPasswordRepository: repositories.passwords,
+    loginAttemptRepository: repositories.loginAttempts,
   });
 };

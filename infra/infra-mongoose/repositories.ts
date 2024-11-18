@@ -8,6 +8,18 @@ export class MongooseBaseRepository<T extends Document, TPrimaryKey = string>
     public noLean: boolean = false,
   ) { }
 
+  getModel() {
+    return this.model;
+  }
+
+  requireLean() {
+    return new MongooseBaseRepository(this.model, true);
+  }
+
+  optionalLean() {
+    return new MongooseBaseRepository(this.model, false);
+  }
+
   async exists(filter: Partial<T>): Promise<boolean> {
     const count = await this.model.countDocuments(filter as FilterQuery<T>);
 
