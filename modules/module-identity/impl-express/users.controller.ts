@@ -47,7 +47,7 @@ export class UsersController<T extends TUser = TUser>
         username,
         password,
         ipAddress: this.ipAddress,
-      });
+      }) as any as Promise<T>;
   }
 
   protected async getProfile(userId: any) {
