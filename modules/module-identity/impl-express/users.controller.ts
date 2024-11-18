@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { getControllerCreator } from '@omniflex/infra-express';
 import { BaseEntitiesController } from '@omniflex/infra-express/utils/base-entities-controller';
 
 import { resolve } from '@omniflex/module-identity-core';
@@ -57,9 +58,4 @@ export class UsersController<T extends TUser = TUser>
   }
 }
 
-export const getCreator = <T extends UsersController = UsersController>(
-  constructor: new (req: Request, res: Response, next: NextFunction) => T
-) => {
-  return (req: Request, res: Response, next: NextFunction) =>
-    new constructor(req, res, next);
-};
+export const getCreator = getControllerCreator<UsersController>();
