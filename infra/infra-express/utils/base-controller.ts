@@ -47,11 +47,11 @@ export class BaseExpressController<TLocals extends TBaseLocals = TBaseLocals> {
     }
   }
 
-  protected respondOne(data: any) {
+  respondOne(data: any) {
     return this.res.json({ data });
   }
 
-  protected respondMany(data: Array<any> = [], total?: number) {
+  respondMany(data: Array<any> = [], total?: number) {
     return this.res.json({
       data,
       total: total || data.length,
