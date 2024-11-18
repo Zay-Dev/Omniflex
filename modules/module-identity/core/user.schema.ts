@@ -94,9 +94,43 @@ export const schemas = {
 };
 
 modulesSchemas.moduleIdentity = {
-  register: j2s(schemaRegister).swagger,
-  registerWithEmail: j2s(schemaRegisterWithEmail).swagger,
+  register: {
+    ...j2s(schemaRegister).swagger,
+    example: {
+      username: 'username',
+      password: 'P@ssword12#',
+      repeatPassword: 'P@ssword12#',
 
-  login: j2s(schemaLogin).swagger,
-  loginWithEmail: j2s(schemaLoginWithEmail).swagger,
+      email: 'license@omniflex.io',
+      firstName: 'John',
+      lastName: 'Doe',
+    } as TBodyRegister & { repeatPassword; },
+  },
+
+  registerWithEmail: {
+    ...j2s(schemaRegisterWithEmail).swagger,
+    example: {
+      email: 'license@omniflex.io',
+      password: 'P@ssword12#',
+      repeatPassword: 'P@ssword12#',
+
+      firstName: 'John',
+      lastName: 'Doe',
+    } as TBodyRegisterWithEmail & { repeatPassword; },
+  },
+
+  login: {
+    ...j2s(schemaLogin).swagger,
+    example: {
+      username: 'username',
+      password: 'P@ssword12#',
+    } as TBodyLogin,
+  },
+  loginWithEmail: {
+    ...j2s(schemaLoginWithEmail).swagger,
+    example: {
+      email: 'license@omniflex.io',
+      password: 'P@ssword12#',
+    } as TBodyLoginWithEmail,
+  },
 };
