@@ -36,7 +36,9 @@ const baseRegisterSchema = {
     .regex(/[0-9]/)
     .min(8)
     .required(),
-  repeatPassword: Joi.ref('password'),
+  repeatPassword: Joi.string()
+    .valid(Joi.ref('password'))
+    .strip(),
 
   firstName: Joi.string()
     .trim()
