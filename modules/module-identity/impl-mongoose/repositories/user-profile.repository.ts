@@ -8,12 +8,4 @@ export class UserProfileRepository
   constructor(model: Model<TUserProfile & Document>) {
     super(model);
   }
-
-  async findByUser(user: TUser) {
-    return this.findOne({ user, isDeleted: false });
-  }
-
-  async findByEmail(email: string) {
-    return this.findOne({ email, isDeleted: false });
-  }
 }

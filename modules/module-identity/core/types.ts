@@ -48,15 +48,10 @@ export type TLoginAttempt = TSoftDeletable & TWithTimestamps & {
 
 export interface IUserRepository<T extends TUser = TUser>
   extends IBaseRepository<T, string> {
-  findByIdentifier(identifier: string): Promise<T | null>;
-  findByUsername(username: string): Promise<T | null>;
-  findByEmail(email: string): Promise<T | null>;
 }
 
 export interface IUserProfileRepository
   extends IBaseRepository<TUserProfile, string> {
-  findByUser(user: TUser): Promise<TUserProfile | null>;
-  findByEmail(email: string): Promise<TUserProfile | null>;
 }
 
 export interface IUserPasswordRepository
@@ -66,5 +61,4 @@ export interface IUserPasswordRepository
 
 export interface ILoginAttemptRepository
   extends IBaseRepository<TLoginAttempt, string> {
-  findByUser(user: TUser): Promise<TLoginAttempt[]>;
 }
