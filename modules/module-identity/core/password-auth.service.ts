@@ -17,7 +17,7 @@ type TRegisterProfile = {
 } & Record<string, any>;
 
 type TRecordLoginAttemptProps = {
-  user?: TUser;
+  userId?: string;
   identifier: string;
   remark?: any;
   success?: boolean;
@@ -57,20 +57,20 @@ export class PasswordAuthService {
     const { salt, hashedPassword } = await hashPassword(password);
 
     await passwords.create({
-      user,
       salt,
       username,
       hashedPassword,
+      userId: user.id,
     });
 
     await profiles.create({
-      user,
       profile,
-
       email,
       firstName,
       lastName,
       mobileNumber,
+
+      userId: user.id,
     });
 
     return user;
@@ -103,13 +103,13 @@ export class PasswordAuthService {
     });
 
     if (!isValidPassword) {
-      await recordFail({ user: password.user });
+      await recordFail({ userId: password.userId });
       throw errors.unauthorized();
     }
 
-    const user = await users.findOne({ id: `${password.user}` });
+    const user = await users.findOne({ id: `${password.userId}` });
     if (!user) {
-      await recordFail({ user: password.user });
+      await recordFail({ userId: password.userId });
       throw errors.unauthorized();
     }
 
@@ -117,7 +117,7 @@ export class PasswordAuthService {
       lastSignInAtUtc: new Date()
     });
 
-    await recordFail({ user, success: true });
+    await recordFail({ userId: user.id, success: true });
     return user;
   }
 
@@ -130,8 +130,8 @@ export class PasswordAuthService {
       ipAddress: data.ipAddress,
       success: data.success || false,
 
-      user: data.user,
-      identifier: data.user?.identifier || data.identifier,
+      userId: data.userId,
+      identifier: data.identifier,
     });
   }
 }
