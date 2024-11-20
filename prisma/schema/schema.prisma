@@ -1,5 +1,0 @@
-generator client {
-  provider        = "prisma-client-js"
-  output          = "../../infra/infra-prisma/prisma-client"
-  previewFeatures = ["prismaSchemaFolder"]
-}
