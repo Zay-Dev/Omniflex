@@ -22,6 +22,16 @@ export abstract class BaseRepository<T> {
       this.model.schema.alias('_id', 'id');
       this.model.recompileSchema();
     }
+
+    (['toJSON', 'toObject'] as const)
+      .forEach((method) => {
+        const current = model.schema.get(method);
+
+        model.schema.set(method, {
+          ...(current || {}),
+          ...(this.autoLeanOptions || {}),
+        });
+      });
   }
 
   useAutoLean() {

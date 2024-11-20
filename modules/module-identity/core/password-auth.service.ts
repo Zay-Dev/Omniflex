@@ -5,7 +5,7 @@ import { TUser } from './types';
 import { resolve } from './containers';
 
 const hashProvider = providers.hash;
-const repositories = resolve<TUser & { _id: any; }>();
+const repositories = resolve<TUser>();
 const { users, profiles, passwords, loginAttempts } = repositories;
 
 type TRegisterProfile = {
@@ -107,7 +107,7 @@ export class PasswordAuthService {
       throw errors.unauthorized();
     }
 
-    const user = await users.findOne({ _id: password.user });
+    const user = await users.findOne({ id: `${password.user}` });
     if (!user) {
       await recordFail({ user: password.user });
       throw errors.unauthorized();
