@@ -1,0 +1,26 @@
+{
+  "name": "@omniflex/infra-postgres",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && tsc-alias"
+  },
+  "private": true,
+  "exports": {
+    "./types": {
+      "development": "./types.ts",
+      "import": "./dist/types.js"
+    },
+    ".": {
+      "development": "./index.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@omniflex/core": "0.1.0",
+    "pg": "^8.13.1",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.5"
+  },
+  "devDependencies": {}
+}
