@@ -34,6 +34,10 @@ export abstract class BaseRepository<T> {
       });
   }
 
+  getModel() {
+    return this.model;
+  }
+
   useAutoLean() {
     return this.newInstance({
       ...this.options,

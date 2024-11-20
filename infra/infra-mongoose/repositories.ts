@@ -7,10 +7,6 @@ import { IBaseRepository } from '@omniflex/core/types';
 export class MongooseBaseRepository<T extends Document, TPrimaryKey = string>
   extends BaseRepository<T>
   implements IBaseRepository<T, TPrimaryKey> {
-  getModel() {
-    return this.model;
-  }
-
   raw() {
     return new RawRepository(this.model, {
       ...this.options,
@@ -41,7 +37,7 @@ export class MongooseBaseRepository<T extends Document, TPrimaryKey = string>
 
   find(
     filter: Partial<T>,
-    options?: { skip?: number; take?: number; }
+    options?: { skip?: number; take?: number; },
   ): Promise<T[]> {
     const query = this.model.find(
       filter as FilterQuery<T>,

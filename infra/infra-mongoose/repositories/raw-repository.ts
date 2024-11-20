@@ -11,10 +11,6 @@ type TModelFnParams<
 > = Parameters<(Model<T>)[K]>;
 
 export class RawRepository<T extends Document> extends BaseRepository<T> {
-  getModel() {
-    return this.model;
-  }
-
   async exists(
     filter: TModelFnParams<T, 'countDocuments'>[0],
   ) {
