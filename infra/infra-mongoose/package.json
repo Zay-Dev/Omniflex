@@ -18,7 +18,10 @@
   },
   "dependencies": {
     "@omniflex/core": "0.1.0",
-    "mongoose": "^8.8.0"
+    "mongoose": "^8.8.0",
+    "mongoose-lean-defaults": "^2.2.1",
+    "mongoose-lean-getters": "^2.1.1",
+    "mongoose-lean-virtuals": "^1.0.0"
   },
   "devDependencies": {}
 }
