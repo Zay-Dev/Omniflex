@@ -52,7 +52,7 @@ export class UsersController<T extends TUser = TUser>
 
   protected async getProfile(userId: any) {
     return this.profiles.findOne({
-      user: userId,
+      userId,
       isDeleted: false,
     });
   }

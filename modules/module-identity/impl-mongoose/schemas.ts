@@ -9,44 +9,51 @@ import {
   mixed,
   toRequiredObjectId,
   isDeleted,
+  toOptionalObjectId,
 } from '@omniflex/infra-mongoose/types';
 
 export const userBaseSchema = {
   isDeleted,
+
   isVerified: defaultFalse,
   identifier: requiredString,
   lastSignInAtUtc: optionalDate,
 };
 
 export const profileBaseSchema = {
-  user: toRequiredObjectId('Users'),
   isDeleted,
+
   profileImage: optionalString,
   email: optionalString,
   mobileNumber: optionalString,
   firstName: optionalString,
   lastName: optionalString,
   profile: mixed,
+
+  userId: toRequiredObjectId('Users'),
 };
 
 export const passwordBaseSchema = {
-  user: toRequiredObjectId('Users'),
-
   isDeleted,
+
   salt: requiredString,
   username: requiredString,
   hashedPassword: requiredString,
+
+  userId: toRequiredObjectId('Users'),
 };
 
 export const loginAttemptBaseSchema = {
-  user: toRequiredObjectId('Users'),
   isDeleted,
+
   identifier: requiredString,
   loginType: requiredString,
   appType: requiredString,
   success: { type: Boolean, required: true },
   ipAddress: optionalString,
   remark: mixed,
+
+  userId: toOptionalObjectId('Users'),
 };
 
 export const getUserSchema = <T extends TUser = TUser>(
@@ -74,6 +81,7 @@ export const getProfileSchema = <T extends TUserProfile = TUserProfile>(
     { timestamps: true },
   );
 
+  profile.alias('userId', 'user');
   return profile;
 };
 
@@ -84,6 +92,8 @@ export const getPasswordSchema = <T extends TUserPassword = TUserPassword>(
     schema,
     { timestamps: true },
   );
+
+  password.alias('userId', 'user');
 
   // Only enforce uniqueness for active records
   password.index({ username: 1 }, {
@@ -102,5 +112,6 @@ export const getLoginAttemptSchema = <T extends TLoginAttempt = TLoginAttempt>(
     { timestamps: true },
   );
 
+  loginAttempt.alias('userId', 'user');
   return loginAttempt;
 };
