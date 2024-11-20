@@ -1,46 +1,19 @@
+import { BaseRepository } from './repositories/base';
+import { RawRepository } from './repositories/raw-repository';
+
+import { Document, FilterQuery } from 'mongoose';
 import { IBaseRepository } from '@omniflex/core/types';
-import { Model, Document, FilterQuery } from 'mongoose';
 
 export class MongooseBaseRepository<T extends Document, TPrimaryKey = string>
+  extends BaseRepository<T>
   implements IBaseRepository<T, TPrimaryKey> {
-  protected options: {
-    noAliasId: boolean;
-    noAutoLean: boolean;
-  };
-
-  constructor(
-    protected readonly model: Model<T>,
-    options?: {
-      noAliasId?: boolean;
-      noAutoLean?: boolean;
-    },
-  ) {
-    this.options = {
-      noAutoLean: options?.noAutoLean || false,
-      noAliasId: options?.noAliasId || false,
-    };
-
-    if (!this.options.noAliasId) {
-      this.model.schema.alias('_id', 'id');
-      this.model.recompileSchema();
-    }
-  }
-
   getModel() {
     return this.model;
   }
 
-  autoLean() {
-    return new MongooseBaseRepository(this.model, {
+  raw() {
+    return new RawRepository(this.model, {
       ...this.options,
-      noAutoLean: false,
-    });
-  }
-
-  noAutoLean() {
-    return new MongooseBaseRepository(this.model, {
-      ...this.options,
-      noAutoLean: true,
     });
   }
 
@@ -54,7 +27,7 @@ export class MongooseBaseRepository<T extends Document, TPrimaryKey = string>
     return this.model.findById(
       id,
       null,
-      this._sharedQueryOptions,
+      this.sharedQueryOptions,
     );
   }
 
@@ -62,7 +35,7 @@ export class MongooseBaseRepository<T extends Document, TPrimaryKey = string>
     return this.model.findOne(
       filter as FilterQuery<T>,
       null,
-      this._sharedQueryOptions,
+      this.sharedQueryOptions,
     );
   }
 
@@ -73,7 +46,7 @@ export class MongooseBaseRepository<T extends Document, TPrimaryKey = string>
     const query = this.model.find(
       filter as FilterQuery<T>,
       null,
-      this._sharedQueryOptions,
+      this.sharedQueryOptions,
     );
 
     if (options?.skip !== undefined) {
@@ -90,7 +63,7 @@ export class MongooseBaseRepository<T extends Document, TPrimaryKey = string>
   create(data: Partial<T>): Promise<T> {
     const query = this.model.create(data);
 
-    return this._noAutoLean ? query :
+    return this.noAutoLean ? query :
       query.then(result => result.toObject());
   }
 
@@ -99,7 +72,7 @@ export class MongooseBaseRepository<T extends Document, TPrimaryKey = string>
       id,
       data,
       {
-        ...this._sharedQueryOptions,
+        ...this.sharedQueryOptions,
         new: true,
       }
     );
@@ -116,22 +89,4 @@ export class MongooseBaseRepository<T extends Document, TPrimaryKey = string>
 
     return !!result;
   }
-
-  private get _sharedQueryOptions() {
-    return {
-      translateAliases: true,
-      lean: this._autoLeanOptions,
-    };
-  };
-
-  private get _autoLeanOptions() {
-    if (this._noAutoLean) return undefined;
-
-    return {
-      getters: true,
-      defaults: true,
-      virtuals: true,
-    };
-  }
-  private get _noAutoLean() { return this.options.noAutoLean; }
 }
