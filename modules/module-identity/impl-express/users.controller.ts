@@ -1,5 +1,3 @@
-import { Request, Response, NextFunction } from 'express';
-import { getControllerCreator } from '@omniflex/infra-express';
 import { BaseEntitiesController } from '@omniflex/infra-express/utils/base-entities-controller';
 
 import { resolve } from '@omniflex/module-identity-core';
@@ -57,5 +55,3 @@ export class UsersController<T extends TUser = TUser>
     });
   }
 }
-
-export const getCreator = getControllerCreator<UsersController>();

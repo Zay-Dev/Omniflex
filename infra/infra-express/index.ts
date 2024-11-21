@@ -2,11 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 
 export { AutoServer } from './auto-server';
 
-export const getControllerCreator = <TBase>() => {
-  return <T extends TBase = TBase>(
-    constructor: new (req: Request, res: Response, next: NextFunction) => T
+export const getControllerCreator = <T>(
+  constructor: new (req: Request, res: Response, next: NextFunction) => T
+) => {
+  return (
+    callback: (controller: T) => void | Promise<void>
   ) => {
-    return (req: Request, res: Response, next: NextFunction) =>
-      new constructor(req, res, next);
+    return (req: Request, res: Response, next: NextFunction) => {
+      return callback(new constructor(req, res, next));
+    };
   };
 };
