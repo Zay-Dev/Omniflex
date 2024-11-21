@@ -10,6 +10,10 @@
       "development": "./types.ts",
       "import": "./dist/types.js"
     },
+    "./validators": {
+      "development": "./validators.ts",
+      "import": "./dist/validators.js"
+    },
     "./helpers/*": {
       "development": "./helpers/*.ts",
       "import": "./dist/helpers/*.js"

@@ -14,6 +14,10 @@
       "development": "./types/*.ts",
       "import": "./dist/types/*.js"
     },
+    "./middlewares/*": {
+      "development": "./middlewares/*.ts",
+      "import": "./dist/middlewares/*.js"
+    },
     ".": {
       "development": "./index.ts",
       "import": "./dist/index.js"

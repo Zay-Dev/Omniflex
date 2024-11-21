@@ -6,8 +6,10 @@ export const requestPreparation = (type: string) => {
     res.locals = {
       appType: type,
       user: undefined,
-      requestId: uuidv4(),
+
+      required: {},
       request: null as any,
+      requestId: uuidv4(),
     };
 
     return next();

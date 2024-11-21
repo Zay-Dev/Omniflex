@@ -48,6 +48,7 @@ export type TLocals = BaseLocals & {
   requestId: string;
   request: ProcessedRequest;
   error?: Error | BaseError;
+  required: Record<string, any>;
 };
 
 export type Response = BaseResponse & {

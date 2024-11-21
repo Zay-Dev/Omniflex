@@ -51,6 +51,10 @@ export class BaseExpressController<TLocals extends TBaseLocals = TBaseLocals> {
     return this.res.json({ data });
   }
 
+  respondRequired(key: string) {
+    return this.respondOne(this.locals.required[key]);
+  }
+
   respondMany(data: Array<any> = [], total?: number) {
     return this.res.json({
       data,
