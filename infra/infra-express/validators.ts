@@ -37,10 +37,14 @@ export const DbEntries = {
   requiredById: (
     repository,
     getId: (req: Request, res: Response, next: NextFunction) => any,
-    countOnly: boolean = false,
+    countOnlyOrKeyName: true | string = '_byId',
   ) => {
     return (req: Request, res: Response, next: NextFunction) => {
       const id = getId(req, res, next);
+
+      const countOnly = countOnlyOrKeyName === true;
+      const keyName = countOnlyOrKeyName === true ?
+        '_byId' : countOnlyOrKeyName;
 
       requiredById(id, {
         countOnly,
@@ -50,7 +54,7 @@ export const DbEntries = {
           if (!countOnly) {
             res.locals.required = manageFetched(
               res.locals.required || {},
-              '_byId',
+              keyName,
               _byId,
             );
           }
@@ -64,10 +68,14 @@ export const DbEntries = {
   requiredFirstMatch: <T extends {}, TPrimaryKey>(
     repository: IBaseRepository<T, TPrimaryKey>,
     getQuery: (req: Request, res: Response, next: NextFunction) => Partial<T>,
-    countOnly: boolean = false,
+    countOnlyOrKeyName: true | string = '_firstMatch',
   ) => {
     return (req: Request, res: Response, next: NextFunction) => {
       const query = getQuery(req, res, next);
+
+      const countOnly = countOnlyOrKeyName === true;
+      const keyName = countOnlyOrKeyName === true ?
+        '_byId' : countOnlyOrKeyName;
 
       requiredFirstMatch(query, {
         countOnly,
@@ -77,7 +85,7 @@ export const DbEntries = {
           if (!countOnly) {
             res.locals.required = manageFetched(
               res.locals.required || {},
-              '_firstMatch',
+              keyName,
               _firstMatch,
             );
           }
