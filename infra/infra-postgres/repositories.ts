@@ -146,9 +146,13 @@ export class PostgresRepository<
     }
 
     if (options.populate) {
-      transformed['include'] = options.populate.map(field => ({
-        association: field.toString(),
-        required: false
+      const fields = (Array.isArray(options.populate) ?
+        options.populate :
+        options.populate.split(' '))
+        .map(String);
+
+      transformed['include'] = fields.map(association => ({
+        association,
       }));
     }
 

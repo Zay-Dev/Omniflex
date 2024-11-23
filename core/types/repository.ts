@@ -28,7 +28,7 @@ export type TDeepPartial<T> = {
 
 export type TQueryOptions<T> = {
   select?: Array<keyof T> | string;
-  populate?: Array<keyof T>;
+  populate?: Array<keyof T> | string;
   skip?: number;
   take?: number;
   sort?: {
