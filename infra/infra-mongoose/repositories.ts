@@ -14,7 +14,10 @@ export class MongooseBaseRepository<T extends Document, TPrimaryKey = string>
   }
 
   async exists(filter: Partial<T>): Promise<boolean> {
-    const count = await this.model.countDocuments(filter as FilterQuery<T>);
+    const count = await this.model.countDocuments(
+      filter as FilterQuery<T>,
+      this.sharedQueryOptions,
+    );
 
     return count > 0;
   }
