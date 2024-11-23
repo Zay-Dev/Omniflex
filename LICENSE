@@ -3,7 +3,7 @@ Copyright (c) 2024 Omniflex
 This license applies to all code, files, and workspaces contained within this repository and its subdirectories, including but not limited to all packages, modules, and applications under the @omniflex namespace.
 
 Definitions:
-- "Commercial use" refers to any use intended to generate revenue, either directly 
+- "Commercial use" refers to any use intended to generate revenue, either directly
   or indirectly, including but not limited to:
   * Use by a business, corporation, or commercial entity
   * Integration into products or services that are sold
@@ -44,10 +44,11 @@ following conditions:
    b) Include this license
    c) State changes if modified
    d) Include a link to the original source
+   e) Include our website: omniflex.io
 
 Commercial Licensing:
 For commercial use of this software, please contact:
-- Email: licensing@omniflex.io (monitored Monday-Friday)
+- Email: license@omniflex.io (monitored Monday-Friday)
 - Website: https://omniflex.io/licensing
 
 Commercial licenses are available for:
@@ -62,4 +63,4 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE. 
+SOFTWARE.
