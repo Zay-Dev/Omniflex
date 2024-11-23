@@ -60,10 +60,7 @@ export class PostgresRepository<
   ): Promise<T[]> {
     return (await this.model
       .findAll({
-        ...this.sharedQueryOptions,
-
-        limit: options?.take,
-        offset: options?.skip,
+        ...this.transformQueryOptions(options),
         where: this.transformFilter(filter),
       }))
       .map(entity => entity.toJSON());
