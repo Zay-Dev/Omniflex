@@ -116,7 +116,33 @@ export class PostgresRepository<
     };
 
     if (options.select) {
-      transformed['attributes'] = options.select;
+      const fields = (Array.isArray(options.select) ?
+        options.select :
+        options.select.split(' '))
+        .map(String);
+
+      const included = fields
+        .filter(field => !field.startsWith('-'))
+        .map(field => field.startsWith('+') ? field.slice(1) : field);
+
+      const excluded = fields
+        .filter(field => field.startsWith('-'))
+        .map(field => field.slice(1));
+
+      if (included.length + excluded.length === 0) {
+        transformed['attributes'] = undefined;
+      } else {
+        const attributes = Object.keys(this.model.getAttributes())
+          .filter(attr => !excluded.includes(attr));
+
+        if (included.length > 0) {
+          transformed['attributes'] = attributes.filter(attr =>
+            included.includes(attr),
+          );
+        } else {
+          transformed['attributes'] = attributes;
+        }
+      }
     }
 
     if (options.populate) {

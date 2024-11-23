@@ -90,7 +90,9 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
     };
 
     if (options.select) {
-      transformed['select'] = options.select.join(' ');
+      transformed['select'] = Array.isArray(options.select) ?
+        options.select.join(' ') :
+        options.select;
     }
 
     if (options.populate) {
