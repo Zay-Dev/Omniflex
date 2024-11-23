@@ -1,11 +1,11 @@
-import { Model, Document } from 'mongoose';
+import { Model } from 'mongoose';
 import { MongooseBaseRepository } from '@omniflex/infra-mongoose';
 import { IUserPasswordRepository, TUserPassword } from '@omniflex/module-identity-core/types';
 
 export class UserPasswordRepository
-  extends MongooseBaseRepository<TUserPassword & Document>
+  extends MongooseBaseRepository<TUserPassword>
   implements IUserPasswordRepository {
-  constructor(model: Model<TUserPassword & Document>) {
+  constructor(model: Model<TUserPassword>) {
     super(model);
   }
 

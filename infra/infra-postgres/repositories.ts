@@ -1,8 +1,14 @@
 import { BaseRepository } from './repositories/base';
 import { RawRepository } from './repositories/raw-repository';
 
-import { Identifier } from 'sequelize';
-import { IBaseRepository } from '@omniflex/core/types/repository';
+import { Identifier, Op } from 'sequelize';
+
+import {
+  TDeepPartial,
+  TQueryOptions,
+  TQueryOperators,
+  IBaseRepository,
+} from '@omniflex/core/types/repository';
 
 export class PostgresRepository<
   T extends { id: TPrimaryKey; },
@@ -16,33 +22,49 @@ export class PostgresRepository<
     });
   }
 
-  async exists(filter: Partial<T>): Promise<boolean> {
-    const count = await this.model.count({ where: filter as any });
+  async exists(filter: TDeepPartial<T>): Promise<boolean> {
+    const count = await this.model.count({
+      where: this.transformFilter(filter),
+    });
 
     return count > 0;
   }
 
-  async findById(id: TPrimaryKey): Promise<T | null> {
-    return (await this.model.findByPk(id))?.toJSON() || null;
+  async findById(
+    id: TPrimaryKey,
+    options?: TQueryOptions<T>,
+  ): Promise<T | null> {
+    const result = await this.model.findByPk(
+      id,
+      this.transformQueryOptions(options),
+    );
+
+    return result?.toJSON() || null;
   }
 
-  async findOne(filter: Partial<T>): Promise<T | null> {
-    return (
-      await this.model.findOne({ where: filter as any }))
-      ?.toJSON() || null;
+  async findOne(
+    filter: TDeepPartial<T>,
+    options?: TQueryOptions<T>,
+  ): Promise<T | null> {
+    const result = await this.model.findOne({
+      ...this.transformQueryOptions(options),
+      where: this.transformFilter(filter)
+    });
+
+    return result?.toJSON() || null;
   }
 
   async find(
-    filter: Partial<T>,
-    options?: { skip?: number; take?: number; },
+    filter: TDeepPartial<T>,
+    options?: TQueryOptions<T>,
   ): Promise<T[]> {
     return (await this.model
       .findAll({
         ...this.sharedQueryOptions,
 
-        where: filter as any,
         limit: options?.take,
         offset: options?.skip,
+        where: this.transformFilter(filter),
       }))
       .map(entity => entity.toJSON());
   }
@@ -58,10 +80,12 @@ export class PostgresRepository<
 
   async update(id: TPrimaryKey, data: Partial<T>): Promise<T | null> {
     await this.model.update(
-      data as any, {
-      where: { id: id as any },
-      ...this.sharedQueryOptions,
-    });
+      data as any,
+      {
+        where: { id: id as any },
+        ...this.sharedQueryOptions,
+      }
+    );
 
     return this.findById(id);
   }
@@ -77,5 +101,68 @@ export class PostgresRepository<
     const result = await this.update(id, { isDeleted: true } as any);
 
     return !!result;
+  }
+
+  protected transformQueryOptions<T>(options?: TQueryOptions<T>) {
+    if (!options) return this.sharedQueryOptions;
+
+    const transformed = {
+      ...this.sharedQueryOptions,
+      offset: options.skip,
+      limit: options.take,
+      order: options.sort ?
+        Object.entries(options.sort)
+          .map(([key, value]) =>
+            [key, (value as string).toUpperCase()]
+          ) :
+        undefined,
+    };
+
+    if (options.select) {
+      transformed['attributes'] = options.select;
+    }
+
+    if (options.populate) {
+      transformed['include'] = options.populate.map(field => ({
+        association: field.toString(),
+        required: false
+      }));
+    }
+
+    return transformed;
+  }
+
+  protected transformFilter(filter: TDeepPartial<T>) {
+    const transformed = {};
+
+    for (const [key, value] of Object.entries(filter)) {
+      if (typeof value === 'object' && !Array.isArray(value)) {
+        transformed[key] = this.transformOperators(value);
+      } else {
+        transformed[key] = value;
+      }
+    }
+
+    return transformed;
+  }
+
+  protected transformOperators(operators: TQueryOperators<any>) {
+    const transformed = {};
+
+    for (const [key, value] of Object.entries(operators)) {
+      switch (key) {
+        case '$eq': transformed[Op.eq] = value; break;
+        case '$ne': transformed[Op.ne] = value; break;
+        case '$gt': transformed[Op.gt] = value; break;
+        case '$gte': transformed[Op.gte] = value; break;
+        case '$lt': transformed[Op.lt] = value; break;
+        case '$lte': transformed[Op.lte] = value; break;
+        case '$in': transformed[Op.in] = value; break;
+        case '$nin': transformed[Op.notIn] = value; break;
+        case '$regex': transformed[Op.regexp] = value; break;
+      }
+    }
+
+    return transformed;
   }
 }

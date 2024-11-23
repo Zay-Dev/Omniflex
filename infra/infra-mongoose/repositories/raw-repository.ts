@@ -1,5 +1,5 @@
+import { Model } from 'mongoose';
 import { BaseRepository } from './base';
-import { Model, Document } from 'mongoose';
 
 type TKeyOfFn<T> = keyof {
   [P in keyof T as T[P] extends (...args) => any ? P : never]: any
@@ -10,7 +10,7 @@ type TModelFnParams<
   K extends TKeyOfFn<Model<T>>
 > = Parameters<(Model<T>)[K]>;
 
-export class RawRepository<T extends Document> extends BaseRepository<T> {
+export class RawRepository<T> extends BaseRepository<T> {
   async exists(
     filter: TModelFnParams<T, 'countDocuments'>[0],
   ) {

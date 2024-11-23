@@ -1,10 +1,13 @@
 import { BaseRepository } from './repositories/base';
 import { RawRepository } from './repositories/raw-repository';
 
-import { Document, FilterQuery } from 'mongoose';
-import { IBaseRepository } from '@omniflex/core/types';
+import {
+  TDeepPartial,
+  TQueryOptions,
+  IBaseRepository,
+} from '@omniflex/core/types';
 
-export class MongooseBaseRepository<T extends Document, TPrimaryKey = string>
+export class MongooseBaseRepository<T, TPrimaryKey = string>
   extends BaseRepository<T>
   implements IBaseRepository<T, TPrimaryKey> {
   raw() {
@@ -13,50 +16,37 @@ export class MongooseBaseRepository<T extends Document, TPrimaryKey = string>
     });
   }
 
-  async exists(filter: Partial<T>): Promise<boolean> {
+  async exists(filter: TDeepPartial<T>): Promise<boolean> {
     const count = await this.model.countDocuments(
-      filter as FilterQuery<T>,
+      filter,
       this.sharedQueryOptions,
     );
 
     return count > 0;
   }
 
-  findById(id: TPrimaryKey): Promise<T | null> {
+  findById(id: TPrimaryKey, options?: TQueryOptions<T>): Promise<T | null> {
     return this.model.findById(
       id,
       null,
-      this.sharedQueryOptions,
+      this.transformQueryOptions(options)
     );
   }
 
-  findOne(filter: Partial<T>): Promise<T | null> {
+  findOne(filter: TDeepPartial<T>, options?: TQueryOptions<T>): Promise<T | null> {
     return this.model.findOne(
-      filter as FilterQuery<T>,
+      filter,
       null,
-      this.sharedQueryOptions,
+      this.transformQueryOptions(options)
     );
   }
 
-  find(
-    filter: Partial<T>,
-    options?: { skip?: number; take?: number; },
-  ): Promise<T[]> {
-    const query = this.model.find(
-      filter as FilterQuery<T>,
+  find(filter: TDeepPartial<T>, options?: TQueryOptions<T>): Promise<T[]> {
+    return this.model.find(
+      filter,
       null,
-      this.sharedQueryOptions,
+      this.transformQueryOptions(options)
     );
-
-    if (options?.skip !== undefined) {
-      query.skip(options.skip);
-    }
-
-    if (options?.take !== undefined) {
-      query.limit(options.take);
-    }
-
-    return query;
   }
 
   create(data: Partial<T>): Promise<T> {
@@ -87,5 +77,26 @@ export class MongooseBaseRepository<T extends Document, TPrimaryKey = string>
     const result = await this.model.findByIdAndUpdate(id, { isDeleted: true });
 
     return !!result;
+  }
+
+  protected transformQueryOptions<T>(options?: TQueryOptions<T>) {
+    if (!options) return this.sharedQueryOptions;
+
+    const transformed = {
+      ...this.sharedQueryOptions,
+      skip: options.skip,
+      limit: options.take,
+      sort: options.sort,
+    };
+
+    if (options.select) {
+      transformed['select'] = options.select.join(' ');
+    }
+
+    if (options.populate) {
+      transformed['populate'] = options.populate;
+    }
+
+    return transformed;
   }
 }

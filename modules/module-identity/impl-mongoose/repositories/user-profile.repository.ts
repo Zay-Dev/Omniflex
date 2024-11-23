@@ -1,11 +1,11 @@
-import { Model, Document } from 'mongoose';
+import { Model } from 'mongoose';
 import { MongooseBaseRepository } from '@omniflex/infra-mongoose';
-import { IUserProfileRepository, TUser, TUserProfile } from '@omniflex/module-identity-core/types';
+import { IUserProfileRepository, TUserProfile } from '@omniflex/module-identity-core/types';
 
 export class UserProfileRepository
-  extends MongooseBaseRepository<TUserProfile & Document>
+  extends MongooseBaseRepository<TUserProfile>
   implements IUserProfileRepository {
-  constructor(model: Model<TUserProfile & Document>) {
+  constructor(model: Model<TUserProfile>) {
     super(model);
   }
 }

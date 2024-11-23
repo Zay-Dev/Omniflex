@@ -59,7 +59,7 @@ export const loginAttemptBaseSchema = {
 export const getUserSchema = <T extends TUser = TUser>(
   schema: typeof userBaseSchema & Record<string, any> = userBaseSchema,
 ) => {
-  const user = new Schema<T & Document>(
+  const user = new Schema<T>(
     schema,
     { timestamps: true },
   );
@@ -76,24 +76,35 @@ export const getUserSchema = <T extends TUser = TUser>(
 export const getProfileSchema = <T extends TUserProfile = TUserProfile>(
   schema: typeof profileBaseSchema & Record<string, any> = profileBaseSchema,
 ) => {
-  const profile = new Schema<TUserProfile & T & Document>(
+  const profile = new Schema<T>(
     schema,
     { timestamps: true },
   );
 
-  profile.alias('userId', 'user');
+  profile.virtual('user', {
+    ref: 'Users',
+    justOne: true,
+    foreignField: '_id',
+    localField: 'userId',
+  });
+
   return profile;
 };
 
 export const getPasswordSchema = <T extends TUserPassword = TUserPassword>(
   schema: typeof passwordBaseSchema & Record<string, any> = passwordBaseSchema,
 ) => {
-  const password = new Schema<TUserPassword & T & Document>(
+  const password = new Schema<T>(
     schema,
     { timestamps: true },
   );
 
-  password.alias('userId', 'user');
+  password.virtual('user', {
+    ref: 'Users',
+    justOne: true,
+    foreignField: '_id',
+    localField: 'userId',
+  });
 
   // Only enforce uniqueness for active records
   password.index({ username: 1 }, {
@@ -107,11 +118,17 @@ export const getPasswordSchema = <T extends TUserPassword = TUserPassword>(
 export const getLoginAttemptSchema = <T extends TLoginAttempt = TLoginAttempt>(
   schema: typeof loginAttemptBaseSchema & Record<string, any> = loginAttemptBaseSchema,
 ) => {
-  const loginAttempt = new Schema<TLoginAttempt & T & Document>(
+  const loginAttempt = new Schema<T>(
     schema,
     { timestamps: true },
   );
 
-  loginAttempt.alias('userId', 'user');
+  loginAttempt.virtual('user', {
+    ref: 'Users',
+    justOne: true,
+    foreignField: '_id',
+    localField: 'userId',
+  });
+
   return loginAttempt;
 };
