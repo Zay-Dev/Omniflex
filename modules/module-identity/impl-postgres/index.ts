@@ -32,8 +32,35 @@ export const createRegisteredRepositories = (
   const passwordModel = postgres.define('UserPassword', passwordSchema.schema, passwordSchema.options);
   const loginAttemptModel = postgres.define('LoginAttempt', loginAttemptSchema.schema, loginAttemptSchema.options);
 
-  profileModel.hasOne(userModel, { foreignKey: 'userId', as: 'user' });
-  passwordModel.hasOne(userModel, { foreignKey: 'userId', as: 'user' });
+  userModel.hasOne(profileModel, {
+    as: 'profile',
+    foreignKey: 'userId',
+  });
+
+  userModel.hasMany(passwordModel, {
+    as: 'passwords',
+    foreignKey: 'userId',
+  });
+
+  userModel.hasMany(loginAttemptModel, {
+    as: 'loginAttempts',
+    foreignKey: 'userId',
+  });
+
+  profileModel.belongsTo(userModel, {
+    as: 'user',
+    foreignKey: 'userId',
+  });
+
+  passwordModel.belongsTo(userModel, {
+    as: 'user',
+    foreignKey: 'userId',
+  });
+
+  loginAttemptModel.belongsTo(userModel, {
+    as: 'user',
+    foreignKey: 'userId',
+  });
 
   repositories.users = new Repositories.UserRepository(userModel);
   repositories.profiles = new Repositories.UserProfileRepository(profileModel);

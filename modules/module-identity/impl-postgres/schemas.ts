@@ -31,7 +31,13 @@ export const profileBaseSchema = {
   lastName: optionalString(),
   profile: mixed(),
 
-  userId: toRequired(id('UUID', false)),
+  userId: {
+    ...toRequired(id('UUID', false)),
+    references: {
+      key: 'id',
+      model: 'Users',
+    },
+  },
 };
 
 export const passwordBaseSchema = {
@@ -42,7 +48,13 @@ export const passwordBaseSchema = {
   username: requiredString(),
   hashedPassword: requiredString(),
 
-  userId: toRequired(id('UUID', false)),
+  userId: {
+    ...toRequired(id('UUID', false)),
+    references: {
+      key: 'id',
+      model: 'Users',
+    },
+  },
 };
 
 export const loginAttemptBaseSchema = {
@@ -56,7 +68,13 @@ export const loginAttemptBaseSchema = {
   ipAddress: optionalString(),
   remark: mixed(),
 
-  userId: toOptional(id('UUID', false)),
+  userId: {
+    ...toOptional(id('UUID', false)),
+    references: {
+      key: 'id',
+      model: 'Users',
+    },
+  },
 };
 
 export const getUserSchema = (
