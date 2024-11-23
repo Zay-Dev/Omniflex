@@ -23,12 +23,19 @@ export type TQueryOperators<T> = {
 export type TQueryCondition<T> = T | TQueryOperators<T>;
 
 export type TDeepPartial<T> = {
-  [P in keyof T]?: T[P] extends object ? TDeepPartial<T[P]> | TQueryCondition<T[P]> : TQueryCondition<T[P]>
+  [P in keyof T]?: T[P] extends object ?
+  TDeepPartial<T[P]> | TQueryCondition<T[P]> : TQueryCondition<T[P]>
+};
+
+export type TPopulateOption<T, K = T> = {
+  path: keyof T;
+  select?: string | Array<keyof K>;
+  populate?: string | Array<keyof K> | TPopulateOption<K>;
 };
 
 export type TQueryOptions<T> = {
   select?: Array<keyof T> | string;
-  populate?: Array<keyof T> | string;
+  populate?: Array<keyof T | TPopulateOption<T, any>> | string | TPopulateOption<T, any>;
   skip?: number;
   take?: number;
   sort?: {

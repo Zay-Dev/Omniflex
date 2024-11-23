@@ -6,6 +6,7 @@ import { Identifier, Op } from 'sequelize';
 import {
   TDeepPartial,
   TQueryOptions,
+  TPopulateOption,
   TQueryOperators,
   IBaseRepository,
 } from '@omniflex/core/types/repository';
@@ -146,17 +147,69 @@ export class PostgresRepository<
     }
 
     if (options.populate) {
-      const fields = (Array.isArray(options.populate) ?
-        options.populate :
-        options.populate.split(' '))
-        .map(String);
-
-      transformed['include'] = fields.map(association => ({
-        association,
-      }));
+      transformed['include'] = this.transformPopulateOption(options.populate);
     }
 
     return transformed;
+  }
+
+  private transformPopulateOption<T>(
+    populate: Array<keyof T | TPopulateOption<T>> | string | TPopulateOption<T>
+  ): any[] {
+    const handleSelect = (select: any) => this.transformSelect(
+      Array.isArray(select) ?
+        select.map(String) : String(select)
+    );
+
+    if (typeof populate === 'string') {
+      return populate.split(' ').map(field => ({
+        association: field
+      }));
+    }
+
+    if (Array.isArray(populate)) {
+      return populate.map(item => {
+        if (typeof item === 'object') {
+          const popOption = item as TPopulateOption<T>;
+
+          return {
+            association: popOption.path,
+            attributes: popOption.select ? handleSelect(popOption.select) : undefined,
+            include: popOption.populate ?
+              this.transformPopulateOption(popOption.populate) : undefined
+          };
+        }
+        return { association: item };
+      });
+    }
+
+    const popOption = populate as TPopulateOption<T>;
+    return [{
+      association: popOption.path,
+      attributes: popOption.select ? handleSelect(popOption.select) : undefined,
+      include: popOption.populate ?
+        this.transformPopulateOption(popOption.populate) : undefined
+    }];
+  }
+
+  private transformSelect(select: string | string[]) {
+    if (typeof select === 'string') {
+      const fields = select.split(' ');
+      const included = fields
+        .filter(field => !field.startsWith('-'))
+        .map(field => field.startsWith('+') ? field.slice(1) : field);
+      const excluded = fields
+        .filter(field => field.startsWith('-'))
+        .map(field => field.slice(1));
+
+      if (included.length > 0) {
+        return included;
+      }
+
+      return { exclude: excluded };
+    }
+
+    return select;
   }
 
   protected transformFilter(filter: TDeepPartial<T>) {
