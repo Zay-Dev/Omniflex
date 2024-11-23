@@ -327,6 +327,22 @@ const userSchema = {
 
 The database infrastructure packages are designed to provide consistent patterns and interfaces while abstracting away the complexity of database operations.
 
+#### Git Submodules
+
+This project uses a forked version of [swagger-autogen](https://github.com/swagger-autogen/swagger-autogen) as a git submodule. After cloning the repository, you'll need to initialize and update the submodule:
+
+```bash
+git submodule init
+git submodule update
+```
+
+Or you can clone the repository with submodules in one command:
+
+```bash
+git clone --recurse-submodules git@github.com:Zay-Dev/Omniflex.git
+```
+
+The forked swagger-autogen includes custom enhancements specific to our needs while maintaining compatibility with the original project.
 
 ## Contributing
 
