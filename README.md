@@ -17,7 +17,13 @@ The Omniflex Mono-Repo offers a streamlined development experience with features
 
 ### Quick Start
 
+*only develop branch available as the alpha version*
+
 ```bash
+npx https://gist.github.com/Zay-Dev/7bcca907f661409d00a4d59e3615eeb4 my-awesome-project
+
+#### or
+
 # clone the omniflex mono-repo
 git clone --recurse-submodules git@github.com:Zay-Dev/Omniflex.git omniflex
 
