@@ -11,37 +11,7 @@ The omniflex mono-repo is available at [here](https://github.com/Zay-Dev/omnifle
 
 Welcome to the Omniflex Mono-Repo! This repository is designed to provide a robust and scalable foundation for developers to build their applications. Our focus is on maintaining a high-quality infrastructure and package ecosystem, allowing you to concentrate on developing your application logic.
 
-### Features
-
-#### infra/infra-express
-
-- **Request Processing**: Automatic sanitization and masking of sensitive data
-- **Error Handling**
-  - Standardized error responses with configurable detail exposure
-  - Capture unhandled async errors and prevent the app from dying
-- **Logging**
-  - Comprehensive request/response logging with Morgan integration
-- **Security**
-  - Built-in security middlewares including:
-    - CORS
-    - Helmet
-    - File upload handling
-    - User agent parsing
-  - Response time tracking
-- **Base Controller Classes**: each controller instance serves one and only one request, eliminating the messy `(req: Request, res: Response)` passing around but just `this.req` and `this.res`
-  - BaseExpressController:
-    - provides `tryAction` and `tryActionWithBody` methods out of the box that make it easier to wrap logic in a try/catch block and standardized the error handling
-    - provides `throwNotFound` and `throwForbidden` methods out of the box that make it easier to throw standardized errors
-    - provides `respondOne` and `respondMany` methods out of the box that make it easier to respond with standardized data structure
-    - `this.pathId`, `this.pageSize` and `this.page` are automatically populated for convenience
-  - BaseEntitiesController:
-    - everything from `BaseExpressController`, and
-    - `tryListAll`, `tryGetOne`, `tryListPaginated`, `tryCreate`, `tryUpdate`, `tryDelete` and `trySoftDelete` methods out of the box that make it easier to perform CRUD operations
-- uses Joi for request body validation
-- Detailed request/response logging with request ID tracking
-
-
-## Quick Usage
+## Usage
 
 The Omniflex Mono-Repo offers a streamlined development experience with features like quick scaffolding, automatic Swagger documentation, and modular architecture. These benefits lead to easier maintenance and faster development cycles.
 
@@ -50,6 +20,21 @@ The Omniflex Mono-Repo offers a streamlined development experience with features
 1. **Clone the Repository**: Start by cloning this mono-repo to your local machine.
 2. **Create Your App**: Develop your application within the `apps` folder. Each app (or the whole apps/) can be a separate Git repository, allowing you to focus on your code while we handle the infrastructure.
 3. **Leverage Our Infrastructure**: Experience the power of our maintained packages and infrastructure! While you focus on crafting amazing features for your application, we ensure your foundation stays rock-solid with continuous updates, security patches, and performance improvements. It's like having an expert team at your service!
+
+### Example Structure
+
+```
+core/                # Omniflex core packages
+infra/               # Omniflex infrastructure packages
+modules/             # Omniflex feature-specific modules
+...
+apps/
+  └── server/                   # Example Express server
+      ├── .git/                 # Separate Git repository
+      ├── modules/
+      ├── services/
+      └── package.json
+```
 
 ### Package Configuration
 
@@ -101,23 +86,136 @@ For more information about Yarn workspaces, visit the [official documentation](h
 
 For a complete working example, please refer to our reference implementation at [omniflex-express-apps-server](https://github.com/Zay-Dev/omniflex-express-apps-server).
 
-### Example Structure
-
-```
-apps/
-  └── server/                   # Example Express server
-      ├── .git/                 # Separate Git repository
-      ├── modules/
-      ├── services/
-      └── package.json
-```
-
 ## Structure
 
 - **core**: Contains shared types and utilities.
 - **infra**: Infrastructure-related packages, such as Express, Mongoose, and Swagger autogen.
 - **modules**: Feature-specific modules, such as identity management.
 - **apps**: Applications built using the core and infra packages.
+
+### Features
+
+#### core
+
+- **Error Handling**
+  - Generic and standardized error types and handling mechanisms
+  - Although the usage looks like built for HTTP, it is not limited to HTTP
+- **Dependency Injection**
+  - Uses `Awilix` to manage dependencies and promote loose coupling between components
+
+The core package serves as the foundation for all other packages in the Omniflex ecosystem, providing essential utilities and standardized patterns that ensure consistency across your application.
+
+### Usage Example
+
+```typescript
+import { logger, errors, Containers } from '@omniflex/core';
+
+// Logging
+logger.info('Operation successful', { tags: ['user-service'] });
+logger.error('Operation failed', { error, tags: ['auth'] });
+
+// Error handling
+throw errors.notFound('User not found');
+throw errors.forbidden('Invalid permissions');
+
+// Container usage
+const container = Containers.create('myApp');
+container.register('userService', () => new UserService());
+```
+
+#### infra/infra-express
+
+- **Error Handling**
+  - Standardized error responses with configurable detail exposure
+  - Capture unhandled async errors and prevent the app from dying
+- **Logging**
+  - Comprehensive request/response logging with Morgan integration
+  - Detailed request/response logging with request ID tracking
+  - Automatic sanitization and masking of sensitive data
+- **Security**
+  - Built-in security middlewares including:
+    - CORS
+    - Helmet
+    - File upload handling
+    - User agent parsing
+  - Response time tracking
+- **Base Controller Classes**: each controller instance serves one and only one request, eliminating the messy `(req: Request, res: Response)` passing around but just `this.req` and `this.res`
+  - BaseExpressController:
+    - provides `tryAction` and `tryActionWithBody` methods out of the box that make it easier to wrap logic in a try/catch block and standardized the error handling
+    - provides `throwNotFound` and `throwForbidden` methods out of the box that make it easier to throw standardized errors
+    - provides `respondOne` and `respondMany` methods out of the box that make it easier to respond with standardized data structure
+    - `this.pathId`, `this.pageSize` and `this.page` are automatically populated for convenience
+  - BaseEntitiesController:
+    - everything from `BaseExpressController`, and
+    - `tryListAll`, `tryGetOne`, `tryListPaginated`, `tryCreate`, `tryUpdate`, `tryDelete` and `trySoftDelete` methods out of the box that make it easier to perform CRUD operations
+- uses Joi for request body validation
+
+#### infra/infra-{db}
+
+##### infra-mongoose
+- **Type System**
+  - Predefined schema types with common configurations:
+    - Easier to read and understand
+    - Required/Optional variants for all basic types
+    - Integer handling with automatic rounding
+    - String enums with type safety
+    - Boolean fields with default values
+
+Usage example:
+
+```typescript
+import { getConnection } from '@omniflex/infra-mongoose';
+import { optionalString, requiredDate, defaultFalse } from '@omniflex/infra-mongoose/types';
+
+// Connection setup
+const connection = await getConnection({
+  mongoose: {
+    uri: 'mongodb://localhost:27017',
+    dbName: 'myapp'
+  }
+});
+
+// Schema definition using provided types
+const userSchema = {
+  name: requiredString,
+  bio: optionalString,
+  joinedAt: requiredDate,
+  isActive: defaultFalse
+};
+```
+
+##### infra-postgres
+- **Connection Management**
+  - Uses `Sequelize` ORM
+  - Built-in logging integration with core logger
+  - Predefined schema types with common configurations:
+    - Easier to read and understand
+    - Required/Optional variants for all basic types
+    - Consistent type definitions across the application
+
+Usage example:
+```typescript
+import { getConnection } from '@omniflex/infra-postgres';
+import { optionalString, requiredDate, defaultFalse } from '@omniflex/infra-postgres/types';
+
+// Connection setup with automatic logging
+const connection = await getConnection({
+  postgres: {
+    uri: 'postgresql://user:pass@localhost:5432/myapp'
+  }
+});
+
+// Schema definition using provided types
+const userSchema = {
+  name: requiredString(),
+  bio: optionalString(),
+  joinedAt: requiredDate(),
+  isActive: defaultFalse()
+};
+```
+
+The database infrastructure packages are designed to provide consistent patterns and interfaces while abstracting away the complexity of database operations.
+
 
 ## Contributing
 
