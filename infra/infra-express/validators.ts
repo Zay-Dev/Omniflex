@@ -1,3 +1,4 @@
+import { errors } from '@omniflex/core';
 import { IBaseRepository } from '@omniflex/core/types/repository';
 
 import {
@@ -41,6 +42,9 @@ export const DbEntries = {
   ) => {
     return (req: Request, res: Response, next: NextFunction) => {
       const id = getId(req, res, next);
+      if (!repository.isValidPrimaryKey(id)) {
+        return next(errors.badRequest('Invalid ID'));
+      }
 
       const countOnly = countOnlyOrKeyName === true;
       const keyName = countOnlyOrKeyName === true ?

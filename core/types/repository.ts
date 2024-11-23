@@ -44,6 +44,8 @@ export type TQueryOptions<T> = {
 };
 
 export interface IBaseRepository<T, TPrimaryKey> {
+  isValidPrimaryKey(id: TPrimaryKey): boolean;
+
   exists(filter: TDeepPartial<T>): Promise<boolean>;
 
   findById(id: TPrimaryKey, options?: TQueryOptions<T>): Promise<T | null>;

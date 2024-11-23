@@ -16,6 +16,10 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
     });
   }
 
+  isValidPrimaryKey(id: TPrimaryKey): boolean {
+    return super.isValidDocumentId(id);
+  }
+
   async exists(filter: TDeepPartial<T>): Promise<boolean> {
     const count = await this.model.countDocuments(
       filter,

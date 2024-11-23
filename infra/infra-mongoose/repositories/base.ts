@@ -52,6 +52,12 @@ export abstract class BaseRepository<T> {
     });
   }
 
+  isValidDocumentId(id: any) {
+    return id &&
+      typeof id === 'string' &&
+      id.length == 24;
+  }
+
   protected get sharedQueryOptions() {
     return {
       translateAliases: true,

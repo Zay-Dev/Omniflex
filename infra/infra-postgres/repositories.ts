@@ -1,7 +1,8 @@
+import { logger } from '@omniflex/core';
+import { Identifier, Op } from 'sequelize';
+
 import { BaseRepository } from './repositories/base';
 import { RawRepository } from './repositories/raw-repository';
-
-import { Identifier, Op } from 'sequelize';
 
 import {
   TDeepPartial,
@@ -21,6 +22,25 @@ export class PostgresRepository<
     return new RawRepository<T, TPrimaryKey>(this.model, {
       ...this.options,
     });
+  }
+
+  isValidPrimaryKey(id: TPrimaryKey): boolean {
+    const type = `${this.model.getAttributes()['id']?.type || ''}`;
+
+    switch (type) {
+      case 'INTEGER':
+        return !isNaN(Number(id));
+      case 'UUID':
+        return id &&
+          typeof id === 'string' &&
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    }
+
+    logger.warn(
+      `Failed to validate ${id} with type ${type}`,
+      { tags: ['Postgres', this.model.tableName] },
+    );
+    return true;
   }
 
   async exists(filter: TDeepPartial<T>): Promise<boolean> {
