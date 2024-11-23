@@ -15,6 +15,25 @@ Welcome to the Omniflex Mono-Repo! This repository is designed to provide a robu
 
 The Omniflex Mono-Repo offers a streamlined development experience with features like quick scaffolding, automatic Swagger documentation, and modular architecture. These benefits lead to easier maintenance and faster development cycles.
 
+### Quick Start
+
+```bash
+# clone the omniflex mono-repo
+git clone --recurse-submodules git@github.com:Zay-Dev/Omniflex.git omniflex
+
+# clone the example apps-server
+git clone git@github.com:Zay-Dev/omniflex-express-apps-server.git apps/server
+
+# remove the git history of the cloned apps-server
+rm -rf apps/server/.git
+
+# install dependencies
+yarn
+
+# run the example apps-server
+yarn dev:server
+```
+
 ### Getting Started
 
 1. **Clone the Repository**: Start by cloning this mono-repo to your local machine.
