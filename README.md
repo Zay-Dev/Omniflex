@@ -11,6 +11,36 @@ The omniflex mono-repo is available at [here](https://github.com/Zay-Dev/omnifle
 
 Welcome to the Omniflex Mono-Repo! This repository is designed to provide a robust and scalable foundation for developers to build their applications. Our focus is on maintaining a high-quality infrastructure and package ecosystem, allowing you to concentrate on developing your application logic.
 
+### Features
+
+#### infra/infra-express
+
+- **Request Processing**: Automatic sanitization and masking of sensitive data
+- **Error Handling**
+  - Standardized error responses with configurable detail exposure
+  - Capture unhandled async errors and prevent the app from dying
+- **Logging**
+  - Comprehensive request/response logging with Morgan integration
+- **Security**
+  - Built-in security middlewares including:
+    - CORS
+    - Helmet
+    - File upload handling
+    - User agent parsing
+  - Response time tracking
+- **Base Controller Classes**: each controller instance serves one and only one request, eliminating the messy `(req: Request, res: Response)` passing around but just `this.req` and `this.res`
+  - BaseExpressController:
+    - provides `tryAction` and `tryActionWithBody` methods out of the box that make it easier to wrap logic in a try/catch block and standardized the error handling
+    - provides `throwNotFound` and `throwForbidden` methods out of the box that make it easier to throw standardized errors
+    - provides `respondOne` and `respondMany` methods out of the box that make it easier to respond with standardized data structure
+    - `this.pathId`, `this.pageSize` and `this.page` are automatically populated for convenience
+  - BaseEntitiesController:
+    - everything from `BaseExpressController`, and
+    - `tryListAll`, `tryGetOne`, `tryListPaginated`, `tryCreate`, `tryUpdate`, `tryDelete` and `trySoftDelete` methods out of the box that make it easier to perform CRUD operations
+- uses Joi for request body validation
+- Detailed request/response logging with request ID tracking
+
+
 ## Quick Usage
 
 The Omniflex Mono-Repo offers a streamlined development experience with features like quick scaffolding, automatic Swagger documentation, and modular architecture. These benefits lead to easier maintenance and faster development cycles.
