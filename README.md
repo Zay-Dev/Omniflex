@@ -88,20 +88,20 @@ For a complete working example, please refer to our reference implementation at 
 
 ## Structure
 
-- **core**: Contains shared types and utilities.
-- **infra**: Infrastructure-related packages, such as Express, Mongoose, and Swagger autogen.
-- **modules**: Feature-specific modules, such as identity management.
-- **apps**: Applications built using the core and infra packages.
+- `core/`: Contains shared types and utilities.
+- `infra/`: Infrastructure-related packages, such as Express, Mongoose, and Swagger autogen.
+- `modules/`: Feature-specific modules, such as identity management.
+- `apps/`: Applications built using the core and infra packages.
 
 ### Features
 
-#### core
+#### `core/`
 
 - **Error Handling**
   - Generic and standardized error types and handling mechanisms
   - Although the usage looks like built for HTTP, it is not limited to HTTP
 - **Dependency Injection**
-  - Uses `Awilix` to manage dependencies and promote loose coupling between components
+  - Uses [awilix](https://github.com/jeffijoe/awilix) to manage dependencies and promote loose coupling between components
 
 The core package serves as the foundation for all other packages in the Omniflex ecosystem, providing essential utilities and standardized patterns that ensure consistency across your application.
 
@@ -129,16 +129,18 @@ container.register('userService', () => new UserService());
   - Standardized error responses with configurable detail exposure
   - Capture unhandled async errors and prevent the app from dying
 - **Logging**
-  - Comprehensive request/response logging with Morgan integration
+  - Comprehensive request/response logging with [morgan](https://github.com/expressjs/morgan) integration
   - Detailed request/response logging with request ID tracking
   - Automatic sanitization and masking of sensitive data
 - **Security**
   - Built-in security middlewares including:
-    - CORS
-    - Helmet
-    - File upload handling
-    - User agent parsing
-  - Response time tracking
+    - [cors](https://github.com/expressjs/cors)
+    - [helmet](https://github.com/helmetjs/helmet)
+    - [express-fileupload](https://github.com/richardgirges/express-fileupload)
+    - [express-useragent](https://github.com/biggora/express-useragent)
+  - [response-time](https://github.com/expressjs/response-time) for tracking response time
+- uses [joi](https://github.com/hapijs/joi) for request body validation
+- compatible with [swagger-autogen](https://github.com/swagger-autogen/swagger-autogen)
 - **Base Controller Classes**: each controller instance serves one and only one request, eliminating the messy `(req: Request, res: Response)` passing around but just `this.req` and `this.res`
   - BaseExpressController:
     - provides `tryAction` and `tryActionWithBody` methods out of the box that make it easier to wrap logic in a try/catch block and standardized the error handling
@@ -148,7 +150,113 @@ container.register('userService', () => new UserService());
   - BaseEntitiesController:
     - everything from `BaseExpressController`, and
     - `tryListAll`, `tryGetOne`, `tryListPaginated`, `tryCreate`, `tryUpdate`, `tryDelete` and `trySoftDelete` methods out of the box that make it easier to perform CRUD operations
-- uses Joi for request body validation
+
+Example:
+
+```typescript
+// -- controller.ts
+
+class Controller extends UsersController<TUser & {
+  appTypes: string[];
+}> {
+  tryRegisterWithEmail(appType: string) {
+    type TBody = Schemas.TBodyRegisterWithEmail;
+
+    this.tryActionWithBody<TBody>(async ({ password, ...body }) => {
+      const { id } = await this.register(appType, password, {
+        ...body,
+        username: body.email,
+      });
+
+      const user = await this.repository.update(id, {
+        appTypes: [appType],
+      });
+
+      return this.respondOne(user);
+    });
+  }
+
+  tryLoginWithEmail(appType: string) {
+    type TBody = Schemas.TBodyLoginWithEmail;
+
+    this.tryActionWithBody<TBody>(async (body) => {
+      const user = await this.login(appType, {
+        ...body,
+        username: body.email,
+      });
+      const userAppTypes = user.appTypes || [];
+
+      if (!userAppTypes.includes(appType)) {
+        throw errors.unauthorized();
+      }
+
+      return this.respondOne({
+        token: await jwtProvider.sign({
+          ...user,
+          id: user.id,
+
+          __appType: appType,
+          __type: 'access-token',
+        }),
+      });
+    });
+  }
+
+  tryGetMyProfile() {
+    this.tryAction(async () => {
+      const profile = this.res.locals.required.profile;
+
+      return this.respondOne({
+        profileId: profile.id,
+        ...profile,
+      });
+    });
+  }
+}
+
+// -- exposed.ts
+// #swagger.file.tags = ['Users']
+// #swagger.file.basePath = '/v1/users'
+
+import ...;
+
+const router = Servers.exposedRoute('/v1/users');
+
+const appType = Servers.servers.exposed.type;
+
+router
+  .get('/my/profile',
+    // #swagger.security = [{"bearerAuth": []}]
+    auth.requireExposed,
+
+    DbEntries.requiredById(
+      repositories.users,
+      (req, res, next) => res.locals.user.id,
+      true,
+    ),
+    DbEntries.requiredFirstMatch(
+      repositories.profiles,
+      (_, res) => ({ userId: res.locals.user.id }),
+      'profile'
+    ),
+
+    create(controller => controller.tryGetMyProfile()),
+  )
+
+  .post('/',
+    // #swagger.jsonBody = required|components/schemas/moduleIdentity/registerWithEmail
+    Validators.validateRegisterWithEmail,
+
+    create(controller => controller.tryRegisterWithEmail(appType)),
+  )
+
+  .post('/access-tokens',
+    // #swagger.jsonBody = required|components/schemas/moduleIdentity/loginWithEmail
+    Validators.validateLoginWithEmail,
+
+    create(controller => controller.tryLoginWithEmail(appType)),
+  );
+```
 
 #### infra/infra-{db}
 
@@ -186,8 +294,8 @@ const userSchema = {
 
 ##### infra-postgres
 - **Connection Management**
-  - Uses `Sequelize` ORM
-  - Built-in logging integration with core logger
+  - Uses [sequelize](https://sequelize.org/) ORM
+  - Built-in logging integration with `core/` logger
   - Predefined schema types with common configurations:
     - Easier to read and understand
     - Required/Optional variants for all basic types
