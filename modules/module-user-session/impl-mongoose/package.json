@@ -1,0 +1,24 @@
+{
+  "name": "@omniflex/module-user-session-mongoose",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc && tsc-alias"
+  },
+  "exports": {
+    "./schemas": {
+      "development": "./schemas.ts",
+      "import": "./dist/schemas.js"
+    },
+    ".": {
+      "development": "./index.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@omniflex/core": "0.1.0",
+    "@omniflex/infra-mongoose": "0.1.0",
+    "@omniflex/module-user-session-core": "0.1.0"
+  }
+}

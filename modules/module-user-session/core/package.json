@@ -1,0 +1,21 @@
+{
+  "name": "@omniflex/module-user-session-core",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && tsc-alias"
+  },
+  "exports": {
+    "./*": {
+      "development": "./*.ts",
+      "import": "./dist/*.js"
+    },
+    ".": {
+      "development": "./index.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@omniflex/core": "0.1.0"
+  }
+}
