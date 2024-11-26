@@ -70,7 +70,7 @@ export class BaseExpressController<TLocals extends TBaseLocals = TBaseLocals> {
     throw errors.forbidden();
   }
 
-  protected get ipAddress() {
+  protected get remoteAddress() {
     return `${this.req.headers.forwarded || this.req.ip}`.trim() ||
       undefined;
   }

@@ -65,7 +65,7 @@ export const loginAttemptBaseSchema = {
   loginType: requiredString(),
   appType: requiredString(),
   success: requiredBoolean(),
-  ipAddress: optionalString(),
+  remoteAddress: optionalString(),
   remark: mixed(),
 
   userId: {

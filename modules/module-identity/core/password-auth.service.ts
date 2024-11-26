@@ -21,7 +21,7 @@ type TRecordLoginAttemptProps = {
   identifier: string;
   remark?: any;
   success?: boolean;
-  ipAddress?: string;
+  remoteAddress?: string;
 };
 
 const hashPassword = async (password: string) => {
@@ -79,13 +79,13 @@ export class PasswordAuthService {
   async loginByUsername(values: {
     username: string;
     password: string;
-    ipAddress?: string;
+    remoteAddress?: string;
   }) {
     const recordFail = (data: Partial<TRecordLoginAttemptProps> = {}) => {
       return this._recordLoginAttempt({
         ...data,
         identifier: values.username,
-        ipAddress: values.ipAddress,
+        remoteAddress: values.remoteAddress,
         success: data.success || false,
       });
     };
@@ -127,7 +127,7 @@ export class PasswordAuthService {
       appType: this.appType,
 
       remark: data.remark,
-      ipAddress: data.ipAddress,
+      remoteAddress: data.remoteAddress,
       success: data.success || false,
 
       userId: data.userId,

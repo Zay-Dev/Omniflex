@@ -39,7 +39,7 @@ export type TLoginAttempt = TSoftDeletable & TWithTimestamps & {
   loginType: string;
   appType: string;
   success: boolean;
-  ipAddress?: string;
+  remoteAddress?: string;
   remark?: any;
 
   user?: TUser;

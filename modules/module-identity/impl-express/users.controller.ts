@@ -44,7 +44,7 @@ export class UsersController<T extends TUser = TUser>
       .loginByUsername({
         username,
         password,
-        ipAddress: this.ipAddress,
+        remoteAddress: this.remoteAddress,
       }) as any as Promise<T>;
   }
 

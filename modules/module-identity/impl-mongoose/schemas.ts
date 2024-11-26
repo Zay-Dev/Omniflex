@@ -50,7 +50,7 @@ export const loginAttemptBaseSchema = {
   loginType: requiredString,
   appType: requiredString,
   success: { type: Boolean, required: true },
-  ipAddress: optionalString,
+  remoteAddress: optionalString,
   remark: mixed,
 
   userId: toOptionalObjectId('Users'),
