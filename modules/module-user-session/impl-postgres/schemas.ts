@@ -12,18 +12,21 @@ import {
 export const sessionBaseSchema = {
   id: id('UUID'),
   isDeleted: isDeleted(),
-
   sessionType: requiredString(),
+
   isActive: defaultFalse(),
   expiredAt: requiredDate(),
+  identifier: requiredString(),
+  pairIdentifier: requiredString(),
 
-  ipAddress: optionalString(),
-  userAgent: optionalString(),
-  deviceInfo: mixed(),
   metadata: mixed(),
+  deviceInfo: mixed(),
+  userAgent: optionalString(),
+  remoteAddress: optionalString(),
 
   userId: {
     ...toRequired(id('UUID', false)),
+
     references: {
       key: 'id',
       model: 'Users',

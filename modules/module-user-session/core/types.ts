@@ -2,15 +2,18 @@ import { IBaseRepository, TSoftDeletable, TWithTimestamps } from '@omniflex/core
 
 export type TUserSession = TSoftDeletable & TWithTimestamps & {
   id: string;
-  sessionType: string;
-  isActive: boolean;
-  expiredAt: Date;
   userId: string;
+  sessionType: string;
 
-  ipAddress?: string;
-  userAgent?: string;
-  deviceInfo?: any;
+  expiredAt: Date;
+  isActive: boolean;
+  identifier: string;
+  pairIdentifier: string;
+
   metadata?: any;
+  deviceInfo?: any;
+  userAgent?: string;
+  remoteAddress?: string;
 };
 
 export interface IUserSessionRepository extends IBaseRepository<TUserSession, string> {

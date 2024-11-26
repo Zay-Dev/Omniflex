@@ -13,15 +13,17 @@ import {
 
 export const sessionBaseSchema = {
   isDeleted,
-
   sessionType: requiredString,
+
   isActive: defaultFalse,
   expiredAt: requiredDate,
+  identifier: requiredString,
+  pairIdentifier: requiredString,
 
-  ipAddress: optionalString,
-  userAgent: optionalString,
-  deviceInfo: mixed,
   metadata: mixed,
+  deviceInfo: mixed,
+  userAgent: optionalString,
+  remoteAddress: optionalString,
 
   userId: toRequiredObjectId('Users'),
 };
