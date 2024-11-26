@@ -60,7 +60,7 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
       query.then(result => result.toObject());
   }
 
-  update(id: TPrimaryKey, data: Partial<T>): Promise<T | null> {
+  updateById(id: TPrimaryKey, data: Partial<T>): Promise<T | null> {
     return this.model.findByIdAndUpdate(
       id,
       data,
@@ -69,6 +69,15 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
         new: true,
       }
     );
+  }
+
+  async updateMany(filter: TDeepPartial<T>, data: Partial<T>) {
+    return (await this.model
+      .updateMany(
+        filter,
+        data,
+        this.sharedQueryOptions,
+      )).modifiedCount;
   }
 
   async delete(id: TPrimaryKey): Promise<boolean> {

@@ -96,7 +96,7 @@ export class PostgresRepository<
     return instance.toJSON();
   }
 
-  async update(id: TPrimaryKey, data: Partial<T>): Promise<T | null> {
+  async updateById(id: TPrimaryKey, data: Partial<T>): Promise<T | null> {
     await this.model.update(
       data as any,
       {
@@ -108,6 +108,13 @@ export class PostgresRepository<
     return this.findById(id);
   }
 
+  async updateMany(filter: TDeepPartial<T>, data: Partial<T>) {
+    return (await this.model.update(data, {
+      where: this.transformFilter(filter),
+      ...this.sharedQueryOptions,
+    }))[0];
+  }
+
   async delete(id: TPrimaryKey) {
     const result = await this.model
       .destroy({ where: { id: id as any } });
@@ -116,7 +123,7 @@ export class PostgresRepository<
   }
 
   async softDelete(id: TPrimaryKey) {
-    const result = await this.update(id, { isDeleted: true } as any);
+    const result = await this.updateById(id, { isDeleted: true } as any);
 
     return !!result;
   }

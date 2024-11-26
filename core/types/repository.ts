@@ -53,7 +53,8 @@ export interface IBaseRepository<T, TPrimaryKey> {
   find(filter: TDeepPartial<T>, options?: TQueryOptions<T>): Promise<T[]>;
 
   create(data: Partial<T>): Promise<T>;
-  update(id: TPrimaryKey, data: Partial<T>): Promise<T | null>;
+  updateById(id: TPrimaryKey, data: Partial<T>): Promise<T | null>;
+  updateMany(filter: TDeepPartial<T>, data: Partial<T>): Promise<number>;
 
   delete(id: TPrimaryKey): Promise<boolean>;
   softDelete(id: TPrimaryKey): Promise<boolean>;

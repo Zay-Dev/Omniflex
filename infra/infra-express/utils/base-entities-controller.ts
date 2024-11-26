@@ -73,7 +73,7 @@ export class BaseEntitiesController<
   tryUpdate<T extends Partial<TEntity> = Partial<TEntity>>() {
     return this.tryActionWithBody<T>(async (body) => {
       const id = this.pathId as TPrimaryKey;
-      const entity = await this.repository.update(id, body);
+      const entity = await this.repository.updateById(id, body);
 
       if (!entity) {
         this.throwNotFound();

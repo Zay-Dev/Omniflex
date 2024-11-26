@@ -113,7 +113,7 @@ export class PasswordAuthService {
       throw errors.unauthorized();
     }
 
-    await users.update(user.id, {
+    await users.updateById(user.id, {
       lastSignInAtUtc: new Date()
     });
 
