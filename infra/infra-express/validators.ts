@@ -37,11 +37,12 @@ const manageFetched = (
 export const DbEntries = {
   requiredById: (
     repository,
-    getId: (req: Request, res: Response, next: NextFunction) => any,
+    getId: (req: Request, res: Response, next: NextFunction) => any | Promise<any>,
     countOnlyOrKeyName: true | string = '_byId',
   ) => {
-    return (req: Request, res: Response, next: NextFunction) => {
-      const id = getId(req, res, next);
+    return async (req: Request, res: Response, next: NextFunction) => {
+      const id = await getId(req, res, next);
+
       if (!repository.isValidPrimaryKey(id)) {
         return next(errors.badRequest('Invalid ID'));
       }
