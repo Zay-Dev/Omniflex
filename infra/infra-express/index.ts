@@ -2,6 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 
 export { AutoServer } from './auto-server';
 
+export * from './utils/base-controller';
+export * from './utils/base-entities-controller';
+
 export const getControllerCreator = <T>(
   constructor: new (req: Request, res: Response, next: NextFunction) => T
 ) => {

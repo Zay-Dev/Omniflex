@@ -1,1 +1,1 @@
-export * from './session.validation';
+export * as UserSessionValidators from './session.validation';
