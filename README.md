@@ -167,7 +167,7 @@ container.register('userService', () => new UserService());
   - [response-time](https://github.com/expressjs/response-time) for tracking response time
 - compatible with (an enhanced) [swagger-autogen](https://github.com/swagger-autogen/swagger-autogen)
 - Uses [joi](https://github.com/hapijs/joi) for request body validation
-- Utilizes [joi-to-swagger](https://github.com/Twipped/joi-to-swagger) to generate swagger documentation, no need to maintain the request body schema manually anymore
+- Employs [joi-to-swagger](https://github.com/Twipped/joi-to-swagger) for automatic generation of swagger documentation, eliminating the need for manual maintenance of request body schema
 - **Base Controller Classes**: each controller instance serves one and only one request, eliminating the messy `(req: Request, res: Response)` passing around but just `this.req` and `this.res`
   - BaseExpressController:
     - provides `tryAction` and `tryActionWithBody` methods out of the box that make it easier to wrap logic in a try/catch block and standardized the error handling
@@ -380,5 +380,11 @@ Please feel free to open issues to share your ideas or report problems.
 
 ## License
 
-See the LICENSE file for more details.
+This project is licensed under a custom license that allows free use for non-commercial purposes. Commercial use requires a separate license.
+
+Key points:
+- Free for personal and non-commercial projects
+- Commercial use requires licensing
+- Contact license@omniflex.io for commercial inquiries
+- See the [LICENSE](LICENSE) file for complete terms
 
