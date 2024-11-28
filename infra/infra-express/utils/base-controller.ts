@@ -4,14 +4,18 @@ import { Request, Response, NextFunction, TLocals } from '../types';
 type TBaseLocals = TLocals;
 
 export class BaseExpressController<TLocals extends TBaseLocals = TBaseLocals> {
+  protected req: Request;
+  protected res: Response;
+  protected next: NextFunction;
   protected locals: TLocals;
+
   public user?: TLocals['user'];
 
-  constructor(
-    protected req: Request,
-    protected res: Response,
-    protected next: NextFunction
-  ) {
+  constructor(req, res, next) {
+    this.req = req;
+    this.res = res;
+    this.next = next;
+
     this.user = this.res.locals.user;
     this.locals = this.res.locals as TLocals;
   }

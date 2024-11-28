@@ -2,6 +2,12 @@ import { errors } from '@omniflex/core';
 import { IBaseRepository } from '@omniflex/core/types/repository';
 
 import {
+  Request as ERequest,
+  Response as EResponse,
+  NextFunction as ENextFunction,
+} from 'express';
+
+import {
   Request,
   Response,
   NextFunction,
@@ -40,7 +46,7 @@ export const DbEntries = {
     getId: (req: Request, res: Response, next: NextFunction) => any | Promise<any>,
     countOnlyOrKeyName: true | string = '_byId',
   ) => {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return (async (req: Request, res: Response, next: NextFunction) => {
       const id = await getId(req, res, next);
 
       if (!repository.isValidPrimaryKey(id)) {
@@ -67,16 +73,16 @@ export const DbEntries = {
           return next();
         },
       });
-    };
+    }) as (req: ERequest, res: EResponse, next: ENextFunction) => Promise<void>;
   },
 
   requiredFirstMatch: <T extends {}, TPrimaryKey>(
     repository: IBaseRepository<T, TPrimaryKey>,
-    getQuery: (req: Request, res: Response, next: NextFunction) => Partial<T>,
+    getQuery: (req: Request, res: Response, next: NextFunction) => Partial<T> | Promise<Partial<T>>,
     countOnlyOrKeyName: true | string = '_firstMatch',
   ) => {
-    return (req: Request, res: Response, next: NextFunction) => {
-      const query = getQuery(req, res, next);
+    return (async (req: Request, res: Response, next: NextFunction) => {
+      const query = await getQuery(req, res, next);
 
       const countOnly = countOnlyOrKeyName === true;
       const keyName = countOnlyOrKeyName === true ?
@@ -98,6 +104,6 @@ export const DbEntries = {
           return next();
         },
       });
-    };
+    }) as (req: ERequest, res: EResponse, next: ENextFunction) => Promise<void>;
   },
 };
