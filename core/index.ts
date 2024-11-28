@@ -46,3 +46,38 @@ export const initializeAppContainer = (values: {
     Containers.asValue('hashProvider', values.hashProvider);
   }
 };
+
+export const autoImport = async (
+  absolutePath: string,
+  shouldImport: (filename: string) => boolean,
+  depth: number = 99,
+) => {
+  const fs = await import('fs/promises');
+  const { pathToFileURL } = await import('url');
+
+  const children = await fs.readdir(absolutePath, { withFileTypes: true });
+
+  const files = children.filter(child => child.isFile());
+  const directories = children.filter(child => child.isDirectory());
+
+  await Promise.all(
+    files
+      .filter(file => {
+        return shouldImport(
+          file.name
+            .split('.')
+            .slice(0, -1)
+            .join('.')
+        );
+      })
+      .map(file => pathToFileURL(`${file.parentPath}/${file.name}`))
+      .map(file => import(`${file}`)),
+  );
+
+  if (depth >= 0) {
+    await Promise.all(
+      directories
+        .map(dir => autoImport(`${dir.parentPath}/${dir.name}`, shouldImport, depth - 1))
+    );
+  }
+};
