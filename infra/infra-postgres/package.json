@@ -18,9 +18,9 @@
   },
   "dependencies": {
     "@omniflex/core": "0.1.0",
+    "@omniflex/infra-sequelize-v6": "0.1.0",
     "pg": "^8.13.1",
-    "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.5"
+    "pg-hstore": "^2.3.4"
   },
   "devDependencies": {}
 }

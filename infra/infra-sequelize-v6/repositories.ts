@@ -12,7 +12,7 @@ import {
   IBaseRepository,
 } from '@omniflex/core/types/repository';
 
-export class PostgresRepository<
+export class SequelizeRepository<
   T extends { id: TPrimaryKey; },
   TPrimaryKey extends Identifier = string
 >
@@ -38,7 +38,7 @@ export class PostgresRepository<
 
     logger.warn(
       `Failed to validate ${id} with type ${type}`,
-      { tags: ['Postgres', this.model.tableName] },
+      { tags: ['Sequelize', this.model.tableName] },
     );
     return true;
   }
