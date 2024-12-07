@@ -23,6 +23,11 @@ export default {
     '^@omniflex/module-user-session-impl-express/?(.*)$': '<rootDir>/modules/module-user-session/impl-express/$1',
     '^@omniflex/module-user-session-impl-mongoose/?(.*)$': '<rootDir>/modules/module-user-session/impl-mongoose/$1',
     '^@omniflex/module-user-session-impl-sequelize-v6/?(.*)$': '<rootDir>/modules/module-user-session/impl-sequelize-v6/$1',
+
+    '^@omniflex/module-identity-core/?(.*)$': '<rootDir>/modules/module-identity/core/$1',
+    '^@omniflex/module-identity-impl-express/?(.*)$': '<rootDir>/modules/module-identity/impl-express/$1',
+    '^@omniflex/module-identity-impl-mongoose/?(.*)$': '<rootDir>/modules/module-identity/impl-mongoose/$1',
+    '^@omniflex/module-identity-impl-sequelize-v6/?(.*)$': '<rootDir>/modules/module-identity/impl-sequelize-v6/$1',
   },
 
   coveragePathIgnorePatterns: [
