@@ -35,6 +35,7 @@ jest.mock('@omniflex/core', () => {
       })
     },
     handleUncaughtException: jest.fn(),
-    BaseError
+    BaseError,
+    modulesSchemas: {}
   };
 });

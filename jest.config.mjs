@@ -13,10 +13,16 @@ export default {
     '^@omniflex/core$': '<rootDir>/core',
     '^@omniflex/core/(.*)$': '<rootDir>/core/$1',
     '^@omniflex/infra-express/?(.*)$': '<rootDir>/infra/infra-express/$1',
-    '^@omniflex/infra-postgres/?(.*)$': '<rootDir>/infra/infra-postgres/$1',
     '^@omniflex/infra-sqlite/?(.*)$': '<rootDir>/infra/infra-sqlite/$1',
+    '^@omniflex/infra-postgres/?(.*)$': '<rootDir>/infra/infra-postgres/$1',
+    '^@omniflex/infra-mongoose/?(.*)$': '<rootDir>/infra/infra-mongoose/$1',
     '^@omniflex/infra-sequelize-v6/?(.*)$': '<rootDir>/infra/infra-sequelize-v6/$1',
     '^@/(.*)$': '<rootDir>/apps/server/$1',
+
+    '^@omniflex/module-user-session-core/?(.*)$': '<rootDir>/modules/module-user-session/core/$1',
+    '^@omniflex/module-user-session-impl-express/?(.*)$': '<rootDir>/modules/module-user-session/impl-express/$1',
+    '^@omniflex/module-user-session-impl-mongoose/?(.*)$': '<rootDir>/modules/module-user-session/impl-mongoose/$1',
+    '^@omniflex/module-user-session-impl-sequelize-v6/?(.*)$': '<rootDir>/modules/module-user-session/impl-sequelize-v6/$1',
   },
 
   coveragePathIgnorePatterns: [
