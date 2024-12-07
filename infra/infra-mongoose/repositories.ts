@@ -22,16 +22,19 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
 
   async exists(filter: TDeepPartial<T>): Promise<boolean> {
     const count = await this.model.countDocuments(
-      filter,
+      this.transformFilter(filter),
       this.sharedQueryOptions,
     );
 
     return count > 0;
   }
 
-  findById(id: TPrimaryKey, options?: TQueryOptions<T>): Promise<T | null> {
-    return this.model.findById(
-      id,
+  findById(_id: TPrimaryKey, options?: TQueryOptions<T>): Promise<T | null> {
+    return this.model.findOne(
+      {
+        _id,
+        ...this.getParanoidFilter(options),
+      },
       null,
       this.transformQueryOptions(options)
     );
@@ -39,7 +42,10 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
 
   findOne(filter: TDeepPartial<T>, options?: TQueryOptions<T>): Promise<T | null> {
     return this.model.findOne(
-      filter,
+      {
+        ...this.transformFilter(filter),
+        ...this.getParanoidFilter(options),
+      },
       null,
       this.transformQueryOptions(options)
     );
@@ -47,7 +53,10 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
 
   find(filter: TDeepPartial<T>, options?: TQueryOptions<T>): Promise<T[]> {
     return this.model.find(
-      filter,
+      {
+        ...this.transformFilter(filter),
+        ...this.getParanoidFilter(options),
+      },
       null,
       this.transformQueryOptions(options)
     );
@@ -60,9 +69,12 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
       query.then(result => result.toObject());
   }
 
-  updateById(id: TPrimaryKey, data: Partial<T>): Promise<T | null> {
-    return this.model.findByIdAndUpdate(
-      id,
+  async updateById(_id: TPrimaryKey, data: Partial<T>): Promise<T | null> {
+    return this.model.findOneAndUpdate(
+      {
+        _id,
+        ...this.getParanoidFilter(),
+      },
       data,
       {
         ...this.sharedQueryOptions,
@@ -74,20 +86,31 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
   async updateMany(filter: TDeepPartial<T>, data: Partial<T>) {
     return (await this.model
       .updateMany(
-        filter,
+        {
+          ...this.transformFilter(filter),
+          ...this.getParanoidFilter(),
+        },
         data,
         this.sharedQueryOptions,
       )).modifiedCount;
   }
 
-  async delete(id: TPrimaryKey): Promise<boolean> {
-    const result = await this.model.findByIdAndDelete(id);
+  async delete(_id: TPrimaryKey): Promise<boolean> {
+    const result = await this.model
+      .findOneAndDelete({ _id });
 
     return !!result;
   }
 
-  async softDelete(id: TPrimaryKey): Promise<boolean> {
-    const result = await this.model.findByIdAndUpdate(id, { isDeleted: true });
+  async softDelete(_id: TPrimaryKey): Promise<boolean> {
+    const result = await this.model.findOneAndUpdate(
+      {
+        _id,
+        deletedAt: null,
+      },
+      { deletedAt: new Date() },
+      { new: true }
+    );
 
     return !!result;
   }
@@ -113,5 +136,14 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
     }
 
     return transformed;
+  }
+
+  protected transformFilter(filter: TDeepPartial<T>) {
+    return filter;
+  }
+
+  protected getParanoidFilter(options?: TQueryOptions<T>) {
+    if (options?.paranoid === false) return {};
+    return { deletedAt: null };
   }
 }
