@@ -1,4 +1,6 @@
-export const mockRequest = () => {
+import { Request } from '../types';
+
+export const mockRequest = (): Request => {
   return {
     body: {},
     query: {},
@@ -7,7 +9,7 @@ export const mockRequest = () => {
     path: '',
     method: '',
     url: ''
-  };
+  } as unknown as Request;
 };
 
 export const mockResponse = () => {
