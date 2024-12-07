@@ -5,19 +5,19 @@ import { SQLiteRepository } from '@omniflex/infra-sqlite';
 interface TestEntity {
   id: string;
   name: string;
-  isDeleted: boolean;
+  deletedAt: Date | null;
 }
 
 class TestModel extends Model<InferAttributes<TestModel>, InferCreationAttributes<TestModel>> {
   declare id: CreationOptional<string>;
   declare name: string;
-  declare isDeleted: CreationOptional<boolean>;
+  declare deletedAt: CreationOptional<Date>;
 
   toJSON(): TestEntity {
     return {
       id: this.id,
       name: this.name,
-      isDeleted: this.isDeleted ?? false
+      deletedAt: this.deletedAt ?? null
     };
   }
 }
@@ -62,22 +62,19 @@ describe('BaseEntitiesController', () => {
         type: DataTypes.STRING,
         allowNull: false
       },
-      isDeleted: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-        allowNull: false
-      }
+      deletedAt: DataTypes.DATE
     }, {
       sequelize,
       modelName: 'test',
-      timestamps: false
+      paranoid: true,
+      timestamps: true
     });
 
     await sequelize.sync({ force: true });
   });
 
   beforeEach(async () => {
-    await TestModel.destroy({ where: {}, truncate: true });
+    await TestModel.destroy({ where: {}, force: true });
     req = createMockReq();
     res = createMockRes();
     next = jest.fn();
@@ -112,6 +109,18 @@ describe('BaseEntitiesController', () => {
         await controller.tryGetOne();
         expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringContaining('Not Found') }));
       });
+
+      it('should not return soft-deleted entity', async () => {
+        const entity = await createTestModel('test');
+        await repository.softDelete(entity.id);
+        req.params.id = entity.id;
+
+        await controller.tryGetOne();
+
+        expect(next).toHaveBeenCalledWith(
+          expect.objectContaining({ message: expect.stringContaining('Not Found') })
+        );
+      });
     });
 
     describe('list operations', () => {
@@ -143,6 +152,37 @@ describe('BaseEntitiesController', () => {
           data: expect.arrayContaining([
             expect.objectContaining({ name: 'test1' }),
             expect.objectContaining({ name: 'test2' })
+          ]),
+          total: 2
+        });
+      });
+
+      it('should not return soft-deleted entities in tryListAll', async () => {
+        const active = await createTestModel('active');
+        const deleted = await createTestModel('deleted');
+        await repository.softDelete(deleted.id);
+
+        await controller.tryListAll();
+
+        expect(res.json).toHaveBeenCalledWith({
+          data: [expect.objectContaining({ id: active.id, name: 'active' })],
+          total: 1
+        });
+      });
+
+      it('should not return soft-deleted entities in tryListPaginated', async () => {
+        const active1 = await createTestModel('active1');
+        const deleted = await createTestModel('deleted');
+        const active2 = await createTestModel('active2');
+        await repository.softDelete(deleted.id);
+
+        req.query = { page: '1', pageSize: '2' };
+        await controller.tryListPaginated();
+
+        expect(res.json).toHaveBeenCalledWith({
+          data: expect.arrayContaining([
+            expect.objectContaining({ name: 'active1' }),
+            expect.objectContaining({ name: 'active2' })
           ]),
           total: 2
         });
@@ -191,7 +231,7 @@ describe('BaseEntitiesController', () => {
 
         expect(res.json).toHaveBeenCalledWith({ data: { success: true } });
         const softDeleted = await repository.findById(entity.id);
-        expect(softDeleted?.isDeleted).toBe(true);
+        expect(softDeleted).toBeNull();
       });
 
       it('should handle hard delete', async () => {

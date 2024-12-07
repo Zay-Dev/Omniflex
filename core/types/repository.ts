@@ -31,6 +31,7 @@ export type TPopulateOption<T, K = T> = {
   path: keyof T;
   select?: string | Array<keyof K>;
   populate?: string | Array<keyof K> | TPopulateOption<K>;
+  paranoid?: boolean;
 };
 
 export type TQueryOptions<T> = {
@@ -41,6 +42,7 @@ export type TQueryOptions<T> = {
   sort?: {
     [P in keyof T]?: 'asc' | 'desc'
   };
+  paranoid?: boolean;
 };
 
 export interface IBaseRepository<T, TPrimaryKey> {

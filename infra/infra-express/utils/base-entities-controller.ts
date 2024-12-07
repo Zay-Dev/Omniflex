@@ -30,7 +30,7 @@ export class BaseEntitiesController<
     if (typeof id === 'undefined') {
       throw errors.custom('Path id is required');
     }
-    
+
     return id as unknown as TPrimaryKey;
   }
 
