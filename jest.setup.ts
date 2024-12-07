@@ -17,5 +17,6 @@ jest.mock('@omniflex/core', () => ({
         exposeErrorDetails: false
       }
     })
-  }
+  },
+  handleUncaughtException: jest.fn(),
 }));
