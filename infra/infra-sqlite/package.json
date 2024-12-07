@@ -1,0 +1,24 @@
+{
+  "name": "@omniflex/infra-sqlite",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && tsc-alias"
+  },
+  "private": true,
+  "exports": {
+    "./types": {
+      "development": "./types.ts",
+      "import": "./dist/types.js"
+    },
+    ".": {
+      "development": "./index.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@omniflex/core": "0.1.0",
+    "@omniflex/infra-sequelize-v6": "0.1.0",
+    "sqlite3": "^5.1.7"
+  }
+}
