@@ -1,9 +1,9 @@
 import { Model } from 'sequelize';
-import { TModel, PostgresRepository } from '@omniflex/infra-postgres';
+import { TModel, SequelizeRepository } from '@omniflex/infra-sequelize-v6';
 import { IUserRepository, TUser } from '@omniflex/module-identity-core/types';
 
 export class UserRepository
-  extends PostgresRepository<TUser>
+  extends SequelizeRepository<TUser>
   implements IUserRepository<TUser> {
   constructor(model: TModel<Model<TUser>>) {
     super(model);

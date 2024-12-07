@@ -1,9 +1,9 @@
 import { Model } from 'sequelize';
-import { TModel, PostgresRepository } from '@omniflex/infra-postgres';
+import { TModel, SequelizeRepository } from '@omniflex/infra-sequelize-v6';
 import { IUserSessionRepository, TUserSession } from '@omniflex/module-user-session-core/types';
 
 export class UserSessionRepository
-  extends PostgresRepository<TUserSession>
+  extends SequelizeRepository<TUserSession>
   implements IUserSessionRepository {
   constructor(model: TModel<Model<TUserSession>>) {
     super(model);

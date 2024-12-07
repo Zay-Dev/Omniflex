@@ -1,15 +1,15 @@
 {
-  "name": "@omniflex/module-identity-postgres",
+  "name": "@omniflex/infra-sqlite",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
   "scripts": {
     "build": "tsc && tsc-alias"
   },
+  "private": true,
   "exports": {
-    "./schemas": {
-      "development": "./schemas.ts",
-      "import": "./dist/schemas.js"
+    "./types": {
+      "development": "./types.ts",
+      "import": "./dist/types.js"
     },
     ".": {
       "development": "./index.ts",
@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@omniflex/core": "0.1.0",
-    "@omniflex/infra-postgres": "0.1.0",
-    "@omniflex/module-identity-core": "0.1.0"
+    "@omniflex/infra-sequelize-v6": "0.1.0",
+    "sqlite3": "^5.1.7"
   }
 }
