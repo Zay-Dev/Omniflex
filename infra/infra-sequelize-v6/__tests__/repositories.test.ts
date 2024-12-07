@@ -5,11 +5,15 @@ import { SequelizeRepository } from '../repositories';
 interface ITestModel {
   id: string;
   deletedAt?: Date;
+  identifier?: string;
+  isVerified?: boolean;
 }
 
 class TestModel extends Model<ITestModel> {
   declare id: string;
   declare deletedAt?: Date;
+  declare identifier?: string;
+  declare isVerified?: boolean;
 }
 
 describe('SequelizeRepository', () => {
@@ -24,6 +28,12 @@ describe('SequelizeRepository', () => {
         type: DataTypes.STRING,
         primaryKey: true
       },
+      identifier: {
+        type: DataTypes.STRING
+      },
+      isVerified: {
+        type: DataTypes.BOOLEAN
+      }
     }, {
       sequelize,
       tableName: 'test_models',
@@ -40,6 +50,40 @@ describe('SequelizeRepository', () => {
 
   afterAll(async () => {
     await sequelize.close();
+  });
+
+  describe('findOne', () => {
+    it('should find record with raw option', async () => {
+      const model = await TestModel.create({ id: 'test-id', identifier: 'test' });
+      const result = await repository.findOne({ id: model.id });
+
+      expect(result).toBeTruthy();
+      expect(result?.id).toBe(model.id);
+    });
+
+    it('should handle query options with pagination and sort', async () => {
+      const model = await TestModel.create({ id: 'test-id', identifier: 'test' });
+      const result = await repository.findOne(
+        { id: model.id },
+        { paranoid: false, sort: { id: 'desc' } }
+      );
+
+      expect(result).toBeTruthy();
+      expect(result?.id).toBe(model.id);
+    });
+  });
+
+  describe('updateMany', () => {
+    it('should update records with field-specific operations', async () => {
+      const model = await TestModel.create({ id: 'test-id', isVerified: false });
+      await repository.updateMany(
+        { id: model.id },
+        { isVerified: true }
+      );
+
+      const updated = await TestModel.findByPk(model.id);
+      expect(updated?.isVerified).toBe(true);
+    });
   });
 
   describe('delete', () => {
