@@ -204,4 +204,4 @@ describe('PasswordAuthService', () => {
       expect(result).toBe(mockUser);
     });
   });
-}); 
+});

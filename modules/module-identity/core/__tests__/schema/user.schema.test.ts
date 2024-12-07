@@ -163,4 +163,4 @@ describe('User Schemas', () => {
       expect(error?.details[0].message).toContain('"password" is required');
     });
   });
-}); 
+});
