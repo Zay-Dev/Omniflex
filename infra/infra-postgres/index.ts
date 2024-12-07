@@ -3,6 +3,7 @@ import { logger, Containers } from '@omniflex/core';
 
 import { TPostgresConfig } from './types';
 
+export * from './repositories';
 export * from '@omniflex/infra-sequelize-v6';
 
 export const getConnection = async (
