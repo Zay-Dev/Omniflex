@@ -4,7 +4,7 @@ import { logger, Containers } from '@omniflex/core';
 import { TPostgresConfig } from './types';
 
 export * from './repositories';
-export { type TModel } from './repositories/base';
+export * from '@omniflex/infra-sequelize-v6';
 
 export const getConnection = async (
   { postgres } = Containers.configAs<TPostgresConfig>()

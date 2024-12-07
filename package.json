@@ -7,6 +7,7 @@
     "ws-run": "yarn workspace",
     "build": "yarn workspaces run build",
     "dev:server": "yarn workspace apps-server dev",
+    "build:server": "yarn workspace apps-server tsc",
     "start:server": "yarn workspace apps-server start"
   },
   "workspaces": [
