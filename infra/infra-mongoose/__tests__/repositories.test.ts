@@ -1,6 +1,7 @@
-import { Schema, connect, Types } from 'mongoose';
+import { Schema, Types } from 'mongoose';
 
 import { MongooseBaseRepository } from '../repositories';
+import { createMockMongooseModel } from './utils/mongoose.mock';
 
 interface ITestModel {
   _id: string;
@@ -14,18 +15,12 @@ const TestSchema = new Schema<ITestModel>({
 });
 
 describe('MongooseBaseRepository', () => {
-  let connection;
   let repository: MongooseBaseRepository<ITestModel>;
   let TestModel;
 
-  beforeAll(async () => {
-    connection = await connect('mongodb://192.168.1.230:27017/omniflex-unit-test');
-    TestModel = connection.model('TestModel', TestSchema);
+  beforeEach(() => {
+    TestModel = createMockMongooseModel({}, TestSchema);
     repository = new MongooseBaseRepository(TestModel);
-  });
-
-  beforeEach(async () => {
-    await TestModel.deleteMany({});
   });
 
   describe('delete', () => {
@@ -61,9 +56,9 @@ describe('MongooseBaseRepository', () => {
 
       expect(result).toBe(true);
 
-      const softDeleted = await TestModel.findById(model._id);
-      expect(softDeleted).not.toBeNull();
-      expect(softDeleted?.deletedAt).not.toBeNull();
+      const softDeleted = await TestModel.findById(model._id, { paranoid: false });
+      expect(softDeleted).toBeTruthy();
+      expect(softDeleted?.deletedAt).toBeTruthy();
 
       const notFound = await repository.findById(model._id);
       expect(notFound).toBeNull();
@@ -90,7 +85,7 @@ describe('MongooseBaseRepository', () => {
       const model = await TestModel.create({ _id: new Types.ObjectId().toString() });
       const result = await repository.findById(model._id);
 
-      expect(result).not.toBeNull();
+      expect(result).toBeTruthy();
       expect(`${result?._id}`).toBe(`${model._id}`);
     });
 
@@ -115,9 +110,9 @@ describe('MongooseBaseRepository', () => {
 
       const result = await repository.findById(model._id, { paranoid: false });
 
-      expect(result).not.toBeNull();
+      expect(result).toBeTruthy();
       expect(`${result?._id}`).toBe(`${model._id}`);
-      expect(result?.deletedAt).not.toBeNull();
+      expect(result?.deletedAt).toBeTruthy();
     });
 
     it('should not find hard-deleted record even with paranoid false', async () => {
