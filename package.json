@@ -32,6 +32,7 @@
     "@types/jest": "^29.5.14",
     "@types/uuid": "^10.0.0",
     "jest": "^29.7.0",
+    "jest-silent-reporter": "^0.6.0",
     "ts-jest": "^29.2.5",
     "tsc": "^2.0.4",
     "tsc-alias": "^1.8.10",
