@@ -8,9 +8,11 @@ import { UserSessionRepository } from './repositories/user-session.repository';
 export * from './schemas';
 export * from './repositories/user-session.repository';
 
+type TContainer = { sequelize: Sequelize; };
+
 function get<T>(fn: () => T) { return fn(); }
 
-const appContainer = Containers.appContainerAs<{ postgres: Sequelize; }>();
+export const appContainer = Containers.appContainerAs<TContainer>();
 
 export const repositories = {} as {
   sessions: UserSessionRepository;
@@ -19,9 +21,13 @@ export const repositories = {} as {
 export const createRegisteredRepositories = (
   sessionSchema = get(Schemas.getSessionSchema),
 ) => {
-  const postgres = appContainer.resolve('postgres');
+  const sequelize = appContainer.resolve('sequelize');
 
-  const sessionModel = postgres.define('UserSession', sessionSchema.schema, sessionSchema.options);
+  const sessionModel = sequelize.define(
+    'UserSession',
+    sessionSchema.schema,
+    sessionSchema.options,
+  );
 
   repositories.sessions = new UserSessionRepository(sessionModel);
 
