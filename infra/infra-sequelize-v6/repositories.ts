@@ -116,16 +116,20 @@ export class SequelizeRepository<
   }
 
   async delete(id: TPrimaryKey) {
-    const result = await this.model
-      .destroy({ where: { id: id as any } });
+    const result = await this.model.destroy({ 
+      where: { id: id as any },
+      force: true 
+    });
 
     return result > 0;
   }
 
   async softDelete(id: TPrimaryKey) {
-    const result = await this.updateById(id, { isDeleted: true } as any);
+    const result = await this.model.destroy({ 
+      where: { id: id as any }
+    });
 
-    return !!result;
+    return result > 0;
   }
 
   protected transformQueryOptions<T>(options?: TQueryOptions<T>) {
@@ -135,6 +139,7 @@ export class SequelizeRepository<
       ...this.sharedQueryOptions,
       offset: options.skip,
       limit: options.take,
+      paranoid: options.paranoid ?? true,
       order: options.sort ?
         Object.entries(options.sort)
           .map(([key, value]) =>
