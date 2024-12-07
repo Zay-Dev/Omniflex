@@ -116,16 +116,16 @@ export class SequelizeRepository<
   }
 
   async delete(id: TPrimaryKey) {
-    const result = await this.model.destroy({ 
+    const result = await this.model.destroy({
       where: { id: id as any },
-      force: true 
+      force: true
     });
 
     return result > 0;
   }
 
   async softDelete(id: TPrimaryKey) {
-    const result = await this.model.destroy({ 
+    const result = await this.model.destroy({
       where: { id: id as any }
     });
 
@@ -245,11 +245,18 @@ export class SequelizeRepository<
   }
 
   protected transformFilter(filter: TDeepPartial<T>) {
+    if (!filter) return {};
+    
     const transformed = {};
 
     for (const [key, value] of Object.entries(filter)) {
-      if (typeof value === 'object' && !Array.isArray(value)) {
-        transformed[key] = this.transformOperators(value);
+      if (value === null) {
+        transformed[key] = null;
+      } else if (typeof value === 'object' && !Array.isArray(value)) {
+        const transformedOps = this.transformOperators(value);
+        if (Object.keys(transformedOps).length > 0) {
+          transformed[key] = transformedOps;
+        }
       } else {
         transformed[key] = value;
       }
@@ -259,9 +266,13 @@ export class SequelizeRepository<
   }
 
   protected transformOperators(operators: TQueryOperators<any>) {
+    if (!operators) return {};
+    
     const transformed = {};
 
     for (const [key, value] of Object.entries(operators)) {
+      if (value === null || value === undefined) continue;
+      
       switch (key) {
         case '$eq': transformed[Op.eq] = value; break;
         case '$ne': transformed[Op.ne] = value; break;
