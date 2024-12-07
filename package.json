@@ -8,7 +8,8 @@
     "build": "yarn workspaces run build",
     "dev:server": "yarn workspace apps-server dev",
     "build:server": "yarn workspace apps-server tsc",
-    "start:server": "yarn workspace apps-server start"
+    "start:server": "yarn workspace apps-server start",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "workspaces": [
     "core",
@@ -28,7 +29,10 @@
     "uuid": "^11.0.2"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "@types/uuid": "^10.0.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
     "tsc": "^2.0.4",
     "tsc-alias": "^1.8.10",
     "typescript": "^5.6.3"
