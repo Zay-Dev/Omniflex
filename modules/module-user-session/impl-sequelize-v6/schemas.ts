@@ -2,7 +2,6 @@ import * as Types from '@omniflex/infra-sequelize-v6/types';
 
 export const sessionBaseSchema = {
   id: Types.id('UUID'),
-  isDeleted: Types.isDeleted(),
   sessionType: Types.requiredString(),
 
   isActive: Types.defaultFalse(),
@@ -23,6 +22,8 @@ export const sessionBaseSchema = {
       model: 'Users',
     },
   },
+
+  deletedAt: Types.deletedAt(),
 };
 
 export const getSessionSchema = (
@@ -31,11 +32,12 @@ export const getSessionSchema = (
   return {
     schema,
     options: {
+      paranoid: true,
       tableName: 'UserSessions',
       indexes: [
         {
           fields: ['userId', 'sessionType', 'isActive'],
-          where: { isDeleted: false },
+          where: { deletedAt: null },
         },
       ],
     },

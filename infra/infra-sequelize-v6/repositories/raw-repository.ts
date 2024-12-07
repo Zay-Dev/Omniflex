@@ -70,7 +70,8 @@ export class RawRepository<
     return result > 0;
   }
 
-  async softDelete(id: TPrimaryKey) {
-    return this.update(id, { isDeleted: true } as any);
+  async softDelete(id: TPrimaryKey): Promise<boolean> {
+    const result = await this.update(id, { deletedAt: new Date() } as any);
+    return !!result;
   }
 }

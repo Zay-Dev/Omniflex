@@ -10,6 +10,6 @@ export class UserPasswordRepository
   }
 
   async findByUsername(username: string) {
-    return this.findOne({ username, isDeleted: false });
+    return this.findOne({ username });
   }
 }

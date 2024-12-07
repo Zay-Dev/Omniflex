@@ -68,7 +68,7 @@ export const toOptionalMixedWithDefault = defaultValue => ({
 
 export const toSubSchema = (schema) => new Schema(schema, { _id: false });
 
-export const isDeleted = { ...defaultFalse } as const;
+export const deletedAt = { ...optionalDate, default: null } as const;
 
 export const preferredDate = {
   readable: requiredString,

@@ -2,18 +2,18 @@ import { Schema, Document } from 'mongoose';
 import { TUser, TUserProfile, TUserPassword, TLoginAttempt } from '@omniflex/module-identity-core/types';
 
 import {
-  defaultFalse,
-  requiredString,
-  optionalDate,
-  optionalString,
   mixed,
+  deletedAt,
+  defaultFalse,
+  optionalDate,
+  requiredString,
+  optionalString,
   toRequiredObjectId,
-  isDeleted,
   toOptionalObjectId,
 } from '@omniflex/infra-mongoose/types';
 
 export const userBaseSchema = {
-  isDeleted,
+  deletedAt,
 
   isVerified: defaultFalse,
   identifier: requiredString,
@@ -21,7 +21,7 @@ export const userBaseSchema = {
 };
 
 export const profileBaseSchema = {
-  isDeleted,
+  deletedAt,
 
   profileImage: optionalString,
   email: optionalString,
@@ -34,7 +34,7 @@ export const profileBaseSchema = {
 };
 
 export const passwordBaseSchema = {
-  isDeleted,
+  deletedAt,
 
   salt: requiredString,
   username: requiredString,
@@ -44,7 +44,7 @@ export const passwordBaseSchema = {
 };
 
 export const loginAttemptBaseSchema = {
-  isDeleted,
+  deletedAt,
 
   identifier: requiredString,
   loginType: requiredString,
@@ -64,10 +64,9 @@ export const getUserSchema = <T extends TUser = TUser>(
     { timestamps: true },
   );
 
-  // Only enforce uniqueness for active records
   user.index({ identifier: 1 }, {
     unique: true,
-    partialFilterExpression: { isDeleted: false }
+    partialFilterExpression: { deletedAt: null }
   });
 
   return user;
@@ -106,10 +105,9 @@ export const getPasswordSchema = <T extends TUserPassword = TUserPassword>(
     localField: 'userId',
   });
 
-  // Only enforce uniqueness for active records
   password.index({ username: 1 }, {
     unique: true,
-    partialFilterExpression: { isDeleted: false }
+    partialFilterExpression: { deletedAt: null }
   });
 
   return password;

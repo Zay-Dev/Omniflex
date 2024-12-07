@@ -9,7 +9,6 @@ type TOptions<T, TPrimaryKey> = {
   repository: IBaseRepository<T, TPrimaryKey>,
 
   countOnly?: boolean;
-  notSoftDeletable?: boolean;
   retrieve?: (data: T | null) => void | Promise<void>;
 };
 
@@ -17,7 +16,7 @@ const validate = async (
   query: Record<string, any>,
   options: TOptions<any, any> & { notFoundMessage: string; },
 ) => {
-  const { onError, repository, notSoftDeletable } = options;
+  const { onError, repository } = options;
 
   const handleError = () => {
     const error = errors.notFound(options.notFoundMessage);
@@ -36,7 +35,6 @@ const validate = async (
   const entity = await repository.findOne(query);
 
   if (!entity) return handleError();
-  if (entity['isDeleted']) return handleError();
 
   await options.retrieve?.(entity);
   return entity;
@@ -49,10 +47,7 @@ export const requiredById = async <
   id: TPrimaryKey,
   options: TOptions<T, TPrimaryKey>,
 ) => {
-  const query = {
-    id,
-    isDeleted: options.notSoftDeletable ? undefined : false,
-  };
+  const query = { id };
 
   return await validate(query, {
     ...options,

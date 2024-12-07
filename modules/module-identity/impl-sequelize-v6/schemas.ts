@@ -2,16 +2,16 @@ import * as Types from '@omniflex/infra-sequelize-v6/types';
 
 export const userBaseSchema = {
   id: Types.id('UUID'),
-  isDeleted: Types.isDeleted(),
 
   isVerified: Types.defaultFalse(),
   identifier: Types.requiredString(),
   lastSignInAtUtc: Types.optionalDate(),
+
+  deletedAt: Types.deletedAt(),
 };
 
 export const profileBaseSchema = {
   id: Types.id('UUID'),
-  isDeleted: Types.isDeleted(),
 
   profileImage: Types.optionalString(),
   email: Types.optionalString(),
@@ -27,11 +27,12 @@ export const profileBaseSchema = {
       model: 'Users',
     },
   },
+
+  deletedAt: Types.deletedAt(),
 };
 
 export const passwordBaseSchema = {
   id: Types.id('UUID'),
-  isDeleted: Types.isDeleted(),
 
   salt: Types.requiredString(),
   username: Types.requiredString(),
@@ -44,11 +45,12 @@ export const passwordBaseSchema = {
       model: 'Users',
     },
   },
+
+  deletedAt: Types.deletedAt(),
 };
 
 export const loginAttemptBaseSchema = {
   id: Types.id('UUID'),
-  isDeleted: Types.isDeleted(),
 
   identifier: Types.requiredString(),
   loginType: Types.requiredString(),
@@ -64,6 +66,8 @@ export const loginAttemptBaseSchema = {
       model: 'Users',
     },
   },
+
+  deletedAt: Types.deletedAt(),
 };
 
 export const getUserSchema = (
@@ -72,12 +76,13 @@ export const getUserSchema = (
   return {
     schema,
     options: {
+      paranoid: true,
       tableName: 'Users',
       indexes: [
         {
           unique: true,
           fields: ['identifier'],
-          where: { isDeleted: false },
+          where: { deletedAt: null },
         },
       ],
     },
@@ -90,6 +95,7 @@ export const getProfileSchema = (
   return {
     schema,
     options: {
+      paranoid: true,
       tableName: 'UserProfiles',
     },
   };
@@ -101,12 +107,13 @@ export const getPasswordSchema = (
   return {
     schema,
     options: {
+      paranoid: true,
       tableName: 'UserPasswords',
       indexes: [
         {
           unique: true,
           fields: ['username'],
-          where: { isDeleted: false },
+          where: { deletedAt: null },
         },
       ],
     },
@@ -119,6 +126,7 @@ export const getLoginAttemptSchema = (
   return {
     schema,
     options: {
+      paranoid: true,
       tableName: 'LoginAttempts',
     },
   };
