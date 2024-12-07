@@ -1,38 +1,27 @@
-import {
-  id,
-  mixed,
-  isDeleted,
-  toRequired,
-  toOptional,
-  defaultFalse,
-  optionalDate,
-  requiredString,
-  optionalString,
-  requiredBoolean,
-} from '@omniflex/infra-postgres/types';
+import * as Types from '@omniflex/infra-sequelize-v6/types';
 
 export const userBaseSchema = {
-  id: id('UUID'),
-  isDeleted: isDeleted(),
+  id: Types.id('UUID'),
+  isDeleted: Types.isDeleted(),
 
-  isVerified: defaultFalse(),
-  identifier: requiredString(),
-  lastSignInAtUtc: optionalDate(),
+  isVerified: Types.defaultFalse(),
+  identifier: Types.requiredString(),
+  lastSignInAtUtc: Types.optionalDate(),
 };
 
 export const profileBaseSchema = {
-  id: id('UUID'),
-  isDeleted: isDeleted(),
+  id: Types.id('UUID'),
+  isDeleted: Types.isDeleted(),
 
-  profileImage: optionalString(),
-  email: optionalString(),
-  mobileNumber: optionalString(),
-  firstName: optionalString(),
-  lastName: optionalString(),
-  profile: mixed(),
+  profileImage: Types.optionalString(),
+  email: Types.optionalString(),
+  mobileNumber: Types.optionalString(),
+  firstName: Types.optionalString(),
+  lastName: Types.optionalString(),
+  profile: Types.mixed(),
 
   userId: {
-    ...toRequired(id('UUID', false)),
+    ...Types.toRequired(Types.id('UUID', false)),
     references: {
       key: 'id',
       model: 'Users',
@@ -41,15 +30,15 @@ export const profileBaseSchema = {
 };
 
 export const passwordBaseSchema = {
-  id: id('UUID'),
-  isDeleted: isDeleted(),
+  id: Types.id('UUID'),
+  isDeleted: Types.isDeleted(),
 
-  salt: requiredString(),
-  username: requiredString(),
-  hashedPassword: requiredString(),
+  salt: Types.requiredString(),
+  username: Types.requiredString(),
+  hashedPassword: Types.requiredString(),
 
   userId: {
-    ...toRequired(id('UUID', false)),
+    ...Types.toRequired(Types.id('UUID', false)),
     references: {
       key: 'id',
       model: 'Users',
@@ -58,18 +47,18 @@ export const passwordBaseSchema = {
 };
 
 export const loginAttemptBaseSchema = {
-  id: id('UUID'),
-  isDeleted: isDeleted(),
+  id: Types.id('UUID'),
+  isDeleted: Types.isDeleted(),
 
-  identifier: requiredString(),
-  loginType: requiredString(),
-  appType: requiredString(),
-  success: requiredBoolean(),
-  remoteAddress: optionalString(),
-  remark: mixed(),
+  identifier: Types.requiredString(),
+  loginType: Types.requiredString(),
+  appType: Types.requiredString(),
+  success: Types.requiredBoolean(),
+  remoteAddress: Types.optionalString(),
+  remark: Types.mixed(),
 
   userId: {
-    ...toOptional(id('UUID', false)),
+    ...Types.toOptional(Types.id('UUID', false)),
     references: {
       key: 'id',
       model: 'Users',

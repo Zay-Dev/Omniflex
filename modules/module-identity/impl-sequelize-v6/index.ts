@@ -8,9 +8,11 @@ import * as Repositories from './repositories';
 export * from './schemas';
 export * from './repositories';
 
+type TContainer = { sequelize: Sequelize; };
+
 function get<T>(fn: () => T) { return fn(); }
 
-const appContainer = Containers.appContainerAs<{ postgres: Sequelize; }>();
+export const appContainer = Containers.appContainerAs<TContainer>();
 
 export const repositories = {} as {
   users: Repositories.UserRepository;
@@ -25,12 +27,15 @@ export const createRegisteredRepositories = (
   passwordSchema = get(Schemas.getPasswordSchema),
   loginAttemptSchema = get(Schemas.getLoginAttemptSchema),
 ) => {
-  const postgres = appContainer.resolve('postgres');
+  const sequelize = appContainer.resolve('sequelize');
+  const define = (modelName: string, { schema, options }) => {
+    return sequelize.define(modelName, schema, options);
+  };
 
-  const userModel = postgres.define('User', userSchema.schema, userSchema.options);
-  const profileModel = postgres.define('UserProfile', profileSchema.schema, profileSchema.options);
-  const passwordModel = postgres.define('UserPassword', passwordSchema.schema, passwordSchema.options);
-  const loginAttemptModel = postgres.define('LoginAttempt', loginAttemptSchema.schema, loginAttemptSchema.options);
+  const userModel = define('User', userSchema);
+  const profileModel = define('UserProfile', profileSchema);
+  const passwordModel = define('UserPassword', passwordSchema);
+  const loginAttemptModel = define('LoginAttempt', loginAttemptSchema);
 
   userModel.hasOne(profileModel, {
     as: 'profile',
