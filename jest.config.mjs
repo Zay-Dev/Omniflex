@@ -2,6 +2,7 @@ export default {
   transform: {},
   preset: 'ts-jest',
   testEnvironment: 'node',
+  coverageReporters: ['text', 'text-summary'],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
 
   testMatch: [
