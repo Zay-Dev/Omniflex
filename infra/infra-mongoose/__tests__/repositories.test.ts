@@ -29,7 +29,7 @@ describe('MongooseBaseRepository', () => {
       const result = await repository.delete(model._id);
 
       expect(result).toBe(true);
-      expect(await TestModel.findById(model._id)).toBeNull();
+      expect(await repository.findById(model._id)).toBeNull();
     });
 
     it('should return false when record not found', async () => {
@@ -45,7 +45,7 @@ describe('MongooseBaseRepository', () => {
       const result = await repository.delete(model._id);
 
       expect(result).toBe(true);
-      expect(await TestModel.findById(model._id)).toBeNull();
+      expect(await repository.findById(model._id)).toBeNull();
     });
   });
 
@@ -56,7 +56,7 @@ describe('MongooseBaseRepository', () => {
 
       expect(result).toBe(true);
 
-      const softDeleted = await TestModel.findById(model._id, { paranoid: false });
+      const softDeleted = await repository.findById(model._id, { paranoid: false });
       expect(softDeleted).toBeTruthy();
       expect(softDeleted?.deletedAt).toBeTruthy();
 
