@@ -1,4 +1,4 @@
-import { errorFactory } from '../../impl/error-factory';
+import { errorFactory } from '@omniflex/core/impl/error-factory';
 
 describe('ErrorFactory', () => {
   test('unauthorized creates error with code 401', () => {
