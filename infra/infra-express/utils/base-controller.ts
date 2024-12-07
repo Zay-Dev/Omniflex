@@ -80,14 +80,17 @@ export class BaseExpressController<TLocals extends TBaseLocals = TBaseLocals> {
   }
 
   protected get pathId() {
-    return +this.req.params.id;
+    const value = this.req.params.id;
+    const int = +value;
+
+    return isNaN(int) ? value : int;
   }
 
   protected get pageSize() {
     const rawPageSize = this.req.query.pageSize;
     const pageSize = rawPageSize ? +rawPageSize : undefined;
 
-    if (pageSize && !isNaN(pageSize)) {
+    if (pageSize && !isNaN(pageSize) && pageSize > 0) {
       return pageSize;
     }
 
@@ -98,7 +101,7 @@ export class BaseExpressController<TLocals extends TBaseLocals = TBaseLocals> {
     const rawPage = this.req.query.page;
     const page = rawPage ? +rawPage : undefined;
 
-    if (page && !isNaN(page)) {
+    if (page && !isNaN(page) && page > 0) {
       return page;
     }
 
