@@ -1,38 +1,11 @@
-import { Model } from 'mongoose';
 import { UserSessionRepository } from '../repositories/user-session.repository';
+import { createMockMongooseModel } from '@omniflex/infra-mongoose/__tests__/utils/mongoose.mock';
 
 describe('UserSessionRepository (Mongoose)', () => {
-  const mockModel = {
-    updateMany: jest.fn(),
-    schema: {
-      alias: jest.fn(),
-      get: jest.fn(),
-      set: jest.fn(),
-      methods: {},
-      statics: {},
-      tree: {},
-      paths: {},
-      options: {
-        noAliasId: false
-      }
-    },
-    model: {
-      schema: {
-        recompileSchema: jest.fn(),
-      },
-    },
-    recompileSchema: jest.fn(),
-    base: {
-      models: {},
-    },
-    db: {
-      models: {},
-    },
-    collection: {
-      name: 'user_sessions',
-    },
+  const mockModel = createMockMongooseModel({
+    collection: { name: 'user_sessions' },
     modelName: 'UserSession',
-  } as unknown as Model<any>;
+  });
 
   const repository = new UserSessionRepository(mockModel);
 

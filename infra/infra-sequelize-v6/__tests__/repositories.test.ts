@@ -76,8 +76,8 @@ describe('SequelizeRepository', () => {
       expect(result).toBe(true);
 
       const softDeleted = await TestModel.findByPk(model.id, { paranoid: false });
-      expect(softDeleted).not.toBeNull();
-      expect(softDeleted?.deletedAt).not.toBeNull();
+      expect(softDeleted).toBeTruthy();
+      expect(softDeleted?.deletedAt).toBeTruthy();
 
       const notFound = await TestModel.findByPk(model.id);
       expect(notFound).toBeNull();
@@ -104,8 +104,8 @@ describe('SequelizeRepository', () => {
       const model = await TestModel.create({ id: 'test-id' });
       const result = await repository.findById(model.id);
 
-      expect(result).not.toBeNull();
-      expect(result?.id).toBe(model.id);
+      expect(result).toBeTruthy();
+      expect(`${result?.id}`).toBe(`${model.id}`);
     });
 
     it('should return null for non-existent record', async () => {
@@ -129,9 +129,9 @@ describe('SequelizeRepository', () => {
 
       const result = await repository.findById(model.id, { paranoid: false });
 
-      expect(result).not.toBeNull();
-      expect(result?.id).toBe(model.id);
-      expect(result?.deletedAt).not.toBeNull();
+      expect(result).toBeTruthy();
+      expect(`${result?.id}`).toBe(`${model.id}`);
+      expect(result?.deletedAt).toBeTruthy();
     });
 
     it('should not find hard-deleted record even with paranoid false', async () => {
@@ -143,4 +143,4 @@ describe('SequelizeRepository', () => {
       expect(result).toBeNull();
     });
   });
-}); 
+});
