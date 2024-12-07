@@ -24,9 +24,19 @@ export class BaseEntitiesController<
     }
   }
 
+  protected get entityId(): TPrimaryKey {
+    const id = this.pathId;
+
+    if (typeof id === 'undefined') {
+      throw errors.custom('Path id is required');
+    }
+    
+    return id as unknown as TPrimaryKey;
+  }
+
   tryGetOne() {
     return this.tryAction(async () => {
-      const id = this.pathId as TPrimaryKey;
+      const id = this.entityId;
       const entity = await this.repository.findById(id);
 
       if (!entity) {
@@ -51,7 +61,7 @@ export class BaseEntitiesController<
 
       const entities = await this.repository.find({}, {
         take: pageSize,
-        skip: page * pageSize,
+        skip: (page - 1) * pageSize,
       });
 
       return this.respondMany(entities);
@@ -72,7 +82,7 @@ export class BaseEntitiesController<
 
   tryUpdate<T extends Partial<TEntity> = Partial<TEntity>>() {
     return this.tryActionWithBody<T>(async (body) => {
-      const id = this.pathId as TPrimaryKey;
+      const id = this.entityId;
       const entity = await this.repository.updateById(id, body);
 
       if (!entity) {
@@ -85,7 +95,7 @@ export class BaseEntitiesController<
 
   tryDelete() {
     return this.tryAction(async () => {
-      const id = this.pathId as TPrimaryKey;
+      const id = this.entityId;
       const success = await this.repository.delete(id);
 
       if (!success) {
@@ -98,7 +108,7 @@ export class BaseEntitiesController<
 
   trySoftDelete() {
     return this.tryAction(async () => {
-      const id = this.pathId as TPrimaryKey;
+      const id = this.entityId;
       const success = await this.repository.softDelete(id);
 
       if (!success) {
