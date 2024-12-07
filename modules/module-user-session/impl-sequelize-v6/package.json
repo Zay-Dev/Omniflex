@@ -1,5 +1,5 @@
 {
-  "name": "@omniflex/module-user-session-postgres",
+  "name": "@omniflex/module-user-session-sequelize-v6",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@omniflex/core": "0.1.0",
-    "@omniflex/infra-postgres": "0.1.0",
+    "@omniflex/infra-sequelize-v6": "0.1.0",
     "@omniflex/module-user-session-core": "0.1.0"
   }
 }
