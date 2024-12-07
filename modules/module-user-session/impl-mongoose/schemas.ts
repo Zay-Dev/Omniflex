@@ -3,7 +3,7 @@ import { TUserSession } from '@omniflex/module-user-session-core/types';
 
 import {
   mixed,
-  isDeleted,
+  deletedAt,
   defaultFalse,
   requiredDate,
   requiredString,
@@ -12,7 +12,6 @@ import {
 } from '@omniflex/infra-mongoose/types';
 
 export const sessionBaseSchema = {
-  isDeleted,
   sessionType: requiredString,
 
   isActive: defaultFalse,
@@ -26,6 +25,7 @@ export const sessionBaseSchema = {
   remoteAddress: optionalString,
 
   userId: toRequiredObjectId('Users'),
+  deletedAt,
 };
 
 export const getSessionSchema = <T extends TUserSession = TUserSession>(
@@ -33,7 +33,7 @@ export const getSessionSchema = <T extends TUserSession = TUserSession>(
 ) => {
   const session = new Schema<T>(
     schema,
-    { timestamps: true },
+    { timestamps: true }
   );
 
   session.virtual('user', {
@@ -45,7 +45,7 @@ export const getSessionSchema = <T extends TUserSession = TUserSession>(
 
   session.index(
     { userId: 1, sessionType: 1, isActive: 1 },
-    { partialFilterExpression: { isDeleted: false } }
+    { partialFilterExpression: { deletedAt: null } }
   );
 
   return session;

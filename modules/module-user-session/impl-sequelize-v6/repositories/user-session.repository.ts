@@ -12,7 +12,7 @@ export class UserSessionRepository
   async deactivateByUserId(userId: string) {
     await this.model.update(
       { isActive: false },
-      { where: { userId, isActive: true, isDeleted: false } }
+      { where: { userId, isActive: true } }
     );
   }
 
@@ -23,8 +23,7 @@ export class UserSessionRepository
         where: {
           userId,
           sessionType,
-          isActive: true,
-          isDeleted: false
+          isActive: true
         }
       }
     );

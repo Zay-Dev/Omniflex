@@ -95,7 +95,7 @@ export class RawRepository<T> extends BaseRepository<T> {
     id: TModelFnParams<T, 'findByIdAndUpdate'>[0],
   ) {
     const result = await this.model
-      .findByIdAndUpdate(id, { isDeleted: true });
+      .findByIdAndUpdate(id, { deletedAt: new Date() });
 
     return !!result;
   }

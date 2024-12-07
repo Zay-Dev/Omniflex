@@ -50,7 +50,7 @@ export class UserSessionService {
     const session = await sessions.exists({
       identifier,
       isActive: true,
-      isDeleted: false,
+      deletedAt: null,
       expiredAt: { $gt: new Date() },
     });
 

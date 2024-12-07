@@ -1,5 +1,5 @@
 export type TSoftDeletable = {
-  isDeleted: boolean;
+  deletedAt: Date | null;
 };
 
 export type TWithTimestamps = {

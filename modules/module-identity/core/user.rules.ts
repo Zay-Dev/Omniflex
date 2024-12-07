@@ -5,7 +5,7 @@ const repositories = resolve();
 
 export const throwIfConflictingUsername = async ({ username }) => {
   const userExists = await repositories.users.exists({
-    isDeleted: false,
+    deletedAt: null,
     identifier: username,
   });
 
@@ -13,7 +13,7 @@ export const throwIfConflictingUsername = async ({ username }) => {
 
   const passwordExists = await repositories.passwords.exists({
     username,
-    isDeleted: false,
+    deletedAt: null,
   });
 
   if (passwordExists) throw errors.conflict();
