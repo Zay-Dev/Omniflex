@@ -104,4 +104,4 @@ describe('User Rules', () => {
         .rejects.toThrow('Conflict');
     });
   });
-}); 
+});

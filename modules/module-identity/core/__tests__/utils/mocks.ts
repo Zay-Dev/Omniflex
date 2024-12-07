@@ -20,4 +20,4 @@ export const mockUserPassword: TUserPassword = {
   createdAt: new Date(),
   updatedAt: new Date(),
   deletedAt: null
-}; 
+};
