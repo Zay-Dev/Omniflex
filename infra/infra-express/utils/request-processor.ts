@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from '../types';
+import { Request } from 'express';
 
 const SENSITIVE_KEYS = [
   // Authentication related
@@ -33,7 +33,6 @@ const deepClone = <T>(obj: T): T => {
   try {
     return JSON.parse(JSON.stringify(obj));
   } catch (error) {
-    // If JSON parsing fails, return the original object
     return obj;
   }
 };
@@ -42,7 +41,11 @@ const maskValue = (value: string): string => {
   if (!value) return value;
   if (value.length <= 4) return '*'.repeat(value.length);
 
-  return `${value.slice(0, 2)}${'*'.repeat(value.length - 4)}${value.slice(-2)}`;
+  const firstTwo = value.slice(0, 2);
+  const lastTwo = value.slice(-2);
+  const middleLength = value.length - 4;
+
+  return `${firstTwo}${middleLength > 0 ? '*'.repeat(middleLength) : ''}${lastTwo}`;
 };
 
 const maskSensitiveValue = (values: any, forceSensitive = false): any => {
@@ -84,22 +87,22 @@ const maskSensitiveValue = (values: any, forceSensitive = false): any => {
   return values;
 };
 
-const processRequest = (req: Request) => {
-  return {
-    body: maskSensitiveValue(deepClone(req.body)),
-    query: maskSensitiveValue(deepClone(req.query)),
-    params: maskSensitiveValue(deepClone(req.params)),
-    headers: maskSensitiveValue(deepClone(req.headers)),
-    path: req.path,
-    method: req.method,
-    url: req.url,
-  };
+export type ProcessedRequest = {
+  body: any;
+  query: any;
+  params: any;
+  headers: Record<string, string>;
+  path: string;
+  method: string;
+  url: string;
 };
 
-export const requestProcessor = () => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    res.locals.request = processRequest(req);
-
-    return next();
-  };
-};
+export const processRequest = (req: Request): ProcessedRequest => ({
+  body: maskSensitiveValue(deepClone(req.body)),
+  query: maskSensitiveValue(deepClone(req.query)),
+  params: maskSensitiveValue(deepClone(req.params)),
+  headers: maskSensitiveValue(deepClone(req.headers)),
+  path: req.path,
+  method: req.method,
+  url: req.url,
+});
