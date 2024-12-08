@@ -21,7 +21,11 @@ describe('SequelizeRepository', () => {
   let repository: SequelizeRepository<ITestModel>;
 
   beforeAll(async () => {
-    sequelize = new Sequelize('sqlite::memory:', { logging: false });
+    sequelize = new Sequelize({
+      logging: false,
+      dialect: 'sqlite',
+      storage: ':memory:',
+    });
 
     TestModel.init({
       id: {
