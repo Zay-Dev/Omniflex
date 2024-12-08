@@ -1,17 +1,8 @@
 import { errors } from '@omniflex/core';
-import { IBaseRepository } from '@omniflex/core/types/repository';
+import { TDeepPartial, IBaseRepository } from '@omniflex/core/types/repository';
 
-import {
-  Request as ERequest,
-  Response as EResponse,
-  NextFunction as ENextFunction,
-} from 'express';
-
-import {
-  Request,
-  Response,
-  NextFunction,
-} from '@omniflex/infra-express/types';
+import { Request, Response, NextFunction } from 'express';
+import { asInfraLocals } from '@omniflex/infra-express/internal-types';
 
 import {
   requiredById,
@@ -41,9 +32,9 @@ const manageFetched = (
 };
 
 export const DbEntries = {
-  requiredById: (
-    repository,
-    getId: (req: Request, res: Response, next: NextFunction) => any | Promise<any>,
+  requiredById: <T extends {}, TPrimaryKey>(
+    repository: IBaseRepository<T, TPrimaryKey>,
+    getId: (req: Request, res: Response, next: NextFunction) => TPrimaryKey | Promise<TPrimaryKey>,
     countOnlyOrKeyName: true | string = '_byId',
   ) => {
     return (async (req: Request, res: Response, next: NextFunction) => {
@@ -63,8 +54,8 @@ export const DbEntries = {
         onError: next,
         retrieve: (_byId) => {
           if (!countOnly) {
-            res.locals.required = manageFetched(
-              res.locals.required || {},
+            asInfraLocals(res).required = manageFetched(
+              asInfraLocals(res).required || {},
               keyName,
               _byId,
             );
@@ -73,12 +64,12 @@ export const DbEntries = {
           return next();
         },
       });
-    }) as (req: ERequest, res: EResponse, next: ENextFunction) => Promise<void>;
+    });
   },
 
   requiredFirstMatch: <T extends {}, TPrimaryKey>(
     repository: IBaseRepository<T, TPrimaryKey>,
-    getQuery: (req: Request, res: Response, next: NextFunction) => Partial<T> | Promise<Partial<T>>,
+    getQuery: (req: Request, res: Response, next: NextFunction) => TDeepPartial<T> | Promise<TDeepPartial<T>>,
     countOnlyOrKeyName: true | string = '_firstMatch',
   ) => {
     return (async (req: Request, res: Response, next: NextFunction) => {
@@ -86,7 +77,7 @@ export const DbEntries = {
 
       const countOnly = countOnlyOrKeyName === true;
       const keyName = countOnlyOrKeyName === true ?
-        '_byId' : countOnlyOrKeyName;
+        '_firstMatch' : countOnlyOrKeyName;
 
       requiredFirstMatch(query, {
         countOnly,
@@ -94,8 +85,8 @@ export const DbEntries = {
         onError: next,
         retrieve: (_firstMatch) => {
           if (!countOnly) {
-            res.locals.required = manageFetched(
-              res.locals.required || {},
+            asInfraLocals(res).required = manageFetched(
+              asInfraLocals(res).required || {},
               keyName,
               _firstMatch,
             );
@@ -104,6 +95,6 @@ export const DbEntries = {
           return next();
         },
       });
-    }) as (req: ERequest, res: EResponse, next: ENextFunction) => Promise<void>;
+    });
   },
 };

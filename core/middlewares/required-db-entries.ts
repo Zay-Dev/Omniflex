@@ -1,7 +1,5 @@
 import { errors } from '@omniflex/core';
-import { IBaseRepository } from '@omniflex/core/types/repository';
-
-type TEntity<TPrimaryKey> = { id: TPrimaryKey; };
+import { TDeepPartial, IBaseRepository } from '@omniflex/core/types/repository';
 
 type TOptions<T, TPrimaryKey> = {
   notFoundMessage?: string;
@@ -42,7 +40,7 @@ const validate = async (
 
 export const requiredById = async <
   TPrimaryKey = string,
-  T extends TEntity<TPrimaryKey> = TEntity<TPrimaryKey>,
+  T extends {} = Record<string, any>,
 >(
   id: TPrimaryKey,
   options: TOptions<T, TPrimaryKey>,
@@ -59,7 +57,7 @@ export const requiredById = async <
 export const requiredFirstMatch = async<
   T extends {} = Record<string, any>
 >(
-  query: Partial<T>,
+  query: TDeepPartial<T>,
   options: TOptions<T, any>,
 ) => {
   return await validate(query, {

@@ -8,10 +8,13 @@ import {
   Router,
   Request,
   Response,
-  PathParams,
   NextFunction,
+} from 'express';
+
+import {
+  PathParams,
   RequestHandlerParams,
-} from '../types';
+} from 'express-serve-static-core';
 
 export const getExpressRouter = () => {
   const router = Router() as THydratedRouter;

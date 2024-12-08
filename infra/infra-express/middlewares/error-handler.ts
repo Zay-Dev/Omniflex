@@ -1,6 +1,8 @@
 import { Containers } from '@omniflex/core';
 import { BaseError } from '@omniflex/core/types/error';
-import { Request, Response, NextFunction } from '../types';
+
+import { Request, Response, NextFunction } from 'express';
+import { asInfraLocals } from '@omniflex/infra-express/internal-types';
 
 export const errorHandler = (
   error: Error | BaseError,
@@ -8,7 +10,7 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction,
 ) => {
-  res.locals.error = error;
+  asInfraLocals(res).error = error;
 
   if (error instanceof BaseError) {
     return handleBaseError(error, req, res);
@@ -68,8 +70,8 @@ const getBasicResponse = (
   code,
   status,
   timestamp,
-  appType: res.locals.appType,
-  requestId: res.locals.requestId,
+  appType: asInfraLocals(res).appType,
+  requestId: asInfraLocals(res).requestId,
   path: req.path || 'Unknown path',
   method: req.method || 'Unknown method',
 });

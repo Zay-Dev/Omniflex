@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Request, Response, NextFunction } from '../types';
+import { Request, Response, NextFunction } from 'express';
+import { TInfraExpressLocals } from '@omniflex/infra-express/internal-types';
 
 export const requestPreparation = (type: string) => {
   return (_: Request, res: Response, next: NextFunction) => {
@@ -8,9 +9,8 @@ export const requestPreparation = (type: string) => {
       user: undefined,
 
       required: {},
-      request: null as any,
       requestId: uuidv4(),
-    };
+    } as TInfraExpressLocals;
 
     return next();
   };
