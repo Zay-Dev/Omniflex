@@ -337,7 +337,7 @@ router
     - Integer handling with automatic rounding
     - String enums with type safety
     - Boolean fields with default values
-    - You could still use the native definitions if you want
+    - Still compatible with the native definitions
 
 Usage example:
 
@@ -362,7 +362,7 @@ const userSchema = {
 };
 ```
 
-##### infra-postgres
+##### `infra-postgres/`
 - **Connection Management**
   - Uses [sequelize](https://sequelize.org/) ORM
   - Built-in logging integration with `core/` logger
@@ -370,7 +370,7 @@ const userSchema = {
     - Easier to read and understand
     - Required/Optional variants for all basic types
     - Consistent type definitions across the application
-  - Still supports the native definitions
+  - Still compatible with the native definitions
 
 Usage example:
 ```typescript
