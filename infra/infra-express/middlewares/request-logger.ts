@@ -1,7 +1,7 @@
 import morgan from 'morgan';
 import { logger } from '@omniflex/core';
+import { asInfraLocals } from '../internal-types';
 import { Request, Response, NextFunction } from 'express';
-import { asInfraLocals } from '@omniflex/infra-express/internal-types';
 
 import {
   processRequest,

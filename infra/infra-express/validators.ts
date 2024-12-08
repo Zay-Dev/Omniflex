@@ -1,8 +1,8 @@
 import { errors } from '@omniflex/core';
 import { TDeepPartial, IBaseRepository } from '@omniflex/core/types/repository';
 
+import { asInfraLocals } from './internal-types';
 import { Request, Response, NextFunction } from 'express';
-import { asInfraLocals } from '@omniflex/infra-express/internal-types';
 
 import {
   requiredById,
