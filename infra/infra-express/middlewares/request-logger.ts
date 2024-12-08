@@ -1,6 +1,7 @@
 import morgan from 'morgan';
 import { logger } from '@omniflex/core';
 import { Request, Response, NextFunction } from 'express';
+import { asInfraLocals } from '@omniflex/infra-express/internal-types';
 
 import {
   processRequest,
@@ -49,21 +50,21 @@ const captureRequest = (req: Request, res: Response, next: NextFunction) => {
   return next();
 };
 
-morgan.token('request-id', (_, res: Response) => res.locals.requestId);
-morgan.token('app-type', (_, res: Response) => res.locals.appType);
+morgan.token('request-id', (_, res: Response) => asInfraLocals(res).requestId);
+morgan.token('app-type', (_, res: Response) => asInfraLocals(res).appType);
 morgan.token('processed-request', (_, res: Response) => {
   const processed = res.locals.__processedRequest as ProcessedRequest;
   if (!processed) return '';
 
-  const { error } = res.locals;
+  const { error } = asInfraLocals(res);
   const sections: string[] = [];
 
   sections.push(formatSection('Request Details', {
     path: processed.path,
     method: processed.method,
     timestamp: new Date().toISOString(),
-    appType: res.locals.appType,
-    requestId: res.locals.requestId,
+    appType: asInfraLocals(res).appType,
+    requestId: asInfraLocals(res).requestId,
   }));
 
   if (processed.headers && Object.keys(processed.headers).length) {

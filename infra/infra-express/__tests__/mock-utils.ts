@@ -1,4 +1,4 @@
-import { Request } from '../types';
+import { Request } from 'express';
 
 export const mockRequest = (): Request => {
   return {

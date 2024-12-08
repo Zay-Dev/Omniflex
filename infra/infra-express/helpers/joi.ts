@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { Request } from '../types';
+import { Request } from 'express';
 import { errors } from '@omniflex/core';
 
 const validate = (

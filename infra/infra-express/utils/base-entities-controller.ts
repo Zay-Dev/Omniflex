@@ -1,10 +1,12 @@
 import { errors } from '@omniflex/core';
 import { IBaseRepository } from '@omniflex/core/types';
 
-import { BaseExpressController } from './base-controller';
-import { Request, Response, NextFunction, TLocals } from '../types';
+import { TInfraExpressLocals } from '../internal-types';
+import { Request, Response, NextFunction } from 'express';
 
-type TBaseLocals = TLocals;
+import { BaseExpressController } from './base-controller';
+
+type TBaseLocals = TInfraExpressLocals;
 
 export class BaseEntitiesController<
   TEntity extends { id: TPrimaryKey; },

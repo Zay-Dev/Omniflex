@@ -1,23 +1,21 @@
+import { TInfraExpressLocals } from '../internal-types';
+
 import { errors, logger } from '@omniflex/core';
-import { Request, Response, NextFunction, TLocals } from '../types';
+import { Request, Response, NextFunction } from 'express';
 
-type TBaseLocals = TLocals;
-
-export class BaseExpressController<TLocals extends TBaseLocals = TBaseLocals> {
-  protected req: Request;
-  protected res: Response;
-  protected next: NextFunction;
+export class BaseExpressController<TLocals extends TInfraExpressLocals = TInfraExpressLocals> {
   protected locals: TLocals;
 
   public user?: TLocals['user'];
 
-  constructor(req, res, next) {
-    this.req = req;
-    this.res = res;
-    this.next = next;
+  constructor(
+    protected req: Request,
+    protected res: Response,
+    protected next: NextFunction
+  ) {
 
-    this.user = this.res.locals.user;
     this.locals = this.res.locals as TLocals;
+    this.user = this.locals.user;
   }
 
   tryActionWithBody<T>(
