@@ -253,7 +253,7 @@ class Controller extends UsersController<TUser & {
 
   tryLogout() {
     this.tryAction(async () => {
-      AuthService.logout(this.res);
+      await AuthService.logout(this.res);
 
       return this.res.status(204).send();
     });
