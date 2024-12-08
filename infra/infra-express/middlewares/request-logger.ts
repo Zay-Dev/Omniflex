@@ -1,7 +1,11 @@
 import morgan from 'morgan';
 import { logger } from '@omniflex/core';
-import { Request, Response } from 'express';
-import { processRequest } from '../utils/request-processor';
+import { Request, Response, NextFunction } from 'express';
+
+import {
+  processRequest,
+  ProcessedRequest,
+} from '@omniflex/infra-express/utils/request-processor';
 
 const SUSPICIOUS_PATHS = [
   '/.env',
@@ -26,8 +30,7 @@ const formatSection = (title: string, content: unknown): string => {
   }
 
   const line = '-'.repeat(30);
-  return `\n${line} ${title} ${line}\n${typeof content === 'string' ? content : JSON.stringify(content, null, 2)
-    }`;
+  return `\n${line} ${title} ${line}\n${typeof content === 'string' ? content : JSON.stringify(content, null, 2)}`;
 };
 
 const getLogLevel = (status: number, path: string): 'error' | 'warn' | 'info' => {
@@ -40,12 +43,17 @@ const getLogLevel = (status: number, path: string): 'error' | 'warn' | 'info' =>
   return 'info';
 };
 
+const captureRequest = (req: Request, _res: Response, next: NextFunction) => {
+  return next(processRequest(req));
+};
+
 morgan.token('request-id', (_, res: Response) => res.locals.requestId);
 morgan.token('app-type', (_, res: Response) => res.locals.appType);
-morgan.token('processed-request', (req: Request, res: Response) => {
-  const processed = processRequest(req);
-  const { error } = res.locals;
+morgan.token('processed-request', (_, res: Response) => {
+  const processed = (res as any).processed;
+  if (!processed) return '';
 
+  const { error } = res.locals;
   const sections: string[] = [];
 
   sections.push(formatSection('Request Details', {
@@ -82,25 +90,34 @@ morgan.token('processed-request', (req: Request, res: Response) => {
   return sections.join('\n');
 });
 
-export const requestLogger = () => {
+const createLogger = () => {
   const format = ':processed-request\nResponse: :status :response-time ms';
 
-  return morgan(format, {
-    stream: {
-      write: (message: string) => {
-        const matches = message.match(/Response: (\d+)/);
-        const status = matches ? parseInt(matches[1], 10) : 500;
-        const path = message.match(/path": "([^"]+)"/)?.[1] || '';
+  return (error, req, _res, next) => {
+    const res = {
+      locals: _res.locals,
+      processed: error && error instanceof ProcessedRequest ? error : undefined,
+    };
 
-        const level = getLogLevel(status, path);
-        logger[level](message.trim());
-      }
-    },
-    skip: (req: Request, res: any) => {
-      if (res.locals._noLogger) return true;
+    morgan(format, {
+      stream: {
+        write: (message: string) => {
+          const matches = message.match(/Response: (\d+)/);
+          const status = matches ? parseInt(matches[1], 10) : 500;
+          const path = message.match(/path": "([^"]+)"/)?.[1] || '';
 
-      return HEALTH_CHECK_PATHS.some(p => req.path.includes(p)) ||
-        req.method === 'OPTIONS';
-    }
-  });
+          const level = getLogLevel(status, path);
+          logger[level](message.trim());
+        }
+      },
+      skip: (req: Request, res: any) => {
+        if (res.locals._noLogger) return true;
+
+        return HEALTH_CHECK_PATHS.some(p => req.path.includes(p)) ||
+          req.method === 'OPTIONS';
+      },
+    })(req, res, next);
+  };
 };
+
+export const requestLogger = () => [captureRequest, createLogger()];

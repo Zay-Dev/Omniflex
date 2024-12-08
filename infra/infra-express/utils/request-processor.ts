@@ -87,22 +87,26 @@ const maskSensitiveValue = (values: any, forceSensitive = false): any => {
   return values;
 };
 
-export type ProcessedRequest = {
-  body: any;
-  query: any;
-  params: any;
-  headers: Record<string, string>;
-  path: string;
-  method: string;
-  url: string;
-};
+export class ProcessedRequest {
+  public body: any;
+  public query: any;
+  public params: any;
+  public headers: Record<string, string>;
+  public path: string;
+  public method: string;
+  public url: string;
 
-export const processRequest = (req: Request): ProcessedRequest => ({
-  body: maskSensitiveValue(deepClone(req.body)),
-  query: maskSensitiveValue(deepClone(req.query)),
-  params: maskSensitiveValue(deepClone(req.params)),
-  headers: maskSensitiveValue(deepClone(req.headers)),
-  path: req.path,
-  method: req.method,
-  url: req.url,
-});
+  constructor(req: Request) {
+    this.body = maskSensitiveValue(deepClone(req.body));
+    this.query = maskSensitiveValue(deepClone(req.query));
+    this.params = maskSensitiveValue(deepClone(req.params));
+    this.headers = maskSensitiveValue(deepClone(req.headers));
+    this.path = req.path;
+    this.method = req.method;
+    this.url = req.url;
+  }
+}
+
+export const processRequest = (req: Request): ProcessedRequest => {
+  return new ProcessedRequest(req);
+};
