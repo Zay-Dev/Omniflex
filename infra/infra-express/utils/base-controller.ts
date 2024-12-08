@@ -1,11 +1,11 @@
-import { TInfraExpressLocals } from '../internal-types';
-
 import { errors, logger } from '@omniflex/core';
 import { Request, Response, NextFunction } from 'express';
 
+import { ensureLocals } from './locals-initializer';
+import { TInfraExpressLocals } from '@omniflex/infra-express/internal-types';
+
 export class BaseExpressController<TLocals extends TInfraExpressLocals = TInfraExpressLocals> {
   protected locals: TLocals;
-
   public user?: TLocals['user'];
 
   constructor(
@@ -13,8 +13,7 @@ export class BaseExpressController<TLocals extends TInfraExpressLocals = TInfraE
     protected res: Response,
     protected next: NextFunction
   ) {
-
-    this.locals = this.res.locals as TLocals;
+    this.locals = ensureLocals(this.res.locals, 'default') as TLocals;
     this.user = this.locals.user;
   }
 
