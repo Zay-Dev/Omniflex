@@ -1,66 +1,88 @@
+Omniflex Software License Agreement
+
 Copyright (c) 2024 Omniflex
 
-This license applies to all code, files, and workspaces contained within this repository and its subdirectories, including but not limited to all packages, modules, and applications under the @omniflex namespace.
+This license governs the use, modification, and redistribution of all code, files, and workspaces contained within this repository and its subdirectories, including but not limited to all packages, modules, and applications under the @omniflex namespace.
 
-Definitions:
-- "Commercial use" refers to any use intended to generate revenue, either directly
-  or indirectly, including but not limited to:
-  * Use by a business, corporation, or commercial entity
-  * Integration into products or services that are sold
-  * Use in revenue-generating activities
-  * Use in business operations
-- "Non-commercial use" refers to:
-  * Personal projects without any revenue generation
-  * Academic research and education
-  * Open source projects that do not generate revenue
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to use
-the Software for personal and non-commercial purposes only, subject to the
-following conditions:
+1. Definitions
 
-1. The Software may only be used for:
-   a) Personal projects (defined as projects for individual, non-revenue generating use)
-   b) Non-commercial open source projects (projects that do not generate revenue through donations, sponsorships, or other means)
-   c) Educational purposes (including teaching, learning, and academic research)
+   1.1. "Software": Refers to all source code, binaries, files, documentation, and associated materials provided in this repository and subdirectories.
+   1.2. "Non-Commercial Use": Refers to usage limited to the following purposes:
+      1.2.1. Personal projects that do not generate revenue, directly or indirectly.
+      1.2.2. Academic research, teaching, or learning.
+      1.2.3. Non-revenue-generating open-source projects that do not receive any form of monetary support, including but not limited to sponsorships, donations, crowdfunding, or any other financial contributions.
+   1.3. "Commercial Use": Refers to any use intended to generate revenue, either directly or indirectly, including but not limited to:
+      1.3.1. Use by businesses, corporations, organizations, or commercial entities.
+      1.3.2. Integration into products or services that are sold, licensed, or monetized.
+      1.3.3. Use in business operations, internal tools, or proprietary systems.
+      1.3.4. Revenue-generating activities involving advertising, sponsorships, or partnerships.
+   1.4. "Team Use": Refers to any collaborative usage of the Software by more than one individual on a single project, whether commercial or non-commercial.
+   1.5. "User": Refers to any individual, team, or entity accessing, downloading, modifying, or using the Software in any capacity.
 
-2. The Software may not be used for:
-   a) Commercial purposes (including but not limited to: paid services, products for sale, or use within a commercial organization)
-   b) Generating revenue directly or indirectly
-   c) Commercial products or services
 
-3. Any distribution of the Software must:
-   a) Retain this license notice
-   b) Retain all copyright notices
-   c) Include attribution to the original author
+2. Scope of License
 
-4. Modified versions must:
-   a) Be clearly marked as modified
-   b) Not misrepresent the original source
-   c) Retain this license terms
+   2.1. Permitted Uses:
+      2.1.1. Personal, non-commercial projects by a single individual.
+      2.1.2. Educational purposes, including teaching, learning, and academic research.
+      2.1.3. Open-source projects that do not receive any monetary support, as defined in Section 1.2.3.
+   2.2. Prohibited Uses Without a Commercial License:
+      2.2.1. Any commercial use as defined in Section 1.3.
+      2.2.2. Team use without acquiring a team license.
+      2.2.3. Use within businesses, non-profit organizations, or governmental entities, regardless of profit motive.
+      2.2.4. Deployment of the Software in proprietary, internal, or revenue-generating systems.
+   2.3. Team Licensing:
+      2.3.1. A team license is required for projects involving collaboration between two or more individuals.
+      2.3.2. Each team member must adhere to the terms of this license.
+   2.4. Commercial Licensing:
+      2.4.1. For commercial use, Users must acquire a valid commercial license through https://omniflex.io/licenses.
+      2.4.2. The commercial license permits:
+         a) Use by businesses and organizations.
+         b) Integration into revenue-generating products and services.
+         c) Deployment in internal or external commercial systems.
 
-5. Attribution requirements:
-   a) Include the copyright notice
-   b) Include this license
-   c) State changes if modified
-   d) Include a link to the original source
-   e) Include our website: omniflex.io
 
-Commercial Licensing:
-For commercial use of this software, please contact:
-- Email: license@omniflex.io (monitored Monday-Friday)
-- Website: https://omniflex.io/licensing
+3. Distribution and Attribution
 
-Commercial licenses are available for:
-- Business and enterprise use
-- Integration into commercial products
-- Use within commercial organizations
-- Revenue-generating applications
+   3.1. Redistribution: Users may redistribute the Software for non-commercial purposes under the following conditions:
+      3.1.1. This license and all copyright notices are included in all copies or substantial portions of the Software.
+      3.1.2. Proper attribution is given to Omniflex by:
+         a) Including the original copyright notice.
+         b) Providing a link to https://omniflex.io/licenses.
+         c) Clearly indicating any modifications made to the Software.
+   3.2. Modified Versions:
+      3.2.1. Modified versions must be clearly marked as such.
+      3.2.2. The original authorship of Omniflex must not be misrepresented.
+      3.2.3. Modifications must retain this license and all copyright notices.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+
+4. Warranty and Disclaimers
+
+   4.1. No Warranty: The Software is provided "AS IS," without warranty of any kind, express or implied, including but not limited to warranties of:
+      4.1.1. Merchantability.
+      4.1.2. Fitness for a particular purpose.
+      4.1.3. Non-infringement of third-party rights.
+   4.2. Limitation of Liability: In no event shall Omniflex or its contributors be liable for any claims, damages, or other liabilities, including but not limited to direct, indirect, incidental, or consequential damages, or damages arising from the use or inability to use the Software.
+
+
+5. Compliance and Termination
+
+   5.1. Compliance Monitoring: Omniflex reserves the right to monitor compliance with this license.
+   5.2. Termination of License: This license may be terminated if:
+      5.2.1. The User violates any terms of this license.
+      5.2.2. The User fails to acquire the appropriate license for their use case.
+   5.3. Remedies for Breach:
+      5.3.1. Omniflex may seek legal action against violators, including injunctive relief and damages.
+      5.3.2. Violators may be prohibited from accessing future updates or support.
+
+
+6. Support and Contact Information
+
+   6.1. Support: Support for the Software is not guaranteed. For additional assistance, Users may contact license@omniflex.io.
+   6.2. Contact for Licensing:
+      6.2.1. Website: https://omniflex.io/licenses.
+      6.2.2. Email: license@omniflex.io.
+   6.3. Severability: If any provision of this license is found to be invalid, illegal, or unenforceable by a court of competent jurisdiction, such provision shall be deemed modified to the extent necessary to make it enforceable. If no modification can make the provision enforceable, it shall be severed from this license, and the remainder shall continue in full force and effect.
+
+Last updated: 08 Dec 2024
