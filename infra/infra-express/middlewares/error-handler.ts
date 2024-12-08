@@ -1,8 +1,8 @@
 import { Containers } from '@omniflex/core';
 import { BaseError } from '@omniflex/core/types/error';
 
+import { asInfraLocals } from '../internal-types';
 import { Request, Response, NextFunction } from 'express';
-import { asInfraLocals } from '@omniflex/infra-express/internal-types';
 
 export const errorHandler = (
   error: Error | BaseError,
