@@ -1,8 +1,7 @@
 # Omniflex: Enterprise Patterns, Startup Speed
 
 ## Usage Notice
-This project is built using the Omniflex Mono-Repo. For more information, visit [omniflex.io](https://
-omniflex.io).
+This project is built using the Omniflex Mono-Repo. For more information, visit [omniflex.io](https://omniflex.io).
 
 The omniflex mono-repo is available at [here](https://github.com/Zay-Dev/omniflex).
 
