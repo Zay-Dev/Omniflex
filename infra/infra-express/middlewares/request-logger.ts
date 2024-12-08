@@ -43,14 +43,16 @@ const getLogLevel = (status: number, path: string): 'error' | 'warn' | 'info' =>
   return 'info';
 };
 
-const captureRequest = (req: Request, _res: Response, next: NextFunction) => {
-  return next(processRequest(req));
+const captureRequest = (req: Request, res: Response, next: NextFunction) => {
+  res.locals.__processedRequest = processRequest(req);
+
+  return next();
 };
 
 morgan.token('request-id', (_, res: Response) => res.locals.requestId);
 morgan.token('app-type', (_, res: Response) => res.locals.appType);
 morgan.token('processed-request', (_, res: Response) => {
-  const processed = (res as any).processed;
+  const processed = res.locals.__processedRequest as ProcessedRequest;
   if (!processed) return '';
 
   const { error } = res.locals;
@@ -93,31 +95,24 @@ morgan.token('processed-request', (_, res: Response) => {
 const createLogger = () => {
   const format = ':processed-request\nResponse: :status :response-time ms';
 
-  return (error, req, _res, next) => {
-    const res = {
-      locals: _res.locals,
-      processed: error && error instanceof ProcessedRequest ? error : undefined,
-    };
+  return morgan(format, {
+    stream: {
+      write: (message: string) => {
+        const matches = message.match(/Response: (\d+)/);
+        const status = matches ? parseInt(matches[1], 10) : 500;
+        const path = message.match(/path": "([^"]+)"/)?.[1] || '';
 
-    morgan(format, {
-      stream: {
-        write: (message: string) => {
-          const matches = message.match(/Response: (\d+)/);
-          const status = matches ? parseInt(matches[1], 10) : 500;
-          const path = message.match(/path": "([^"]+)"/)?.[1] || '';
+        const level = getLogLevel(status, path);
+        logger[level](message.trim());
+      }
+    },
+    skip: (req: Request, res: any) => {
+      if (res.locals._noLogger) return true;
 
-          const level = getLogLevel(status, path);
-          logger[level](message.trim());
-        }
-      },
-      skip: (req: Request, res: any) => {
-        if (res.locals._noLogger) return true;
-
-        return HEALTH_CHECK_PATHS.some(p => req.path.includes(p)) ||
-          req.method === 'OPTIONS';
-      },
-    })(req, res, next);
-  };
+      return HEALTH_CHECK_PATHS.some(p => req.path.includes(p)) ||
+        req.method === 'OPTIONS';
+    },
+  });
 };
 
 export const requestLogger = () => [captureRequest, createLogger()];
