@@ -1,17 +1,9 @@
-import { v4 as uuidv4 } from 'uuid';
 import { Request, Response, NextFunction } from 'express';
-import { TInfraExpressLocals } from '@omniflex/infra-express/internal-types';
+import { initializeLocals } from '../utils/locals-initializer';
 
 export const requestPreparation = (type: string) => {
   return (_: Request, res: Response, next: NextFunction) => {
-    res.locals = {
-      appType: type,
-      user: undefined,
-
-      required: {},
-      requestId: uuidv4(),
-    } as TInfraExpressLocals;
-
+    res.locals = initializeLocals(type);
     return next();
   };
 };
