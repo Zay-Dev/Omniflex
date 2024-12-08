@@ -1,64 +1,73 @@
-# Omniflex Mono-Repo
+# Omniflex: Enterprise Patterns, Startup Speed
 
 ## Usage Notice
-
-This project is built using the Omniflex Mono-Repo. For more information, visit [omniflex.io](https://omniflex.io).
+This project is built using the Omniflex Mono-Repo. For more information, visit [omniflex.io](https://
+omniflex.io).
 
 The omniflex mono-repo is available at [here](https://github.com/Zay-Dev/omniflex).
 
+Omniflex is a TypeScript-based monorepo designed to accelerate Node.js backend development. It provides a collection of well-structured, loosely-coupled packages that work together seamlessly while maintaining the flexibility to use them independently.
 
-## Overview
+## Key Thoughts from the Team
 
-Welcome to the Omniflex Mono-Repo! This repository is designed to provide a robust and scalable foundation for developers to build their applications. Our focus is on maintaining a high-quality infrastructure and package ecosystem, allowing you to concentrate on developing your application logic.
+1. **Readability**
+   - comes first
+   - is more important than cleverness
+2. **TypeScript**
+   - is not a silver bullet, it's a tool
+   - should be more like helping me to tell my IDE what to suggest
+   - is eventually compiled to JavaScript, typesafety is for the compiler, not the runtime
+3. **The Repository Interface**
+   - I guarantee you that 99% of our users will not use our IRepository interface
+   - you could use the `DbEntries` validator if you use the interface though
+4. **/apps**
+   - that's pretty cool though
+   - the auto-generated swagger is also pretty cool
+   - less learning curve for the new joiners, yay!
+5. **Design Patterns**
+   - Practical, practical, practical
+6. **Flexible infra layer, strong foundation, modular architecture, enterprise ready, QA ready**
+   - Building enterprise-grade applications
+   - Supporting multiple teams with different technical requirements
+   - Maintaining high code quality and consistency
+   - Rapid development with reusable components
+   - Scalable and maintainable architecture
+   - *this point is entirely from the AI, it keeps saying that*
 
-## Usage
-
-The Omniflex Mono-Repo offers a streamlined development experience with features like quick scaffolding, automatic Swagger documentation, and modular architecture. These benefits lead to easier maintenance and faster development cycles.
+## Getting Started
 
 ### Quick Start
 
-*only develop branch available as the alpha version*
+*This project is still in the alpha version*
 
 ```bash
-npx https://gist.github.com/Zay-Dev/7bcca907f661409d00a4d59e3615eeb4 my-awesome-project
+# Create new project
+npx https://gist.github.com/Zay-Dev/7bcca907f661409d00a4d59e3615eeb4 my-project
 
-#### or
+# OR clone manually
+git clone --recurse-submodules git@github.com:Zay-Dev/Omniflex.git my-project
+cd my-project
 
-# clone the omniflex mono-repo
-git clone --recurse-submodules git@github.com:Zay-Dev/Omniflex.git omniflex
-
-# clone the example apps-server
-git clone git@github.com:Zay-Dev/omniflex-express-apps-server.git apps/server
-
-# remove the git history of the cloned apps-server
-rm -rf apps/server/.git
-
-# install dependencies
-yarn
-
-# run the example apps-server
-yarn dev:server
+## Update .env file, install dependencies and start the server
+yarn && yarn dev:server
 ```
 
-### Getting Started
-
-1. **Clone the Repository**: Start by cloning this mono-repo to your local machine.
-2. **Create Your App**: Develop your application within the `apps` folder. Each app (or the whole apps/) can be a separate Git repository, allowing you to focus on your code while we handle the infrastructure.
-3. **Leverage Our Infrastructure**: Experience the power of our maintained packages and infrastructure! While you focus on crafting amazing features for your application, we ensure your foundation stays rock-solid with continuous updates, security patches, and performance improvements. It's like having an expert team at your service!
-
-### Example Structure
+### Project Structure
 
 ```
-core/                # Omniflex core packages
-infra/               # Omniflex infrastructure packages
-modules/             # Omniflex feature-specific modules
-...
-apps/
-  └── server/                   # Example Express server
-      ├── .git/                 # Separate Git repository
-      ├── modules/
-      ├── services/
-      └── package.json
+/
+├── core/                    # Core utilities and types
+├── infra/                   # Infrastructure packages
+│   ├── infra-express/       # Express.js integration
+│   ├── infra-mongoose/      # Mongoose adapter
+│   ├── infra-postgres/      # Postgres adapter
+│   ├── infra-sequelize-v6/  # Sequelize V6 adapter
+│   └── ...                  # Other infrastructure
+├── modules/                 # Feature modules
+│   ├── module-identity/     # Identity management
+│   └── ...                  # Other modules
+└── apps/                    # Your applications
+    └── server/              # Example Express server
 ```
 
 ### Package Configuration
@@ -66,6 +75,7 @@ apps/
 Configure your application's `package.json` to work with Yarn workspaces. This enables you to manage dependencies and run commands from the root directory.
 
 ```json
+/* apps/server/package.json */
 {
   "name": "apps-server",
   "version": "0.1.0",
@@ -97,12 +107,16 @@ With Yarn workspaces, you can run commands for specific packages from the root d
 ```bash
 # Add dependencies
 yarn ws-run apps-server add @omniflex/core@^0.1.0
+yarn -W add express # -- add a sharing dependency to the root
 
 # Run scripts
 yarn ws-run apps-server dev
 yarn ws-run apps-server build
-yarn ws-run dev:server # predefined yarn workspace apps-server dev
-yarn ws-run start:server # predefined yarn workspace apps-server start
+
+yarn test
+yarn build
+yarn dev:server     # predefined yarn workspace apps-server dev
+yarn start:server   # predefined yarn workspace apps-server start
 ```
 
 For more information about Yarn workspaces, visit the [official documentation](https://classic.yarnpkg.com/lang/en/docs/workspaces/).
@@ -111,12 +125,6 @@ For more information about Yarn workspaces, visit the [official documentation](h
 
 For a complete working example, please refer to our reference implementation at [omniflex-express-apps-server](https://github.com/Zay-Dev/omniflex-express-apps-server).
 
-## Structure
-
-- `core/`: Contains shared types and utilities.
-- `infra/`: Infrastructure-related packages, such as Express, Mongoose, and Swagger autogen.
-- `modules/`: Feature-specific modules, such as identity management.
-- `apps/`: Applications built using the core and infra packages.
 
 ### Features
 
@@ -136,7 +144,8 @@ The core package serves as the foundation for all other packages in the Omniflex
 import { logger, errors, Containers } from '@omniflex/core';
 
 // Logging
-logger.info('Operation successful', { tags: ['user-service'] });
+logger.info('Simple message');
+logger.info('Operation successful', { tags: ['user-service'] }); // -- when you want to print [user-service] as a prefix
 logger.error('Operation failed', { error, tags: ['auth'] });
 
 // Error handling
@@ -158,16 +167,15 @@ container.register('userService', () => new UserService());
   - Detailed request/response logging with request ID tracking
   - Automatic sanitization and masking of sensitive data
 - **Security**
-  - Built-in security middlewares including:
-    - [cors](https://github.com/expressjs/cors)
-    - [helmet](https://github.com/helmetjs/helmet)
+  - [cors](https://github.com/expressjs/cors)
+  - [helmet](https://github.com/helmetjs/helmet)
 - **Utility Middleware**
   - [express-fileupload](https://github.com/richardgirges/express-fileupload) for file upload handling
   - [express-useragent](https://github.com/biggora/express-useragent) for user agent parsing
   - [response-time](https://github.com/expressjs/response-time) for tracking response time
-- compatible with (an enhanced) [swagger-autogen](https://github.com/swagger-autogen/swagger-autogen)
+- compatible with the customized [swagger-autogen](https://github.com/swagger-autogen/swagger-autogen)
 - Uses [joi](https://github.com/hapijs/joi) for request body validation
-- Employs [joi-to-swagger](https://github.com/Twipped/joi-to-swagger) for automatic generation of swagger documentation, eliminating the need for manual maintenance of request body schema
+- Uses [joi-to-swagger](https://github.com/Twipped/joi-to-swagger) for automatic generation of swagger documentation, eliminating the need for manual maintenance of request body schema
 - **Base Controller Classes**: each controller instance serves one and only one request, eliminating the messy `(req: Request, res: Response)` passing around but just `this.req` and `this.res`
   - BaseExpressController:
     - provides `tryAction` and `tryActionWithBody` methods out of the box that make it easier to wrap logic in a try/catch block and standardized the error handling
@@ -296,12 +304,13 @@ router
     - Integer handling with automatic rounding
     - String enums with type safety
     - Boolean fields with default values
+    - You could still use the native definitions if you want
 
 Usage example:
 
 ```typescript
 import { getConnection } from '@omniflex/infra-mongoose';
-import { optionalString, requiredDate, defaultFalse } from '@omniflex/infra-mongoose/types';
+import * as Types from '@omniflex/infra-mongoose/types';
 
 // Connection setup
 const connection = await getConnection({
@@ -313,10 +322,10 @@ const connection = await getConnection({
 
 // Schema definition using provided types
 const userSchema = {
-  name: requiredString,
-  bio: optionalString,
-  joinedAt: requiredDate,
-  isActive: defaultFalse
+  name: Types.requiredString,
+  bio: Types.optionalString,
+  joinedAt: Types.requiredDate,
+  isActive: Types.defaultFalse
 };
 ```
 
@@ -328,11 +337,12 @@ const userSchema = {
     - Easier to read and understand
     - Required/Optional variants for all basic types
     - Consistent type definitions across the application
+  - Still supports the native definitions
 
 Usage example:
 ```typescript
 import { getConnection } from '@omniflex/infra-postgres';
-import { optionalString, requiredDate, defaultFalse } from '@omniflex/infra-postgres/types';
+import * as Types from '@omniflex/infra-postgres/types';
 
 // Connection setup with automatic logging
 const connection = await getConnection({
@@ -343,10 +353,10 @@ const connection = await getConnection({
 
 // Schema definition using provided types
 const userSchema = {
-  name: requiredString(),
-  bio: optionalString(),
-  joinedAt: requiredDate(),
-  isActive: defaultFalse()
+  name: Types.requiredString(),
+  bio: Types.optionalString(),
+  joinedAt: Types.requiredDate(),
+  isActive: Types.defaultFalse()
 };
 ```
 
@@ -380,11 +390,4 @@ Please feel free to open issues to share your ideas or report problems.
 
 ## License
 
-This project is licensed under a custom license that allows free use for non-commercial purposes. Commercial use requires a separate license.
-
-Key points:
-- Free for personal and non-commercial projects
-- Commercial use requires licensing
-- Contact license@omniflex.io for commercial inquiries
-- See the [LICENSE](LICENSE) file for complete terms
-
+See the [LICENSE](LICENSE) file for complete terms
