@@ -27,6 +27,22 @@ const manageFetched = (
   );
 };
 
+export const byPathId = <T extends {}, TPrimaryKey>(
+  repository: IBaseRepository<T, TPrimaryKey>,
+  countOnlyOrKeyName: true | string = '_byId',
+  { fieldName = 'id' }: { fieldName?: string; } = {},
+) => {
+  return byId(repository, (req) => req.params[fieldName], countOnlyOrKeyName);
+};
+
+export const byBodyId = <T extends {}, TPrimaryKey>(
+  repository: IBaseRepository<T, TPrimaryKey>,
+  countOnlyOrKeyName: true | string = '_byId',
+  { fieldName = 'id' }: { fieldName?: string; } = {},
+) => {
+  return byId(repository, (req) => req.body[fieldName], countOnlyOrKeyName);
+};
+
 export const byId = <T extends {}, TPrimaryKey>(
   repository: IBaseRepository<T, TPrimaryKey>,
   getId: (req: Request, res: Response, next: NextFunction) => TPrimaryKey | Promise<TPrimaryKey>,
