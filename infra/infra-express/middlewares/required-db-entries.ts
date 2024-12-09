@@ -27,12 +27,22 @@ const manageFetched = (
   );
 };
 
+const toStringOrNumber = (value) => {
+  const number = Number(value);
+
+  return isNaN(number) ? value : number;
+};
+
 export const byPathId = <T extends {}, TPrimaryKey>(
   repository: IBaseRepository<T, TPrimaryKey>,
   countOnlyOrKeyName: true | string = '_byId',
   { fieldName = 'id' }: { fieldName?: string; } = {},
 ) => {
-  return byId(repository, (req) => req.params[fieldName], countOnlyOrKeyName);
+  return byId(
+    repository,
+    (req) => toStringOrNumber(req.params[fieldName]) as TPrimaryKey,
+    countOnlyOrKeyName,
+  );
 };
 
 export const byBodyId = <T extends {}, TPrimaryKey>(
@@ -40,7 +50,11 @@ export const byBodyId = <T extends {}, TPrimaryKey>(
   countOnlyOrKeyName: true | string = '_byId',
   { fieldName = 'id' }: { fieldName?: string; } = {},
 ) => {
-  return byId(repository, (req) => req.body[fieldName], countOnlyOrKeyName);
+  return byId(
+    repository,
+    (req) => toStringOrNumber(req.body[fieldName]) as TPrimaryKey,
+    countOnlyOrKeyName,
+  );
 };
 
 export const byId = <T extends {}, TPrimaryKey>(
