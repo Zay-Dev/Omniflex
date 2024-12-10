@@ -1,6 +1,8 @@
 import * as Types from './types';
 import * as Containers from './containers';
+
 import { errorFactory } from './impl/error-factory';
+import { createLogger } from './impl/console-logger';
 
 const { appContainer } = Containers;
 
@@ -14,7 +16,7 @@ export const providers = {
   hash: null as any as Types.IHashProvider,
 };
 
-export let logger = null as any as Types.ILogger;
+export let logger = createLogger() as any as Types.ILogger;
 export let errors = appContainer.resolve('errorFactory');
 
 export const handleUncaughtException = () => {
