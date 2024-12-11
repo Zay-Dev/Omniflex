@@ -20,9 +20,9 @@ const SUSPICIOUS_PATHS = [
 ];
 
 const HEALTH_CHECK_PATHS = [
-  '/health',
-  '/ping',
-  '/status',
+  '/health/',
+  '/ping/',
+  '/status/',
 ];
 
 const formatSection = (title: string, content: unknown): string => {
