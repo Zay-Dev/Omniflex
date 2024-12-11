@@ -44,7 +44,17 @@ export const asValues = (services: Partial<TContainer>) => {
 };
 
 export const configAs = <T extends TBaseConfig = TBaseConfig>() => {
-  return appContainer.resolve<T>('config');
+  return appContainer.hasRegistration('config') ?
+    appContainer.resolve<T>('config') : {
+      env: 'production',
+      logging: {
+        level: 'silly',
+        exposeErrorDetails: false,
+      },
+      server: {
+        requestTimeoutInSeconds: 30,
+      },
+    } as T;
 };
 
 export const appContainerAs = <T>() => {
