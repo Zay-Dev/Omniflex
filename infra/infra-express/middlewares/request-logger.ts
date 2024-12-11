@@ -110,7 +110,7 @@ const createLogger = () => {
     skip: (req: Request, res: any) => {
       if (res.locals._noLogger) return true;
 
-      return HEALTH_CHECK_PATHS.some(p => req.path.includes(p)) ||
+      return HEALTH_CHECK_PATHS.some(p => `${req.path}/`.includes(p)) ||
         req.method === 'OPTIONS';
     },
   });
