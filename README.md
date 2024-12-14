@@ -5,7 +5,9 @@ This project is built using the Omniflex Mono-Repo. For more information, visit 
 
 The omniflex mono-repo is available at [here](https://github.com/Zay-Dev/omniflex).
 
-Omniflex is a TypeScript-based monorepo designed to accelerate Node.js backend development. It provides a collection of well-structured, loosely-coupled packages that work together seamlessly while maintaining the flexibility to use them independently.
+Omniflex is a TypeScript-based monorepo designed to accelerate Node.js backend development. 
+It provides a collection of well-structured, loosely-coupled packages that work together seamlessly 
+while maintaining the flexibility to use them independently.
 
 ## Key Thoughts from the Team
 
@@ -41,7 +43,10 @@ Omniflex is a TypeScript-based monorepo designed to accelerate Node.js backend d
 
 ```bash
 # Create new project
-npx https://gist.github.com/Zay-Dev/7bcca907f661409d00a4d59e3615eeb4 my-project
+npx github:Zay-Dev/omniflex-npx --express --alpha my-project
+
+# OR Using the [Get Started](https://www.omniflex.io/get-started/express) document
+npx github:Zay-Dev/omniflex-npx --alpha my-project
 
 # OR clone manually
 git clone --recurse-submodules git@github.com:Zay-Dev/Omniflex.git my-project
@@ -71,7 +76,8 @@ yarn && yarn dev:server
 
 ### Package Configuration
 
-Configure your application's `package.json` to work with Yarn workspaces. This enables you to manage dependencies and run commands from the root directory.
+Configure your application's `package.json` to work with Yarn workspaces. 
+This enables you to manage dependencies and run commands from the root directory.
 
 ```json
 /* apps/server/package.json */
@@ -99,6 +105,31 @@ Configure your application's `package.json` to work with Yarn workspaces. This e
     ]
   }
 }
+
+/* apps/server/tsconfig.json */
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    }
+  },
+  "tsc-alias": {
+    "resolveFullPaths": true
+  },
+  "include": [
+    "./**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
 ```
 
 With Yarn workspaces, you can run commands for specific packages from the root directory:
@@ -106,11 +137,11 @@ With Yarn workspaces, you can run commands for specific packages from the root d
 ```bash
 # Add dependencies
 yarn ws-run apps-server add @omniflex/core@^0.1.0
-yarn -W add express # -- add a sharing dependency to the root
+yarn -W add express   # -- add a sharing dependency to the root
 
 # Run scripts
 yarn ws-run apps-server dev
-yarn ws-run apps-server build
+yarn ws-run apps-server start  # after 'yarn build'
 
 yarn test
 yarn build
@@ -122,7 +153,10 @@ For more information about Yarn workspaces, visit the [official documentation](h
 
 ### Express Server Example
 
-For a complete working example, please refer to our reference implementation at [omniflex-express-apps-server](https://github.com/Zay-Dev/omniflex-express-apps-server).
+For a complete working example, please refer to our reference implementation at 
+[omniflex-express-apps-server](https://github.com/Zay-Dev/omniflex-express-apps-server).
+
+Or our get-started document at [omniflex.io/get-started/express](https://www.omniflex.io/get-started/express).
 
 
 ### Features
