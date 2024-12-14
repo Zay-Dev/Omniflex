@@ -1,6 +1,6 @@
 import Joi from 'joi';
-import { Request } from 'express';
 import { errors } from '@omniflex/core';
+import { Request, Response, NextFunction } from 'express';
 
 const validate = (
   originalValues: any,
@@ -34,4 +34,28 @@ export const validateRequestParams = (
   schema: Joi.ObjectSchema,
 ) => {
   validate(req.params, schema);
+};
+
+export const tryValidateBody = (schema: Joi.ObjectSchema) => {
+  return (req: Request, _: Response, next: NextFunction) => {
+    try {
+      validateRequestBody(req, schema);
+    } catch (error) {
+      return next(error);
+    }
+
+    return next();
+  };
+};
+
+export const tryValidateParams = (schema: Joi.ObjectSchema) => {
+  return (req: Request, _: Response, next: NextFunction) => {
+    try {
+      validateRequestParams(req, schema);
+    } catch (error) {
+      return next(error);
+    }
+
+    return next();
+  };
 };
