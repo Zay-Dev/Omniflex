@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { validateRequestBody } from '@omniflex/infra-express/helpers/joi';
+import { tryValidateBody } from '@omniflex/infra-express/helpers/joi';
 
 import { errors } from '@omniflex/core';
 import { resolve } from '@omniflex/module-identity-core/containers';
@@ -8,15 +8,7 @@ import * as Rules from '@omniflex/module-identity-core/user.rules';
 import { schemas } from '@omniflex/module-identity-core/user.schema';
 
 export const validateRegister = [
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      validateRequestBody(req, schemas.register);
-    } catch (error) {
-      return next(error);
-    }
-
-    return next();
-  },
+  tryValidateBody(schemas.register),
 
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -30,15 +22,7 @@ export const validateRegister = [
 ];
 
 export const validateRegisterWithEmail = [
-  (req: Request, res: Response, next: NextFunction) => {
-    try {
-      validateRequestBody(req, schemas.registerWithEmail);
-    } catch (error) {
-      return next(error);
-    }
-
-    return next();
-  },
+  tryValidateBody(schemas.registerWithEmail),
 
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -52,15 +36,7 @@ export const validateRegisterWithEmail = [
 ];
 
 const getValidateLogin = (schema: any, usernameKey: string) => [
-  (req: Request, res: Response, next: NextFunction) => {
-    try {
-      validateRequestBody(req, schema);
-    } catch (error) {
-      return next(error);
-    }
-
-    return next();
-  },
+  tryValidateBody(schema),
 
   async (req: Request, res: Response, next: NextFunction) => {
     try {
