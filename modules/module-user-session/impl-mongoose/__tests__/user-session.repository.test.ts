@@ -1,4 +1,4 @@
-import { UserSessionRepository } from '../repositories/user-session.repository';
+import { UserSessionRepository } from '../repositories/user-sessions';
 import { createMockMongooseModel } from '@omniflex/infra-mongoose/__tests__/utils/mongoose.mock';
 
 describe('UserSessionRepository (Mongoose)', () => {
