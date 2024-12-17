@@ -4,6 +4,8 @@ import * as Containers from './containers';
 import { errorFactory } from './impl/error-factory';
 import { createLogger } from './impl/console-logger';
 
+export * as Utils from './utils';
+
 const { appContainer } = Containers;
 
 Containers.asValue('errorFactory', errorFactory);
