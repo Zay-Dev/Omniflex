@@ -20,3 +20,7 @@ export interface IUserSessionRepository extends IBaseRepository<TUserSession, st
   deactivateByUserId(userId: string): Promise<void>;
   deactivateBySessionType(userId: string, sessionType: string): Promise<void>;
 }
+
+export type TBodyRefreshToken = {
+  refreshToken: string;
+};
