@@ -1,4 +1,4 @@
-import { errors, logger } from '@omniflex/core';
+import { errors, logger, Utils } from '@omniflex/core';
 import { Request, Response, NextFunction } from 'express';
 
 import { ensureLocals } from './locals-initializer';
@@ -35,17 +35,11 @@ export class BaseExpressController<TLocals extends TInfraExpressLocals = TInfraE
     action: () => Promise<any> | any,
     { streamErrorToConsole = false } = {}
   ) {
-    try {
-      return await action();
-    } catch (error) {
-      streamErrorToConsole && console.error(error);
-
-      logger.error(error instanceof Error ?
-        { error } : { data: error }
-      );
-
-      return this.next(error);
-    }
+    return Utils.tryAction(action, {
+      logger,
+      next: this.next,
+      streamErrorToConsole,
+    });
   }
 
   respondOne(data: any) {
