@@ -1,34 +1,29 @@
-import { Model, Schema } from 'mongoose';
+import { Containers } from '@omniflex/core';
+import { Model, Schema, Connection } from 'mongoose';
+import * as Types from '@omniflex/infra-mongoose/types';
 import { MongooseBaseRepository } from '@omniflex/infra-mongoose';
 import { ILoginAttemptRepository, TLoginAttempt } from '@omniflex/module-identity-core/types';
 
-import {
-  mixed,
-  deletedAt,
-  requiredString,
-  optionalString,
-  toOptionalObjectId,
-} from '@omniflex/infra-mongoose/types';
+const appContainer = Containers.appContainerAs<{ mongoose: Connection; }>();
 
-export class LoginAttemptRepository
-  extends MongooseBaseRepository<TLoginAttempt>
+export class LoginAttempts<T extends TLoginAttempt = TLoginAttempt>
+  extends MongooseBaseRepository<T>
   implements ILoginAttemptRepository {
-  constructor(model: Model<TLoginAttempt>) {
+  constructor(model: Model<T>) {
     super(model);
   }
 }
 
 export const baseDefinition = {
-  deletedAt,
-
-  identifier: requiredString,
-  loginType: requiredString,
-  appType: requiredString,
+  identifier: Types.requiredString,
+  loginType: Types.requiredString,
+  appType: Types.requiredString,
   success: { type: Boolean, required: true },
-  remoteAddress: optionalString,
-  remark: mixed,
+  remoteAddress: Types.optionalString,
+  remark: Types.mixed,
 
-  userId: toOptionalObjectId('Users'),
+  userId: Types.toOptionalObjectId('Users'),
+  deletedAt: Types.deletedAt,
 };
 
 export const defineSchema = <T extends TLoginAttempt = TLoginAttempt>(
@@ -47,4 +42,18 @@ export const defineSchema = <T extends TLoginAttempt = TLoginAttempt>(
   });
 
   return loginAttempt;
-}; 
+};
+
+export const createRepository = <T extends TLoginAttempt = TLoginAttempt>(
+  schemaOrDefinition?: Schema<T> | typeof baseDefinition,
+) => {
+  const mongoose = appContainer.resolve('mongoose');
+
+  const schema = schemaOrDefinition instanceof Schema ?
+    schemaOrDefinition as Schema<T> :
+    defineSchema<T>(schemaOrDefinition);
+
+  const model = mongoose.model<T>('LoginAttempts', schema);
+
+  return new LoginAttempts<T>(model);
+};

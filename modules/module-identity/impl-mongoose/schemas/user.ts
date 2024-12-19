@@ -1,28 +1,25 @@
-import { Model, Schema } from 'mongoose';
+import { Containers } from '@omniflex/core';
+import { Model, Schema, Connection } from 'mongoose';
+import * as Types from '@omniflex/infra-mongoose/types';
 import { MongooseBaseRepository } from '@omniflex/infra-mongoose';
 import { IUserRepository, TUser } from '@omniflex/module-identity-core/types';
 
-import {
-  deletedAt,
-  defaultFalse,
-  optionalDate,
-  requiredString,
-} from '@omniflex/infra-mongoose/types';
+const appContainer = Containers.appContainerAs<{ mongoose: Connection; }>();
 
-export class UserRepository
-  extends MongooseBaseRepository<TUser>
-  implements IUserRepository<TUser> {
-  constructor(model: Model<TUser>) {
+export class Users<T extends TUser = TUser>
+  extends MongooseBaseRepository<T>
+  implements IUserRepository<T> {
+  constructor(model: Model<T>) {
     super(model);
   }
 }
 
 export const baseDefinition = {
-  deletedAt,
+  deletedAt: Types.deletedAt,
 
-  isVerified: defaultFalse,
-  identifier: requiredString,
-  lastSignInAtUtc: optionalDate,
+  isVerified: Types.defaultFalse,
+  identifier: Types.requiredString,
+  lastSignInAtUtc: Types.optionalDate,
 };
 
 export const defineSchema = <T extends TUser = TUser>(
@@ -39,4 +36,18 @@ export const defineSchema = <T extends TUser = TUser>(
   });
 
   return user;
+};
+
+export const createRepository = <T extends TUser = TUser>(
+  schemaOrDefinition?: Schema<T> | typeof baseDefinition,
+) => {
+  const mongoose = appContainer.resolve('mongoose');
+
+  const schema = schemaOrDefinition instanceof Schema ?
+    schemaOrDefinition as Schema<T> :
+    defineSchema<T>(schemaOrDefinition);
+
+  const model = mongoose.model<T>('Users', schema);
+
+  return new Users<T>(model);
 }; 
