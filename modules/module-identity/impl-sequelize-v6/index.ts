@@ -3,74 +3,37 @@ import { Containers } from '@omniflex/core';
 import { registerRepositories } from '@omniflex/module-identity-core';
 
 import * as Schemas from './schemas';
-import * as Repositories from './repositories';
 
 export * from './schemas';
-export * from './repositories';
-
-type TContainer = { sequelize: Sequelize; };
 
 function get<T>(fn: () => T) { return fn(); }
 
-export const appContainer = Containers.appContainerAs<TContainer>();
+const appContainer = Containers.appContainerAs<{ sequelize: Sequelize; }>();
 
 export const repositories = {} as {
-  users: Repositories.UserRepository;
-  profiles: Repositories.UserProfileRepository;
-  passwords: Repositories.UserPasswordRepository;
-  loginAttempts: Repositories.LoginAttemptRepository;
+  users: Schemas.User.UserRepository;
+  profiles: Schemas.UserProfile.UserProfileRepository;
+  passwords: Schemas.UserPassword.UserPasswordRepository;
+  loginAttempts: Schemas.LoginAttempt.LoginAttemptRepository;
 };
 
 export const createRegisteredRepositories = (
-  userSchema = get(Schemas.getUserSchema),
-  profileSchema = get(Schemas.getProfileSchema),
-  passwordSchema = get(Schemas.getPasswordSchema),
-  loginAttemptSchema = get(Schemas.getLoginAttemptSchema),
+  userSchema = get(Schemas.User.defineSchema),
+  profileSchema = get(Schemas.UserProfile.defineSchema),
+  passwordSchema = get(Schemas.UserPassword.defineSchema),
+  loginAttemptSchema = get(Schemas.LoginAttempt.defineSchema),
 ) => {
   const sequelize = appContainer.resolve('sequelize');
-  const define = (modelName: string, { schema, options }) => {
-    return sequelize.define(modelName, schema, options);
-  };
 
-  const userModel = define('User', userSchema);
-  const profileModel = define('UserProfile', profileSchema);
-  const passwordModel = define('UserPassword', passwordSchema);
-  const loginAttemptModel = define('LoginAttempt', loginAttemptSchema);
+  const userModel = sequelize.define('Users', userSchema.schema, userSchema.options);
+  const profileModel = sequelize.define('UserProfiles', profileSchema.schema, profileSchema.options);
+  const passwordModel = sequelize.define('UserPasswords', passwordSchema.schema, passwordSchema.options);
+  const loginAttemptModel = sequelize.define('LoginAttempts', loginAttemptSchema.schema, loginAttemptSchema.options);
 
-  userModel.hasOne(profileModel, {
-    as: 'profile',
-    foreignKey: 'userId',
-  });
-
-  userModel.hasMany(passwordModel, {
-    as: 'passwords',
-    foreignKey: 'userId',
-  });
-
-  userModel.hasMany(loginAttemptModel, {
-    as: 'loginAttempts',
-    foreignKey: 'userId',
-  });
-
-  profileModel.belongsTo(userModel, {
-    as: 'user',
-    foreignKey: 'userId',
-  });
-
-  passwordModel.belongsTo(userModel, {
-    as: 'user',
-    foreignKey: 'userId',
-  });
-
-  loginAttemptModel.belongsTo(userModel, {
-    as: 'user',
-    foreignKey: 'userId',
-  });
-
-  repositories.users = new Repositories.UserRepository(userModel);
-  repositories.profiles = new Repositories.UserProfileRepository(profileModel);
-  repositories.passwords = new Repositories.UserPasswordRepository(passwordModel);
-  repositories.loginAttempts = new Repositories.LoginAttemptRepository(loginAttemptModel);
+  repositories.users = new Schemas.User.UserRepository(userModel);
+  repositories.profiles = new Schemas.UserProfile.UserProfileRepository(profileModel);
+  repositories.passwords = new Schemas.UserPassword.UserPasswordRepository(passwordModel);
+  repositories.loginAttempts = new Schemas.LoginAttempt.LoginAttemptRepository(loginAttemptModel);
 
   registerRepositories({
     userRepository: repositories.users,

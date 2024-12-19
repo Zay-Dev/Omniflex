@@ -3,27 +3,25 @@ import { Containers } from '@omniflex/core';
 import { registerRepositories } from '@omniflex/module-identity-core';
 
 import * as Schemas from './schemas';
-import * as Repositories from './repositories';
 
 export * from './schemas';
-export * from './repositories';
 
 function get<T>(fn: () => T) { return fn(); }
 
 const appContainer = Containers.appContainerAs<{ mongoose: Connection; }>();
 
 export const repositories = {} as {
-  users: Repositories.UserRepository;
-  profiles: Repositories.UserProfileRepository;
-  passwords: Repositories.UserPasswordRepository;
-  loginAttempts: Repositories.LoginAttemptRepository;
+  users: Schemas.User.UserRepository;
+  profiles: Schemas.UserProfile.UserProfileRepository;
+  passwords: Schemas.UserPassword.UserPasswordRepository;
+  loginAttempts: Schemas.LoginAttempt.LoginAttemptRepository;
 };
 
 export const createRegisteredRepositories = (
-  userSchema = get(Schemas.getUserSchema),
-  profileSchema = get(Schemas.getProfileSchema),
-  passwordSchema = get(Schemas.getPasswordSchema),
-  loginAttemptSchema = get(Schemas.getLoginAttemptSchema),
+  userSchema = get(Schemas.User.defineSchema),
+  profileSchema = get(Schemas.UserProfile.defineSchema),
+  passwordSchema = get(Schemas.UserPassword.defineSchema),
+  loginAttemptSchema = get(Schemas.LoginAttempt.defineSchema),
 ) => {
   const mongoose = appContainer.resolve('mongoose');
 
@@ -32,10 +30,10 @@ export const createRegisteredRepositories = (
   const passwordModel = mongoose.model('UserPasswords', passwordSchema);
   const loginAttemptModel = mongoose.model('LoginAttempts', loginAttemptSchema);
 
-  repositories.users = new Repositories.UserRepository(userModel);
-  repositories.profiles = new Repositories.UserProfileRepository(profileModel);
-  repositories.passwords = new Repositories.UserPasswordRepository(passwordModel);
-  repositories.loginAttempts = new Repositories.LoginAttemptRepository(loginAttemptModel);
+  repositories.users = new Schemas.User.UserRepository(userModel);
+  repositories.profiles = new Schemas.UserProfile.UserProfileRepository(profileModel);
+  repositories.passwords = new Schemas.UserPassword.UserPasswordRepository(passwordModel);
+  repositories.loginAttempts = new Schemas.LoginAttempt.LoginAttemptRepository(loginAttemptModel);
 
   registerRepositories({
     userRepository: repositories.users,

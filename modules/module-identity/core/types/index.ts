@@ -61,4 +61,4 @@ export interface IUserPasswordRepository
 
 export interface ILoginAttemptRepository
   extends IBaseRepository<TLoginAttempt, string> {
-}
+} 

@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { errors, providers } from '@omniflex/core';
 
-import { TUser } from './types';
+import { TUser } from './types/index';
 import { resolve } from './containers';
 
 const hashProvider = providers.hash;
