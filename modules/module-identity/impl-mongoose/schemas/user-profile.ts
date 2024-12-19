@@ -6,10 +6,9 @@ import { IUserProfileRepository, TUserProfile } from '@omniflex/module-identity-
 
 const appContainer = Containers.appContainerAs<{ mongoose: Connection; }>();
 
-export class UserProfiles<T extends TUserProfile = TUserProfile>
-  extends MongooseBaseRepository<T>
+export class UserProfiles extends MongooseBaseRepository<TUserProfile>
   implements IUserProfileRepository {
-  constructor(model: Model<T>) {
+  constructor(model: Model<TUserProfile>) {
     super(model);
   }
 }
@@ -27,10 +26,10 @@ export const baseDefinition = {
   userId: Types.toRequiredObjectId('Users'),
 };
 
-export const defineSchema = <T extends TUserProfile = TUserProfile>(
+export const defineSchema = (
   schema: typeof baseDefinition & Record<string, any> = baseDefinition,
 ) => {
-  const profile = new Schema<T>(
+  const profile = new Schema<TUserProfile>(
     schema,
     { timestamps: true },
   );
@@ -45,16 +44,16 @@ export const defineSchema = <T extends TUserProfile = TUserProfile>(
   return profile;
 };
 
-export const createRepository = <T extends TUserProfile = TUserProfile>(
-  schemaOrDefinition?: Schema<T> | typeof baseDefinition,
+export const createRepository = (
+  schemaOrDefinition?: Schema<TUserProfile> | typeof baseDefinition,
 ) => {
   const mongoose = appContainer.resolve('mongoose');
 
   const schema = schemaOrDefinition instanceof Schema ?
-    schemaOrDefinition as Schema<T> :
-    defineSchema<T>(schemaOrDefinition);
+    schemaOrDefinition as Schema<TUserProfile> :
+    defineSchema(schemaOrDefinition);
 
-  const model = mongoose.model<T>('UserProfiles', schema);
+  const model = mongoose.model<TUserProfile>('UserProfiles', schema);
 
-  return new UserProfiles<T>(model);
+  return new UserProfiles(model);
 }; 

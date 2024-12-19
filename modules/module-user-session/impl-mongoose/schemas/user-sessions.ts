@@ -6,10 +6,9 @@ import { IUserSessionRepository, TUserSession } from '@omniflex/module-user-sess
 
 const appContainer = Containers.appContainerAs<{ mongoose: Connection; }>();
 
-export class UserSessions<T extends TUserSession = TUserSession>
-  extends MongooseBaseRepository<T>
+export class UserSessions extends MongooseBaseRepository<TUserSession>
   implements IUserSessionRepository {
-  constructor(model: Model<T>) {
+  constructor(model: Model<TUserSession>) {
     super(model);
   }
 
@@ -50,10 +49,10 @@ export const baseDefinition = {
   deletedAt: Types.deletedAt,
 };
 
-export const defineSchema = <T extends TUserSession = TUserSession>(
+export const defineSchema = (
   schema: typeof baseDefinition & Record<string, any> = baseDefinition,
 ) => {
-  const session = new Schema<T>(
+  const session = new Schema<TUserSession>(
     schema,
     { timestamps: true }
   );
@@ -73,16 +72,16 @@ export const defineSchema = <T extends TUserSession = TUserSession>(
   return session;
 };
 
-export const createRepository = <T extends TUserSession = TUserSession>(
-  schemaOrDefinition?: Schema<T> | typeof baseDefinition,
+export const createRepository = (
+  schemaOrDefinition?: Schema<TUserSession> | typeof baseDefinition,
 ) => {
   const mongoose = appContainer.resolve('mongoose');
 
   const schema = schemaOrDefinition instanceof Schema ?
-    schemaOrDefinition as Schema<T> :
-    defineSchema<T>(schemaOrDefinition);
+    schemaOrDefinition as Schema<TUserSession> :
+    defineSchema(schemaOrDefinition);
 
-  const model = mongoose.model<T>('UserSessions', schema);
+  const model = mongoose.model<TUserSession>('UserSessions', schema);
 
-  return new UserSessions<T>(model);
+  return new UserSessions(model);
 };

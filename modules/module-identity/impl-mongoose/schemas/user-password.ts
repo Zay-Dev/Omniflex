@@ -6,15 +6,14 @@ import { IUserPasswordRepository, TUserPassword } from '@omniflex/module-identit
 
 const appContainer = Containers.appContainerAs<{ mongoose: Connection; }>();
 
-export class UserPasswords<T extends TUserPassword = TUserPassword>
-  extends MongooseBaseRepository<T>
+export class UserPasswords extends MongooseBaseRepository<TUserPassword>
   implements IUserPasswordRepository {
-  constructor(model: Model<T>) {
+  constructor(model: Model<TUserPassword>) {
     super(model);
   }
 
   async findByUsername(username: string) {
-    return this.findOne({ username, deletedAt: { $eq: null } } as any);
+    return this.findOne({ username, deletedAt: null });
   }
 }
 
@@ -28,10 +27,10 @@ export const baseDefinition = {
   userId: Types.toRequiredObjectId('Users'),
 };
 
-export const defineSchema = <T extends TUserPassword = TUserPassword>(
+export const defineSchema = (
   schema: typeof baseDefinition & Record<string, any> = baseDefinition,
 ) => {
-  const password = new Schema<T>(
+  const password = new Schema<TUserPassword>(
     schema,
     { timestamps: true },
   );
@@ -51,16 +50,16 @@ export const defineSchema = <T extends TUserPassword = TUserPassword>(
   return password;
 };
 
-export const createRepository = <T extends TUserPassword = TUserPassword>(
-  schemaOrDefinition?: Schema<T> | typeof baseDefinition,
+export const createRepository = (
+  schemaOrDefinition?: Schema<TUserPassword> | typeof baseDefinition,
 ) => {
   const mongoose = appContainer.resolve('mongoose');
 
   const schema = schemaOrDefinition instanceof Schema ?
-    schemaOrDefinition as Schema<T> :
-    defineSchema<T>(schemaOrDefinition);
+    schemaOrDefinition as Schema<TUserPassword> :
+    defineSchema(schemaOrDefinition);
 
-  const model = mongoose.model<T>('UserPasswords', schema);
+  const model = mongoose.model<TUserPassword>('UserPasswords', schema);
 
-  return new UserPasswords<T>(model);
-}; 
+  return new UserPasswords(model);
+};
