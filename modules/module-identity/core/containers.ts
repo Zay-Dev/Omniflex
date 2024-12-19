@@ -6,7 +6,7 @@ import {
   IUserProfileRepository,
   IUserPasswordRepository,
   ILoginAttemptRepository,
-} from './types';
+} from './types/index';
 
 type TIdentityContainer = {
   userRepository: IUserRepository;
