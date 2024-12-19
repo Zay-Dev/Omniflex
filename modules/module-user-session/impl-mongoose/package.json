@@ -7,9 +7,9 @@
     "build": "tsc && tsc-alias"
   },
   "exports": {
-    "./schemas": {
-      "development": "./schemas.ts",
-      "import": "./dist/schemas.js"
+    "./schemas/*": {
+      "development": "./schemas/*",
+      "import": "./dist/schemas/*"
     },
     ".": {
       "development": "./index.ts",
