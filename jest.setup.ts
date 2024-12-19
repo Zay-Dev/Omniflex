@@ -19,7 +19,20 @@ jest.mock('@omniflex/core', () => {
     forbidden: () => new BaseError({ message: 'Forbidden', code: 403 })
   };
 
-  return {
+  return { 
+    Utils: {
+      tryAction: async (action: () => Promise<any> | any, options?: { next?: (error: any) => void; }) => {
+        try {
+          return await action();
+        } catch (error) {
+          if (options?.next) {
+            options.next(error);
+          } else {
+            throw error;
+          }
+        }
+      },
+    },
     logger: {
       error: jest.fn(),
       info: jest.fn(),
@@ -32,6 +45,10 @@ jest.mock('@omniflex/core', () => {
         logging: {
           exposeErrorDetails: false
         }
+      }),
+      appContainerAs: jest.fn().mockReturnValue({
+        sequelize: {},
+        mongoose: {}
       })
     },
     handleUncaughtException: jest.fn(),

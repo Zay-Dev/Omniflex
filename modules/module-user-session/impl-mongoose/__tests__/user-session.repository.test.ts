@@ -1,4 +1,4 @@
-import { UserSessionRepository } from '../repositories/user-sessions';
+import { UserSessions } from '../schemas/user-sessions';
 import { createMockMongooseModel } from '@omniflex/infra-mongoose/__tests__/utils/mongoose.mock';
 
 describe('UserSessionRepository (Mongoose)', () => {
@@ -7,7 +7,7 @@ describe('UserSessionRepository (Mongoose)', () => {
     modelName: 'UserSession',
   });
 
-  const repository = new UserSessionRepository(mockModel);
+  const repository = new UserSessions(mockModel);
 
   beforeEach(() => {
     jest.clearAllMocks();
