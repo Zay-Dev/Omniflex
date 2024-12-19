@@ -1,16 +1,12 @@
 import { Containers } from '@omniflex/core';
-import { Model, Schema, Connection } from 'mongoose';
+import { Schema, Connection } from 'mongoose';
 import * as Types from '@omniflex/infra-mongoose/types';
 import { MongooseBaseRepository } from '@omniflex/infra-mongoose';
 import { IUserRepository, TUser } from '@omniflex/module-identity-core/types';
 
 const appContainer = Containers.appContainerAs<{ mongoose: Connection; }>();
 
-export class Users extends MongooseBaseRepository<TUser> implements IUserRepository {
-  constructor(model: Model<TUser>) {
-    super(model);
-  }
-}
+export class Users extends MongooseBaseRepository<TUser> implements IUserRepository {}
 
 export const baseDefinition = {
   deletedAt: Types.deletedAt,
@@ -48,4 +44,4 @@ export const createRepository = (
   const model = mongoose.model<TUser>('Users', schema);
 
   return new Users(model);
-}; 
+};

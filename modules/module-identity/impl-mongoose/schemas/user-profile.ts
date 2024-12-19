@@ -1,5 +1,5 @@
 import { Containers } from '@omniflex/core';
-import { Model, Schema, Connection } from 'mongoose';
+import { Schema, Connection } from 'mongoose';
 import * as Types from '@omniflex/infra-mongoose/types';
 import { MongooseBaseRepository } from '@omniflex/infra-mongoose';
 import { IUserProfileRepository, TUserProfile } from '@omniflex/module-identity-core/types';
@@ -7,11 +7,7 @@ import { IUserProfileRepository, TUserProfile } from '@omniflex/module-identity-
 const appContainer = Containers.appContainerAs<{ mongoose: Connection; }>();
 
 export class UserProfiles extends MongooseBaseRepository<TUserProfile>
-  implements IUserProfileRepository {
-  constructor(model: Model<TUserProfile>) {
-    super(model);
-  }
-}
+  implements IUserProfileRepository {}
 
 export const baseDefinition = {
   deletedAt: Types.deletedAt,
@@ -56,4 +52,4 @@ export const createRepository = (
   const model = mongoose.model<TUserProfile>('UserProfiles', schema);
 
   return new UserProfiles(model);
-}; 
+};
