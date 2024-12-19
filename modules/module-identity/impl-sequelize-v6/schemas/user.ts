@@ -16,7 +16,7 @@ const appContainer = Containers.appContainerAs<{ sequelize: Sequelize; }>();
 
 export class Users
   extends SequelizeRepository<TUser>
-  implements IUserRepository<TUser> {
+  implements IUserRepository {
   constructor(model: TModel<Model<TUser>>) {
     super(model);
   }

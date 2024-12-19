@@ -6,10 +6,9 @@ import { ILoginAttemptRepository, TLoginAttempt } from '@omniflex/module-identit
 
 const appContainer = Containers.appContainerAs<{ mongoose: Connection; }>();
 
-export class LoginAttempts<T extends TLoginAttempt = TLoginAttempt>
-  extends MongooseBaseRepository<T>
+export class LoginAttempts extends MongooseBaseRepository<TLoginAttempt>
   implements ILoginAttemptRepository {
-  constructor(model: Model<T>) {
+  constructor(model: Model<TLoginAttempt>) {
     super(model);
   }
 }
@@ -26,10 +25,10 @@ export const baseDefinition = {
   deletedAt: Types.deletedAt,
 };
 
-export const defineSchema = <T extends TLoginAttempt = TLoginAttempt>(
+export const defineSchema = (
   schema: typeof baseDefinition & Record<string, any> = baseDefinition,
 ) => {
-  const loginAttempt = new Schema<T>(
+  const loginAttempt = new Schema<TLoginAttempt>(
     schema,
     { timestamps: true },
   );
@@ -44,16 +43,16 @@ export const defineSchema = <T extends TLoginAttempt = TLoginAttempt>(
   return loginAttempt;
 };
 
-export const createRepository = <T extends TLoginAttempt = TLoginAttempt>(
-  schemaOrDefinition?: Schema<T> | typeof baseDefinition,
+export const createRepository = (
+  schemaOrDefinition?: Schema<TLoginAttempt> | typeof baseDefinition,
 ) => {
   const mongoose = appContainer.resolve('mongoose');
 
   const schema = schemaOrDefinition instanceof Schema ?
-    schemaOrDefinition as Schema<T> :
-    defineSchema<T>(schemaOrDefinition);
+    schemaOrDefinition as Schema<TLoginAttempt> :
+    defineSchema(schemaOrDefinition);
 
-  const model = mongoose.model<T>('LoginAttempts', schema);
+  const model = mongoose.model<TLoginAttempt>('LoginAttempts', schema);
 
-  return new LoginAttempts<T>(model);
+  return new LoginAttempts(model);
 };

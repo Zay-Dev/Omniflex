@@ -6,10 +6,8 @@ import { IUserRepository, TUser } from '@omniflex/module-identity-core/types';
 
 const appContainer = Containers.appContainerAs<{ mongoose: Connection; }>();
 
-export class Users<T extends TUser = TUser>
-  extends MongooseBaseRepository<T>
-  implements IUserRepository<T> {
-  constructor(model: Model<T>) {
+export class Users extends MongooseBaseRepository<TUser> implements IUserRepository {
+  constructor(model: Model<TUser>) {
     super(model);
   }
 }
@@ -22,10 +20,10 @@ export const baseDefinition = {
   lastSignInAtUtc: Types.optionalDate,
 };
 
-export const defineSchema = <T extends TUser = TUser>(
+export const defineSchema = (
   schema: typeof baseDefinition & Record<string, any> = baseDefinition,
 ) => {
-  const user = new Schema<T>(
+  const user = new Schema<TUser>(
     schema,
     { timestamps: true },
   );
@@ -38,16 +36,16 @@ export const defineSchema = <T extends TUser = TUser>(
   return user;
 };
 
-export const createRepository = <T extends TUser = TUser>(
-  schemaOrDefinition?: Schema<T> | typeof baseDefinition,
+export const createRepository = (
+  schemaOrDefinition?: Schema<TUser> | typeof baseDefinition,
 ) => {
   const mongoose = appContainer.resolve('mongoose');
 
   const schema = schemaOrDefinition instanceof Schema ?
-    schemaOrDefinition as Schema<T> :
-    defineSchema<T>(schemaOrDefinition);
+    schemaOrDefinition as Schema<TUser> :
+    defineSchema(schemaOrDefinition);
 
-  const model = mongoose.model<T>('Users', schema);
+  const model = mongoose.model<TUser>('Users', schema);
 
-  return new Users<T>(model);
+  return new Users(model);
 }; 
