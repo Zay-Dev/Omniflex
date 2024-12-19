@@ -1,44 +1,37 @@
-import { Sequelize } from 'sequelize';
-import { Containers } from '@omniflex/core';
 import { registerRepositories } from '@omniflex/module-identity-core';
 
-import * as Schemas from './schemas';
+import * as User from './schemas/user';
+import * as UserProfile from './schemas/user-profile';
+import * as UserPassword from './schemas/user-password';
+import * as LoginAttempt from './schemas/login-attempt';
 
-export * from './schemas';
-
-function get<T>(fn: () => T) { return fn(); }
-
-const appContainer = Containers.appContainerAs<{ sequelize: Sequelize; }>();
-
-export const repositories = {} as {
-  users: Schemas.User.UserRepository;
-  profiles: Schemas.UserProfile.UserProfileRepository;
-  passwords: Schemas.UserPassword.UserPasswordRepository;
-  loginAttempts: Schemas.LoginAttempt.LoginAttemptRepository;
+const models = {
+  users: null as any,
+  profiles: null as any,
+  passwords: null as any,
+  loginAttempts: null as any,
 };
 
 export const createRegisteredRepositories = (
-  userSchema = get(Schemas.User.defineSchema),
-  profileSchema = get(Schemas.UserProfile.defineSchema),
-  passwordSchema = get(Schemas.UserPassword.defineSchema),
-  loginAttemptSchema = get(Schemas.LoginAttempt.defineSchema),
+  userSchema?: Parameters<typeof User.createRepository>[0],
+  profileSchema?: Parameters<typeof UserProfile.createRepository>[0],
+  passwordSchema?: Parameters<typeof UserPassword.createRepository>[0],
+  loginAttemptSchema?: Parameters<typeof LoginAttempt.createRepository>[0],
 ) => {
-  const sequelize = appContainer.resolve('sequelize');
-
-  const userModel = sequelize.define('Users', userSchema.schema, userSchema.options);
-  const profileModel = sequelize.define('UserProfiles', profileSchema.schema, profileSchema.options);
-  const passwordModel = sequelize.define('UserPasswords', passwordSchema.schema, passwordSchema.options);
-  const loginAttemptModel = sequelize.define('LoginAttempts', loginAttemptSchema.schema, loginAttemptSchema.options);
-
-  repositories.users = new Schemas.User.UserRepository(userModel);
-  repositories.profiles = new Schemas.UserProfile.UserProfileRepository(profileModel);
-  repositories.passwords = new Schemas.UserPassword.UserPasswordRepository(passwordModel);
-  repositories.loginAttempts = new Schemas.LoginAttempt.LoginAttemptRepository(loginAttemptModel);
+  const users = User.createRepository(userSchema);
+  const profiles = UserProfile.createRepository(profileSchema);
+  const passwords = UserPassword.createRepository(passwordSchema);
+  const loginAttempts = LoginAttempt.createRepository(loginAttemptSchema);
 
   registerRepositories({
-    userRepository: repositories.users,
-    userProfileRepository: repositories.profiles,
-    userPasswordRepository: repositories.passwords,
-    loginAttemptRepository: repositories.loginAttempts,
+    userRepository: users,
+    userProfileRepository: profiles,
+    userPasswordRepository: passwords,
+    loginAttemptRepository: loginAttempts,
   });
+
+  models.users = users.getModel();
+  models.profiles = profiles.getModel();
+  models.passwords = passwords.getModel();
+  models.loginAttempts = loginAttempts.getModel();
 };

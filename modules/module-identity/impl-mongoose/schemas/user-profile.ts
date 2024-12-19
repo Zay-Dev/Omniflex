@@ -1,33 +1,30 @@
-import { Model, Schema } from 'mongoose';
+import { Containers } from '@omniflex/core';
+import { Model, Schema, Connection } from 'mongoose';
+import * as Types from '@omniflex/infra-mongoose/types';
 import { MongooseBaseRepository } from '@omniflex/infra-mongoose';
 import { IUserProfileRepository, TUserProfile } from '@omniflex/module-identity-core/types';
 
-import {
-  mixed,
-  deletedAt,
-  optionalString,
-  toRequiredObjectId,
-} from '@omniflex/infra-mongoose/types';
+const appContainer = Containers.appContainerAs<{ mongoose: Connection; }>();
 
-export class UserProfileRepository
-  extends MongooseBaseRepository<TUserProfile>
+export class UserProfiles<T extends TUserProfile = TUserProfile>
+  extends MongooseBaseRepository<T>
   implements IUserProfileRepository {
-  constructor(model: Model<TUserProfile>) {
+  constructor(model: Model<T>) {
     super(model);
   }
 }
 
 export const baseDefinition = {
-  deletedAt,
+  deletedAt: Types.deletedAt,
 
-  profileImage: optionalString,
-  email: optionalString,
-  mobileNumber: optionalString,
-  firstName: optionalString,
-  lastName: optionalString,
-  profile: mixed,
+  profileImage: Types.optionalString,
+  email: Types.optionalString,
+  mobileNumber: Types.optionalString,
+  firstName: Types.optionalString,
+  lastName: Types.optionalString,
+  profile: Types.mixed,
 
-  userId: toRequiredObjectId('Users'),
+  userId: Types.toRequiredObjectId('Users'),
 };
 
 export const defineSchema = <T extends TUserProfile = TUserProfile>(
@@ -46,4 +43,18 @@ export const defineSchema = <T extends TUserProfile = TUserProfile>(
   });
 
   return profile;
+};
+
+export const createRepository = <T extends TUserProfile = TUserProfile>(
+  schemaOrDefinition?: Schema<T> | typeof baseDefinition,
+) => {
+  const mongoose = appContainer.resolve('mongoose');
+
+  const schema = schemaOrDefinition instanceof Schema ?
+    schemaOrDefinition as Schema<T> :
+    defineSchema<T>(schemaOrDefinition);
+
+  const model = mongoose.model<T>('UserProfiles', schema);
+
+  return new UserProfiles<T>(model);
 }; 
