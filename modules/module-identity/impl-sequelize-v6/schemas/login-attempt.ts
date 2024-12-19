@@ -16,11 +16,7 @@ const appContainer = Containers.appContainerAs<{ sequelize: Sequelize; }>();
 
 export class LoginAttempts
   extends SequelizeRepository<TLoginAttempt>
-  implements ILoginAttemptRepository {
-  constructor(model: TModel<Model<TLoginAttempt>>) {
-    super(model);
-  }
-}
+  implements ILoginAttemptRepository {}
 
 export const baseDefinition = {
   id: Types.id('UUID'),

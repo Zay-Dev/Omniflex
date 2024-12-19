@@ -1,5 +1,5 @@
 import { Containers } from '@omniflex/core';
-import { Model, Schema, Connection } from 'mongoose';
+import { Schema, Connection } from 'mongoose';
 import * as Types from '@omniflex/infra-mongoose/types';
 import { MongooseBaseRepository } from '@omniflex/infra-mongoose';
 import { ILoginAttemptRepository, TLoginAttempt } from '@omniflex/module-identity-core/types';
@@ -7,11 +7,7 @@ import { ILoginAttemptRepository, TLoginAttempt } from '@omniflex/module-identit
 const appContainer = Containers.appContainerAs<{ mongoose: Connection; }>();
 
 export class LoginAttempts extends MongooseBaseRepository<TLoginAttempt>
-  implements ILoginAttemptRepository {
-  constructor(model: Model<TLoginAttempt>) {
-    super(model);
-  }
-}
+  implements ILoginAttemptRepository {}
 
 export const baseDefinition = {
   identifier: Types.requiredString,

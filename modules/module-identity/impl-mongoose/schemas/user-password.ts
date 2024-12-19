@@ -1,5 +1,5 @@
 import { Containers } from '@omniflex/core';
-import { Model, Schema, Connection } from 'mongoose';
+import { Schema, Connection } from 'mongoose';
 import * as Types from '@omniflex/infra-mongoose/types';
 import { MongooseBaseRepository } from '@omniflex/infra-mongoose';
 import { IUserPasswordRepository, TUserPassword } from '@omniflex/module-identity-core/types';
@@ -8,10 +8,6 @@ const appContainer = Containers.appContainerAs<{ mongoose: Connection; }>();
 
 export class UserPasswords extends MongooseBaseRepository<TUserPassword>
   implements IUserPasswordRepository {
-  constructor(model: Model<TUserPassword>) {
-    super(model);
-  }
-
   async findByUsername(username: string) {
     return this.findOne({ username, deletedAt: null });
   }

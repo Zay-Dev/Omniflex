@@ -1,5 +1,5 @@
 import { Containers } from '@omniflex/core';
-import { Model, Schema, Connection } from 'mongoose';
+import { Schema, Connection } from 'mongoose';
 import * as Types from '@omniflex/infra-mongoose/types';
 import { MongooseBaseRepository } from '@omniflex/infra-mongoose';
 import { IUserSessionRepository, TUserSession } from '@omniflex/module-user-session-core/types';
@@ -8,10 +8,6 @@ const appContainer = Containers.appContainerAs<{ mongoose: Connection; }>();
 
 export class UserSessions extends MongooseBaseRepository<TUserSession>
   implements IUserSessionRepository {
-  constructor(model: Model<TUserSession>) {
-    super(model);
-  }
-
   async deactivateByUserId(userId: string) {
     await this.model.updateMany(
       { userId, isActive: true, deletedAt: null },
