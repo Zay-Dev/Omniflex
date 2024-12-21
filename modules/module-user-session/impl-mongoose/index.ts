@@ -1,31 +1,19 @@
-import { Connection } from 'mongoose';
-import { Containers } from '@omniflex/core';
 import { registerRepositories } from '@omniflex/module-user-session-core';
 
-import * as Schemas from './schemas';
-import { UserSessionRepository } from './repositories/user-session.repository';
+import * as UserSessions from './schemas/user-sessions';
 
-export * from './schemas';
-export * from './repositories/user-session.repository';
-
-function get<T>(fn: () => T) { return fn(); }
-
-const appContainer = Containers.appContainerAs<{ mongoose: Connection; }>();
-
-export const repositories = {} as {
-  sessions: UserSessionRepository;
+const models = {
+  userSessions: null as any,
 };
 
 export const createRegisteredRepositories = (
-  sessionSchema = get(Schemas.getSessionSchema),
+  userSessionSchemaOrDefinition?: Parameters<typeof UserSessions.createRepository>[0],
 ) => {
-  const mongoose = appContainer.resolve('mongoose');
-
-  const sessionModel = mongoose.model('UserSessions', sessionSchema);
-
-  repositories.sessions = new UserSessionRepository(sessionModel);
+  const userSessions = UserSessions.createRepository(userSessionSchemaOrDefinition);
 
   registerRepositories({
-    userSessionRepository: repositories.sessions,
+    userSessionRepository: userSessions,
   });
+
+  models.userSessions = userSessions.getModel();
 };

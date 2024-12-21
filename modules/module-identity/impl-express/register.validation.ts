@@ -1,60 +1,40 @@
-import { Request, Response, NextFunction } from 'express';
 import { tryValidateBody } from '@omniflex/infra-express/helpers/joi';
 
 import { errors } from '@omniflex/core';
-import { resolve } from '@omniflex/module-identity-core/containers';
-
+import { ExpressUtils } from '@omniflex/infra-express';
 import * as Rules from '@omniflex/module-identity-core/user.rules';
-import { schemas } from '@omniflex/module-identity-core/user.schema';
+
+import {
+  resolve,
+  schemaLogin,
+  schemaRegister,
+  schemaLoginWithEmail,
+  schemaRegisterWithEmail,
+} from '@omniflex/module-identity-core';
 
 export const validateRegister = [
-  tryValidateBody(schemas.register),
-
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      Rules.throwIfConflictingUsername(req.body);
-    } catch (error) {
-      return next(error);
-    }
-
-    return next();
-  },
+  tryValidateBody(schemaRegister),
+  ExpressUtils.tryAction((req) => Rules.throwIfConflictingUsername(req.body)),
 ];
 
 export const validateRegisterWithEmail = [
-  tryValidateBody(schemas.registerWithEmail),
-
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      await Rules.throwIfConflictingEmail(req.body);
-    } catch (error) {
-      return next(error);
-    }
-
-    return next();
-  },
+  tryValidateBody(schemaRegisterWithEmail),
+  ExpressUtils.tryAction((req) => Rules.throwIfConflictingEmail(req.body)),
 ];
 
 const getValidateLogin = (schema: any, usernameKey: string) => [
   tryValidateBody(schema),
+  ExpressUtils.tryAction(async (req) => {
+    const { passwords } = resolve();
+    const found = await passwords.exists({
+      username: req.body[usernameKey],
+    });
 
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { passwords } = resolve();
-      const found = await passwords.exists({
-        username: req.body[usernameKey],
-      });
-
-      if (!found) {
-        throw errors.unauthorized();
-      }
-    } catch (error) {
-      return next(error);
+    if (!found) {
+      throw errors.unauthorized();
     }
-
-    return next();
-  },
+  }),
 ];
 
-export const validateLogin = getValidateLogin(schemas.login, 'username');
-export const validateLoginWithEmail = getValidateLogin(schemas.loginWithEmail, 'email');
+export const validateLogin = getValidateLogin(schemaLogin, 'username');
+export const validateLoginWithEmail = getValidateLogin(schemaLoginWithEmail, 'email');

@@ -20,22 +20,46 @@ jest.mock('@omniflex/core', () => {
   };
 
   return {
-    logger: {
-      error: jest.fn(),
-      info: jest.fn(),
-      debug: jest.fn(),
-      warn: jest.fn()
+    Utils: {
+      tryAction: async (action: () => Promise<any> | any, options?: { next?: (error: any) => void; }) => {
+        try {
+          return await action();
+        } catch (error) {
+          if (options?.next) {
+            options.next(error);
+          } else {
+            throw error;
+          }
+        }
+      }
     },
+    errorFactory,
     errors: errorFactory,
+    modulesSchemas: {},
+    providers: {
+      hash: {
+        hash: async (value: string) => value,
+        verify: async (value: string, hashed: string) => value === hashed,
+      },
+    },
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+      warn: jest.fn(),
+      debug: jest.fn(),
+    },
     Containers: {
       configAs: jest.fn().mockReturnValue({
         logging: {
           exposeErrorDetails: false
         }
+      }),
+      appContainerAs: jest.fn().mockReturnValue({
+        sequelize: {},
+        mongoose: {}
       })
     },
     handleUncaughtException: jest.fn(),
     BaseError,
-    modulesSchemas: {}
   };
 });

@@ -1,4 +1,4 @@
-import { TUser, TUserPassword } from '../../types';
+import { TUser, TUserPassword } from '../../types/index';
 
 export const mockUser: TUser = {
   id: 'test-user-id',

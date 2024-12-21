@@ -1,81 +1,67 @@
-import { Sequelize } from 'sequelize';
-import { Containers } from '@omniflex/core';
 import { registerRepositories } from '@omniflex/module-identity-core';
 
-import * as Schemas from './schemas';
-import * as Repositories from './repositories';
+import * as User from './schemas/user';
+import * as UserProfile from './schemas/user-profile';
+import * as UserPassword from './schemas/user-password';
+import * as LoginAttempt from './schemas/login-attempt';
 
-export * from './schemas';
-export * from './repositories';
-
-type TContainer = { sequelize: Sequelize; };
-
-function get<T>(fn: () => T) { return fn(); }
-
-export const appContainer = Containers.appContainerAs<TContainer>();
-
-export const repositories = {} as {
-  users: Repositories.UserRepository;
-  profiles: Repositories.UserProfileRepository;
-  passwords: Repositories.UserPasswordRepository;
-  loginAttempts: Repositories.LoginAttemptRepository;
+const models = {
+  users: null as unknown as ReturnType<User.Users['getModel']>,
+  profiles: null as unknown as ReturnType<UserProfile.UserProfiles['getModel']>,
+  passwords: null as unknown as ReturnType<UserPassword.UserPasswords['getModel']>,
+  loginAttempts: null as unknown as ReturnType<LoginAttempt.LoginAttempts['getModel']>,
 };
 
 export const createRegisteredRepositories = (
-  userSchema = get(Schemas.getUserSchema),
-  profileSchema = get(Schemas.getProfileSchema),
-  passwordSchema = get(Schemas.getPasswordSchema),
-  loginAttemptSchema = get(Schemas.getLoginAttemptSchema),
+  userSchema?: Parameters<typeof User.createRepository>[0],
+  profileSchema?: Parameters<typeof UserProfile.createRepository>[0],
+  passwordSchema?: Parameters<typeof UserPassword.createRepository>[0],
+  loginAttemptSchema?: Parameters<typeof LoginAttempt.createRepository>[0],
 ) => {
-  const sequelize = appContainer.resolve('sequelize');
-  const define = (modelName: string, { schema, options }) => {
-    return sequelize.define(modelName, schema, options);
-  };
+  const users = User.createRepository(userSchema);
+  const profiles = UserProfile.createRepository(profileSchema);
+  const passwords = UserPassword.createRepository(passwordSchema);
+  const loginAttempts = LoginAttempt.createRepository(loginAttemptSchema);
 
-  const userModel = define('User', userSchema);
-  const profileModel = define('UserProfile', profileSchema);
-  const passwordModel = define('UserPassword', passwordSchema);
-  const loginAttemptModel = define('LoginAttempt', loginAttemptSchema);
+  registerRepositories({
+    userRepository: users,
+    userProfileRepository: profiles,
+    userPasswordRepository: passwords,
+    loginAttemptRepository: loginAttempts,
+  });
 
-  userModel.hasOne(profileModel, {
+  models.users = users.getModel();
+  models.profiles = profiles.getModel();
+  models.passwords = passwords.getModel();
+  models.loginAttempts = loginAttempts.getModel();
+
+  models.users.hasOne(models.profiles, {
     as: 'profile',
     foreignKey: 'userId',
   });
 
-  userModel.hasMany(passwordModel, {
+  models.users.hasMany(models.passwords, {
     as: 'passwords',
     foreignKey: 'userId',
   });
 
-  userModel.hasMany(loginAttemptModel, {
+  models.users.hasMany(models.loginAttempts, {
     as: 'loginAttempts',
     foreignKey: 'userId',
   });
 
-  profileModel.belongsTo(userModel, {
+  models.profiles.belongsTo(models.users, {
     as: 'user',
     foreignKey: 'userId',
   });
 
-  passwordModel.belongsTo(userModel, {
+  models.passwords.belongsTo(models.users, {
     as: 'user',
     foreignKey: 'userId',
   });
 
-  loginAttemptModel.belongsTo(userModel, {
+  models.loginAttempts.belongsTo(models.users, {
     as: 'user',
     foreignKey: 'userId',
-  });
-
-  repositories.users = new Repositories.UserRepository(userModel);
-  repositories.profiles = new Repositories.UserProfileRepository(profileModel);
-  repositories.passwords = new Repositories.UserPasswordRepository(passwordModel);
-  repositories.loginAttempts = new Repositories.LoginAttemptRepository(loginAttemptModel);
-
-  registerRepositories({
-    userRepository: repositories.users,
-    userProfileRepository: repositories.profiles,
-    userPasswordRepository: repositories.passwords,
-    loginAttemptRepository: repositories.loginAttempts,
   });
 };

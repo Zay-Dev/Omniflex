@@ -1,12 +1,13 @@
-import { errors, logger } from '@omniflex/core';
+import { errors, logger, Utils } from '@omniflex/core';
 import { Request, Response, NextFunction } from 'express';
 
+import * as ExpressUtils from './express';
 import { ensureLocals } from './locals-initializer';
 import { TInfraExpressLocals } from '@omniflex/infra-express/internal-types';
 
 export class BaseExpressController<TLocals extends TInfraExpressLocals = TInfraExpressLocals> {
   protected locals: TLocals;
-  public user?: TLocals['user'];
+  protected user?: TLocals['user'];
 
   constructor(
     protected req: Request,
@@ -17,7 +18,7 @@ export class BaseExpressController<TLocals extends TInfraExpressLocals = TInfraE
     this.user = this.locals.user;
   }
 
-  tryActionWithBody<T>(
+  protected tryActionWithBody<T>(
     action: (body: T) => Promise<any> | any,
     options: Parameters<BaseExpressController['tryAction']>[1] & {
       getBody?: () => T;
@@ -31,36 +32,27 @@ export class BaseExpressController<TLocals extends TInfraExpressLocals = TInfraE
     }, options);
   }
 
-  async tryAction(
+  protected async tryAction(
     action: () => Promise<any> | any,
     { streamErrorToConsole = false } = {}
   ) {
-    try {
-      return await action();
-    } catch (error) {
-      streamErrorToConsole && console.error(error);
-
-      logger.error(error instanceof Error ?
-        { error } : { data: error }
-      );
-
-      return this.next(error);
-    }
-  }
-
-  respondOne(data: any) {
-    return this.res.json({ data });
-  }
-
-  respondRequired(key: string) {
-    return this.respondOne(this.locals.required[key]);
-  }
-
-  respondMany(data: Array<any> = [], total?: number) {
-    return this.res.json({
-      data,
-      total: total || data.length,
+    return Utils.tryAction(action, {
+      logger,
+      next: this.next,
+      streamErrorToConsole,
     });
+  }
+
+  protected respondOne(data: any) {
+    return ExpressUtils.respondOne(this.res, data);
+  }
+
+  protected respondRequired(key: string) {
+    return ExpressUtils.respondRequired(this.res, this.locals, key);
+  }
+
+  protected respondMany(data: Array<any> = [], total?: number) {
+    return ExpressUtils.respondMany(this.res, data, total);
   }
 
   protected throwNotFound(type?: string) {

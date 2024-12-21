@@ -1,7 +1,7 @@
 import { Model } from 'sequelize';
 import { TModel } from '@omniflex/infra-sequelize-v6';
+import { UserSessions } from '../schemas/user-sessions';
 import { TUserSession } from '@omniflex/module-user-session-core/types';
-import { UserSessionRepository } from '../repositories/user-session.repository';
 
 describe('UserSessionRepository (Sequelize)', () => {
   const mockModel = {
@@ -11,7 +11,7 @@ describe('UserSessionRepository (Sequelize)', () => {
     primaryKeyAttributes: ['id'],
   } as unknown as TModel<Model<TUserSession>>;
 
-  const repository = new UserSessionRepository(mockModel);
+  const repository = new UserSessions(mockModel);
 
   beforeEach(() => {
     jest.clearAllMocks();

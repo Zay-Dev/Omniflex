@@ -1,5 +1,5 @@
 export * from './types';
 export * from './containers';
 
+export * from './joi.schemas';
 export * from './services/user-session.service';
-export * as UserSessionSchemas from './session.schema';
