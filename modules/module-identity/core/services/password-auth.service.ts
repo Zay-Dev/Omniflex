@@ -1,12 +1,10 @@
 import { v4 as uuid } from 'uuid';
 import { errors, providers } from '@omniflex/core';
 
-import { TUser } from './types/index';
-import { resolve } from './containers';
+import { TUser } from '../types';
+import { resolve } from '../containers';
 
 const hashProvider = providers.hash;
-const repositories = resolve<TUser>();
-const { users, profiles, passwords, loginAttempts } = repositories;
 
 type TRegisterProfile = {
   email?: string;
@@ -36,6 +34,8 @@ const verifyPassword = async ({ password, hashedPassword, salt }) => {
 };
 
 export class PasswordAuthService {
+  private _repositories = resolve<TUser>();
+
   constructor(readonly appType: string) { }
 
   async registerWithUsername(
@@ -52,6 +52,7 @@ export class PasswordAuthService {
     }: TRegisterProfile,
   ) {
     const { username, password } = info;
+    const { users, profiles, passwords } = this._repositories;
 
     const user = await users.create({ identifier: username });
     const { salt, hashedPassword } = await hashPassword(password);
@@ -81,6 +82,8 @@ export class PasswordAuthService {
     password: string;
     remoteAddress?: string;
   }) {
+    const { users, passwords } = this._repositories;
+
     const recordFail = (data: Partial<TRecordLoginAttemptProps> = {}) => {
       return this._recordLoginAttempt({
         ...data,
@@ -122,6 +125,8 @@ export class PasswordAuthService {
   }
 
   private _recordLoginAttempt(data: TRecordLoginAttemptProps) {
+    const { loginAttempts } = this._repositories;
+
     return loginAttempts.create({
       loginType: "PASSWORD",
       appType: this.appType,

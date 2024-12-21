@@ -17,10 +17,7 @@ const mockPasswordAuthService = {
 };
 
 jest.mock('@omniflex/module-identity-core', () => ({
-  resolve: () => mockService
-}));
-
-jest.mock('@omniflex/module-identity-core/password-auth.service', () => ({
+  resolve: () => mockService,
   PasswordAuthService: jest.fn().mockImplementation(() => mockPasswordAuthService)
 }));
 

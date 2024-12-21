@@ -1,1 +1,2 @@
-export * as IdentityValidators from './register.validation';
+export * from './users.controller';
+export * from './register.validation';

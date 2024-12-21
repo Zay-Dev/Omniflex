@@ -77,4 +77,4 @@ export const createRepository = (
   );
 
   return new LoginAttempts(model);
-}; 
+};
