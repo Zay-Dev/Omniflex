@@ -3,6 +3,7 @@ import { tryValidateBody } from '@omniflex/infra-express/helpers/joi';
 
 import { errors } from '@omniflex/core';
 import * as Rules from '@omniflex/module-identity-core/user.rules';
+import { tryAction } from '@omniflex/infra-express/utils/try-action';
 
 import {
   resolve,
@@ -14,51 +15,26 @@ import {
 
 export const validateRegister = [
   tryValidateBody(schemaRegister),
-
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      Rules.throwIfConflictingUsername(req.body);
-    } catch (error) {
-      return next(error);
-    }
-
-    return next();
-  },
+  tryAction((req) => Rules.throwIfConflictingUsername(req.body)),
 ];
 
 export const validateRegisterWithEmail = [
   tryValidateBody(schemaRegisterWithEmail),
-
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      await Rules.throwIfConflictingEmail(req.body);
-    } catch (error) {
-      return next(error);
-    }
-
-    return next();
-  },
+  tryAction((req) => Rules.throwIfConflictingEmail(req.body)),
 ];
 
 const getValidateLogin = (schema: any, usernameKey: string) => [
   tryValidateBody(schema),
+  tryAction(async (req) => {
+    const { passwords } = resolve();
+    const found = await passwords.exists({
+      username: req.body[usernameKey],
+    });
 
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { passwords } = resolve();
-      const found = await passwords.exists({
-        username: req.body[usernameKey],
-      });
-
-      if (!found) {
-        throw errors.unauthorized();
-      }
-    } catch (error) {
-      return next(error);
+    if (!found) {
+      throw errors.unauthorized();
     }
-
-    return next();
-  },
+  }),
 ];
 
 export const validateLogin = getValidateLogin(schemaLogin, 'username');

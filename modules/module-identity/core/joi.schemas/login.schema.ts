@@ -17,19 +17,22 @@ export const schemaLoginWithEmail = Joi.object<Types.TBodyLoginWithEmail>({
   email: Base.email.required(),
 }).unknown();
 
-modulesSchemas.moduleIdentityLogin = {
-  ...j2s(schemaLogin).swagger,
-  example: {
-    username: 'username',
-    password: 'P@ssword12#',
-  } as Types.TBodyLogin,
-};
-
-modulesSchemas.moduleIdentityLoginWithEmail = {
-  ...j2s(schemaLoginWithEmail).swagger,
-  example: {
-    email: 'license@omniflex.io',
-    password: 'P@ssword12#',
-  } as Types.TBodyLoginWithEmail,
-};
-
+modulesSchemas.moduleIdentity = Object.assign(
+  modulesSchemas.moduleIdentity || {},
+  {
+    login: {
+      ...j2s(schemaLogin).swagger,
+      example: {
+        username: 'username',
+        password: 'P@ssword12#',
+      } as Types.TBodyLogin,
+    },
+    loginWithEmail: {
+      ...j2s(schemaLoginWithEmail).swagger,
+      example: {
+        email: 'license@omniflex.io',
+        password: 'P@ssword12#',
+      } as Types.TBodyLoginWithEmail,
+    },
+  },
+);

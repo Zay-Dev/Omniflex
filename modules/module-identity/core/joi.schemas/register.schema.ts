@@ -23,27 +23,31 @@ export const schemaRegisterWithEmail = Joi.object<Types.TBodyRegisterWithEmail>(
   email: Base.email.required(),
 }).unknown();
 
-modulesSchemas.moduleIdentityRegister = {
-  ...j2s(schemaRegister).swagger,
-  example: {
-    username: 'username',
-    password: 'P@ssword12#',
-    repeatPassword: 'P@ssword12#',
+modulesSchemas.moduleIdentity = Object.assign(
+  modulesSchemas.moduleIdentity || {},
+  {
+    register: {
+      ...j2s(schemaRegister).swagger,
+      example: {
+        username: 'username',
+        password: 'P@ssword12#',
+        repeatPassword: 'P@ssword12#',
 
-    email: 'license@omniflex.io',
-    firstName: 'John',
-    lastName: 'Doe',
-  } as Types.TBodyRegister & { repeatPassword: string; },
-};
+        email: 'license@omniflex.io',
+        firstName: 'John',
+        lastName: 'Doe',
+      } as Types.TBodyRegister & { repeatPassword: string; },
+    },
+    registerWithEmail: {
+      ...j2s(schemaRegisterWithEmail).swagger,
+      example: {
+        email: 'license@omniflex.io',
+        password: 'P@ssword12#',
+        repeatPassword: 'P@ssword12#',
 
-modulesSchemas.moduleIdentityRegisterWithEmail = {
-  ...j2s(schemaRegisterWithEmail).swagger,
-  example: {
-    email: 'license@omniflex.io',
-    password: 'P@ssword12#',
-    repeatPassword: 'P@ssword12#',
-
-    firstName: 'John',
-    lastName: 'Doe',
-  } as Types.TBodyRegisterWithEmail & { repeatPassword: string; },
-};
+        firstName: 'John',
+        lastName: 'Doe',
+      } as Types.TBodyRegisterWithEmail & { repeatPassword: string; },
+    },
+  },
+);
