@@ -6,14 +6,16 @@ This project is built using the Omniflex Mono-Repo. For more information, visit 
 The omniflex mono-repo is available at [here](https://github.com/Zay-Dev/omniflex).
 
 Omniflex is a TypeScript-based monorepo designed to accelerate Node.js backend development. 
-It provides a collection of well-structured, loosely-coupled packages that work together seamlessly 
-while maintaining the flexibility to use them independently.
+
+It aims to prevent the vendor lock-in, and improve the development experience.
+
 
 ## Key Thoughts from the Team
 
 1. **Readability**
    - comes first
    - is more important than cleverness
+   - yes, I can't read file longer than 250 lines
 2. **TypeScript**
    - is not a silver bullet, it's a tool
    - should be more like helping me to tell my IDE what to suggest
@@ -45,7 +47,7 @@ while maintaining the flexibility to use them independently.
 # Create new project
 npx github:Zay-Dev/omniflex-npx --express --alpha my-project
 
-# OR Using the [Get Started](https://www.omniflex.io/get-started/express) document
+# OR Using the https://www.omniflex.io/get-started/express document
 npx github:Zay-Dev/omniflex-npx --alpha my-project
 
 # OR clone manually
@@ -137,7 +139,7 @@ With Yarn workspaces, you can run commands for specific packages from the root d
 ```bash
 # Add dependencies
 yarn ws-run apps-server add @omniflex/core@^0.1.0
-yarn -W add express   # -- add a sharing dependency to the root
+yarn -W add typescript   # -- add a sharing dependency to the root
 
 # Run scripts
 yarn ws-run apps-server dev
@@ -156,7 +158,7 @@ For more information about Yarn workspaces, visit the [official documentation](h
 For a complete working example, please refer to our reference implementation at 
 [omniflex-express-apps-server](https://github.com/Zay-Dev/omniflex-express-apps-server).
 
-Or our get-started document at [omniflex.io/get-started/express](https://www.omniflex.io/get-started/express).
+Or our [get-started document](https://www.omniflex.io/get-started/express).
 
 
 ### Features
