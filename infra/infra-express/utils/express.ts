@@ -18,12 +18,18 @@ export const respondMany = (res: Response, data: Array<any> = [], total?: number
 
 export const tryAction = (
   action: (req: Request, res: Response) => Promise<any> | any,
+  options: boolean | { noAutoNext?: boolean; } = false,
 ) => {
+  const noAutoNext = typeof options === 'boolean' ? options : options.noAutoNext;
+
   return async (req: Request, res: Response, next: NextFunction) => {
     return Utils.tryAction(
       async () => {
         await action(req, res);
-        return next();
+
+        if (!noAutoNext) {
+          return next();
+        }
       },
       { next },
     );
