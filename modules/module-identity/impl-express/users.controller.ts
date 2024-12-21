@@ -1,9 +1,5 @@
+import { resolve, PasswordAuthService } from '@omniflex/module-identity-core';
 import { BaseEntitiesController } from '@omniflex/infra-express/utils/base-entities-controller';
-
-import { resolve } from '@omniflex/module-identity-core';
-
-import { PasswordAuthService }
-  from '@omniflex/module-identity-core/password-auth.service';
 
 import {
   TUser,

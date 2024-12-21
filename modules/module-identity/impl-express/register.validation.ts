@@ -2,13 +2,18 @@ import { Request, Response, NextFunction } from 'express';
 import { tryValidateBody } from '@omniflex/infra-express/helpers/joi';
 
 import { errors } from '@omniflex/core';
-import { resolve } from '@omniflex/module-identity-core/containers';
-
 import * as Rules from '@omniflex/module-identity-core/user.rules';
-import { schemas } from '@omniflex/module-identity-core/user.schema';
+
+import {
+  resolve,
+  schemaLogin,
+  schemaRegister,
+  schemaLoginWithEmail,
+  schemaRegisterWithEmail,
+} from '@omniflex/module-identity-core';
 
 export const validateRegister = [
-  tryValidateBody(schemas.register),
+  tryValidateBody(schemaRegister),
 
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -22,7 +27,7 @@ export const validateRegister = [
 ];
 
 export const validateRegisterWithEmail = [
-  tryValidateBody(schemas.registerWithEmail),
+  tryValidateBody(schemaRegisterWithEmail),
 
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -56,5 +61,5 @@ const getValidateLogin = (schema: any, usernameKey: string) => [
   },
 ];
 
-export const validateLogin = getValidateLogin(schemas.login, 'username');
-export const validateLoginWithEmail = getValidateLogin(schemas.loginWithEmail, 'email');
+export const validateLogin = getValidateLogin(schemaLogin, 'username');
+export const validateLoginWithEmail = getValidateLogin(schemaLoginWithEmail, 'email');

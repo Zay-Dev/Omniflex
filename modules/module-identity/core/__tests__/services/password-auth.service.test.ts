@@ -1,6 +1,7 @@
+import * as Awilix from 'awilix';
 import { providers } from '@omniflex/core';
 
-import { PasswordAuthService } from '../../password-auth.service';
+import { PasswordAuthService } from '../../';
 import { mockUser, mockUserPassword } from '../utils/mocks';
 
 jest.mock('@omniflex/core', () => ({
@@ -12,11 +13,18 @@ jest.mock('@omniflex/core', () => ({
       hash: jest.fn(),
       verify: jest.fn()
     }
+  },
+  modulesSchemas: {},
+  logger: {
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+    debug: jest.fn(),
   }
 }));
 
-jest.mock('../../containers', () => ({
-  resolve: jest.fn().mockReturnValue({
+jest.mock('../../containers', () => {
+  const mockRepositories = {
     users: {
       isValidPrimaryKey: jest.fn(),
       exists: jest.fn(),
@@ -55,10 +63,33 @@ jest.mock('../../containers', () => ({
       findByUsername: jest.fn()
     },
     loginAttempts: {
-      create: jest.fn()
+      isValidPrimaryKey: jest.fn(),
+      exists: jest.fn(),
+      findById: jest.fn(),
+      findOne: jest.fn(),
+      find: jest.fn(),
+      create: jest.fn(),
+      updateById: jest.fn(),
+      updateMany: jest.fn(),
+      delete: jest.fn(),
+      softDelete: jest.fn()
     }
-  })
-}));
+  };
+
+  const container = Awilix.createContainer();
+
+  container.register({
+    userRepository: Awilix.asValue(mockRepositories.users),
+    userProfileRepository: Awilix.asValue(mockRepositories.profiles),
+    userPasswordRepository: Awilix.asValue(mockRepositories.passwords),
+    loginAttemptRepository: Awilix.asValue(mockRepositories.loginAttempts)
+  });
+
+  return {
+    container,
+    resolve: () => mockRepositories
+  };
+});
 
 describe('PasswordAuthService', () => {
   const service = new PasswordAuthService('test-app');

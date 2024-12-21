@@ -1,2 +1,5 @@
+export * from './types';
 export * from './containers';
-export * as IdentitySchemas from './user.schema';
+
+export * from './joi.schemas';
+export * from './services/password-auth.service';
