@@ -6,10 +6,10 @@ import * as UserPassword from './schemas/user-password';
 import * as LoginAttempt from './schemas/login-attempt';
 
 const models = {
-  users: null as any,
-  profiles: null as any,
-  passwords: null as any,
-  loginAttempts: null as any,
+  users: null as unknown as ReturnType<User.Users['getModel']>,
+  profiles: null as unknown as ReturnType<UserProfile.UserProfiles['getModel']>,
+  passwords: null as unknown as ReturnType<UserPassword.UserPasswords['getModel']>,
+  loginAttempts: null as unknown as ReturnType<LoginAttempt.LoginAttempts['getModel']>,
 };
 
 export const createRegisteredRepositories = (
@@ -34,6 +34,11 @@ export const createRegisteredRepositories = (
   models.profiles = profiles.getModel();
   models.passwords = passwords.getModel();
   models.loginAttempts = loginAttempts.getModel();
+
+  models.users.hasOne(models.profiles, {
+    as: 'profile',
+    foreignKey: 'userId',
+  });
 
   models.users.hasMany(models.passwords, {
     as: 'passwords',
