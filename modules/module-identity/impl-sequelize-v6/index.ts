@@ -34,4 +34,29 @@ export const createRegisteredRepositories = (
   models.profiles = profiles.getModel();
   models.passwords = passwords.getModel();
   models.loginAttempts = loginAttempts.getModel();
+
+  models.users.hasMany(models.passwords, {
+    as: 'passwords',
+    foreignKey: 'userId',
+  });
+
+  models.users.hasMany(models.loginAttempts, {
+    as: 'loginAttempts',
+    foreignKey: 'userId',
+  });
+
+  models.profiles.belongsTo(models.users, {
+    as: 'user',
+    foreignKey: 'userId',
+  });
+
+  models.passwords.belongsTo(models.users, {
+    as: 'user',
+    foreignKey: 'userId',
+  });
+
+  models.loginAttempts.belongsTo(models.users, {
+    as: 'user',
+    foreignKey: 'userId',
+  });
 };
