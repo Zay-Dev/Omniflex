@@ -1,12 +1,13 @@
 import { errors, logger, Utils } from '@omniflex/core';
 import { Request, Response, NextFunction } from 'express';
 
+import * as ExpressUtils from './express';
 import { ensureLocals } from './locals-initializer';
 import { TInfraExpressLocals } from '@omniflex/infra-express/internal-types';
 
 export class BaseExpressController<TLocals extends TInfraExpressLocals = TInfraExpressLocals> {
   protected locals: TLocals;
-  public user?: TLocals['user'];
+  protected user?: TLocals['user'];
 
   constructor(
     protected req: Request,
@@ -17,7 +18,7 @@ export class BaseExpressController<TLocals extends TInfraExpressLocals = TInfraE
     this.user = this.locals.user;
   }
 
-  tryActionWithBody<T>(
+  protected tryActionWithBody<T>(
     action: (body: T) => Promise<any> | any,
     options: Parameters<BaseExpressController['tryAction']>[1] & {
       getBody?: () => T;
@@ -31,7 +32,7 @@ export class BaseExpressController<TLocals extends TInfraExpressLocals = TInfraE
     }, options);
   }
 
-  async tryAction(
+  protected async tryAction(
     action: () => Promise<any> | any,
     { streamErrorToConsole = false } = {}
   ) {
@@ -42,19 +43,16 @@ export class BaseExpressController<TLocals extends TInfraExpressLocals = TInfraE
     });
   }
 
-  respondOne(data: any) {
-    return this.res.json({ data });
+  protected respondOne(data: any) {
+    return ExpressUtils.respondOne(this.res, data);
   }
 
-  respondRequired(key: string) {
-    return this.respondOne(this.locals.required[key]);
+  protected respondRequired(key: string) {
+    return ExpressUtils.respondRequired(this.res, this.locals, key);
   }
 
-  respondMany(data: Array<any> = [], total?: number) {
-    return this.res.json({
-      data,
-      total: total || data.length,
-    });
+  protected respondMany(data: Array<any> = [], total?: number) {
+    return ExpressUtils.respondMany(this.res, data, total);
   }
 
   protected throwNotFound(type?: string) {

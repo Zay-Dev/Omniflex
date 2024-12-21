@@ -1,9 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
 import { tryValidateBody } from '@omniflex/infra-express/helpers/joi';
 
 import { errors } from '@omniflex/core';
+import { ExpressUtils } from '@omniflex/infra-express';
 import * as Rules from '@omniflex/module-identity-core/user.rules';
-import { tryAction } from '@omniflex/infra-express/utils/try-action';
 
 import {
   resolve,
@@ -15,17 +14,17 @@ import {
 
 export const validateRegister = [
   tryValidateBody(schemaRegister),
-  tryAction((req) => Rules.throwIfConflictingUsername(req.body)),
+  ExpressUtils.tryAction((req) => Rules.throwIfConflictingUsername(req.body)),
 ];
 
 export const validateRegisterWithEmail = [
   tryValidateBody(schemaRegisterWithEmail),
-  tryAction((req) => Rules.throwIfConflictingEmail(req.body)),
+  ExpressUtils.tryAction((req) => Rules.throwIfConflictingEmail(req.body)),
 ];
 
 const getValidateLogin = (schema: any, usernameKey: string) => [
   tryValidateBody(schema),
-  tryAction(async (req) => {
+  ExpressUtils.tryAction(async (req) => {
     const { passwords } = resolve();
     const found = await passwords.exists({
       username: req.body[usernameKey],
