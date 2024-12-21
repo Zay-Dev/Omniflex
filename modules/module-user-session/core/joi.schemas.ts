@@ -11,11 +11,9 @@ export const schemas = {
   refreshToken: schemaRefreshToken,
 };
 
-modulesSchemas.moduleUserSession = {
-  refreshToken: {
-    ...j2s(schemaRefreshToken).swagger,
-    example: {
-      refreshToken: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...',
-    } as TBodyRefreshToken,
-  },
+modulesSchemas.moduleUserSessionRefreshToken = {
+  ...j2s(schemaRefreshToken).swagger,
+  example: {
+    refreshToken: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...',
+  } as TBodyRefreshToken,
 };
