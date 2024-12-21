@@ -16,7 +16,7 @@ const appContainer = Containers.appContainerAs<{ sequelize: Sequelize; }>();
 
 export class UserProfiles
   extends SequelizeRepository<TUserProfile>
-  implements IUserProfileRepository {}
+  implements IUserProfileRepository { }
 
 export const baseDefinition = {
   id: Types.id('UUID'),
@@ -77,4 +77,4 @@ export const createRepository = (
   );
 
   return new UserProfiles(model);
-}; 
+};

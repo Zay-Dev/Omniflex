@@ -5,6 +5,7 @@ export { AutoServer } from './auto-server';
 export * from './utils/base-controller';
 export * from './utils/base-entities-controller';
 
+export * as ExpressUtils from './utils/express';
 export * as RequiredDbEntries from './middlewares/required-db-entries';
 
 export const getControllerCreator = <T>(

@@ -73,4 +73,4 @@ export const createRepository = (
   );
 
   return new Users(model);
-}; 
+};

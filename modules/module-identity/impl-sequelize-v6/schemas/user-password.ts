@@ -85,4 +85,4 @@ export const createRepository = (
   );
 
   return new UserPasswords(model);
-}; 
+};
