@@ -7,10 +7,6 @@
     "build": "tsc && tsc-alias"
   },
   "exports": {
-    "./*": {
-      "development": "./*.ts",
-      "import": "./dist/*.js"
-    },
     ".": {
       "development": "./index.ts",
       "import": "./dist/index.js"
