@@ -1,4 +1,18 @@
-import { schemas } from '../../user.schema';
+import {
+  schemaLogin,
+  schemaLoginWithEmail,
+  schemaRegister,
+  schemaRegisterWithEmail,
+} from '../../';
+
+jest.mock('../../containers', () => ({
+  resolve: jest.fn().mockReturnValue({
+    users: {},
+    profiles: {},
+    passwords: {},
+    loginAttempts: {}
+  })
+}));
 
 describe('User Schemas', () => {
   describe('register schema', () => {
@@ -13,13 +27,13 @@ describe('User Schemas', () => {
     };
 
     it('should validate complete valid data', () => {
-      const { error, value } = schemas.register.validate(validData);
+      const { error, value } = schemaRegister.validate(validData);
       expect(error).toBeUndefined();
       expect(value.repeatPassword).toBeUndefined();
     });
 
     it('should require username', () => {
-      const { error } = schemas.register.validate({
+      const { error } = schemaRegister.validate({
         ...validData,
         username: undefined
       });
@@ -27,7 +41,7 @@ describe('User Schemas', () => {
     });
 
     it('should validate username format', () => {
-      const { error } = schemas.register.validate({
+      const { error } = schemaRegister.validate({
         ...validData,
         username: 'a'
       });
@@ -35,7 +49,7 @@ describe('User Schemas', () => {
     });
 
     it('should validate password complexity', () => {
-      const { error } = schemas.register.validate({
+      const { error } = schemaRegister.validate({
         ...validData,
         password: 'simple',
         repeatPassword: 'simple'
@@ -44,7 +58,7 @@ describe('User Schemas', () => {
     });
 
     it('should validate password match', () => {
-      const { error } = schemas.register.validate({
+      const { error } = schemaRegister.validate({
         ...validData,
         repeatPassword: 'DifferentPass123'
       });
@@ -52,7 +66,7 @@ describe('User Schemas', () => {
     });
 
     it('should validate email format when provided', () => {
-      const { error } = schemas.register.validate({
+      const { error } = schemaRegister.validate({
         ...validData,
         email: 'invalid-email'
       });
@@ -60,7 +74,7 @@ describe('User Schemas', () => {
     });
 
     it('should validate mobile number format when provided', () => {
-      const { error } = schemas.register.validate({
+      const { error } = schemaRegister.validate({
         ...validData,
         mobileNumber: 'invalid'
       });
@@ -78,13 +92,13 @@ describe('User Schemas', () => {
     };
 
     it('should validate complete valid data', () => {
-      const { error, value } = schemas.registerWithEmail.validate(validData);
+      const { error, value } = schemaRegisterWithEmail.validate(validData);
       expect(error).toBeUndefined();
       expect(value.repeatPassword).toBeUndefined();
     });
 
     it('should require email', () => {
-      const { error } = schemas.registerWithEmail.validate({
+      const { error } = schemaRegisterWithEmail.validate({
         ...validData,
         email: undefined
       });
@@ -92,7 +106,7 @@ describe('User Schemas', () => {
     });
 
     it('should validate email format', () => {
-      const { error } = schemas.registerWithEmail.validate({
+      const { error } = schemaRegisterWithEmail.validate({
         ...validData,
         email: 'invalid-email'
       });
@@ -107,12 +121,12 @@ describe('User Schemas', () => {
     };
 
     it('should validate complete valid data', () => {
-      const { error } = schemas.login.validate(validData);
+      const { error } = schemaLogin.validate(validData);
       expect(error).toBeUndefined();
     });
 
     it('should require username', () => {
-      const { error } = schemas.login.validate({
+      const { error } = schemaLogin.validate({
         ...validData,
         username: undefined
       });
@@ -120,7 +134,7 @@ describe('User Schemas', () => {
     });
 
     it('should require password', () => {
-      const { error } = schemas.login.validate({
+      const { error } = schemaLogin.validate({
         ...validData,
         password: undefined
       });
@@ -135,12 +149,12 @@ describe('User Schemas', () => {
     };
 
     it('should validate complete valid data', () => {
-      const { error } = schemas.loginWithEmail.validate(validData);
+      const { error } = schemaLoginWithEmail.validate(validData);
       expect(error).toBeUndefined();
     });
 
     it('should require email', () => {
-      const { error } = schemas.loginWithEmail.validate({
+      const { error } = schemaLoginWithEmail.validate({
         ...validData,
         email: undefined
       });
@@ -148,7 +162,7 @@ describe('User Schemas', () => {
     });
 
     it('should validate email format', () => {
-      const { error } = schemas.loginWithEmail.validate({
+      const { error } = schemaLoginWithEmail.validate({
         ...validData,
         email: 'invalid-email'
       });
@@ -156,7 +170,7 @@ describe('User Schemas', () => {
     });
 
     it('should require password', () => {
-      const { error } = schemas.loginWithEmail.validate({
+      const { error } = schemaLoginWithEmail.validate({
         ...validData,
         password: undefined
       });
