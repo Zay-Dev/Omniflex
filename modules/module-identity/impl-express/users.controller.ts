@@ -1,3 +1,5 @@
+import { Request, Response, NextFunction } from 'express';
+import { getControllerCreator } from '@omniflex/infra-express';
 import { resolve, PasswordAuthService } from '@omniflex/module-identity-core';
 import { BaseEntitiesController } from '@omniflex/infra-express/utils/base-entities-controller';
 
@@ -12,13 +14,15 @@ export class UsersController<T extends TUser = TUser>
   protected users: IUserRepository<T>;
   protected profiles: IUserProfileRepository;
 
-  constructor(req, res, next) {
+  constructor(req: Request, res: Response, next: NextFunction) {
     const { users, profiles } = resolve<T>();
     super(req, res, next, users);
 
     this.users = users;
     this.profiles = profiles;
   }
+
+  static create = getControllerCreator(UsersController);
 
   protected async register(
     appType: string,
