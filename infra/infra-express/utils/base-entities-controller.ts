@@ -49,19 +49,19 @@ export class BaseEntitiesController<
     });
   }
 
-  tryListAll() {
+  tryListAll(query?: Parameters<typeof this.repository['find']>[0]) {
     return this.tryAction(async () => {
-      const entities = await this.repository.find({});
+      const entities = await this.repository.find(query || {});
 
       return this.respondMany(entities);
     });
   }
 
-  tryListPaginated() {
+  tryListPaginated(query?: Parameters<typeof this.repository['find']>[0]) {
     return this.tryAction(async () => {
       const { page, pageSize } = this;
 
-      const entities = await this.repository.find({}, {
+      const entities = await this.repository.find(query || {}, {
         take: pageSize,
         skip: (page - 1) * pageSize,
       });
@@ -70,9 +70,14 @@ export class BaseEntitiesController<
     });
   }
 
-  tryCreate<T extends Partial<TEntity> = Partial<TEntity>>() {
+  tryCreate<T extends Partial<TEntity> = Partial<TEntity>>(
+    additionalBody?: T,
+  ) {
     return this.tryActionWithBody<T>(async (body) => {
-      const entity = await this.repository.create(body);
+      const extendedBody = additionalBody ?
+        Object.assign(body, additionalBody) :
+        body;
+      const entity = await this.repository.create(extendedBody);
 
       if (!entity) {
         throw errors.custom('Failed to create entity');
@@ -82,10 +87,16 @@ export class BaseEntitiesController<
     });
   }
 
-  tryUpdate<T extends Partial<TEntity> = Partial<TEntity>>() {
+  tryUpdate<T extends Partial<TEntity> = Partial<TEntity>>(
+    additionalBody?: T,
+  ) {
     return this.tryActionWithBody<T>(async (body) => {
       const id = this.entityId;
-      const entity = await this.repository.updateById(id, body);
+      const extendedBody = additionalBody ?
+        Object.assign(body, additionalBody) :
+        body;
+
+      const entity = await this.repository.updateById(id, extendedBody);
 
       if (!entity) {
         this.throwNotFound();

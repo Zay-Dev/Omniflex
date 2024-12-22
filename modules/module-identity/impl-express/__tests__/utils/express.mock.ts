@@ -4,7 +4,7 @@ export const createMockRequest = (options = {}) => ({
   query: {},
   headers: {},
   ...options
-});
+}) as any;
 
 export const createMockResponse = (options = {}) => {
   const res: any = {
