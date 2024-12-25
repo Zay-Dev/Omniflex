@@ -72,6 +72,9 @@ export class BaseEntitiesController<
 
   tryCreate<T extends Partial<TEntity> = Partial<TEntity>>(
     additionalBody?: T,
+    { respondOne = this.respondOne }: {
+      respondOne?: (entity: TEntity) => void;
+    } = {},
   ) {
     return this.tryActionWithBody<T>(async (body) => {
       const extendedBody = additionalBody ?
@@ -83,12 +86,15 @@ export class BaseEntitiesController<
         throw errors.custom('Failed to create entity');
       }
 
-      return this.respondOne(entity);
+      return respondOne(entity);
     });
   }
 
   tryUpdate<T extends Partial<TEntity> = Partial<TEntity>>(
     additionalBody?: T,
+    { respondOne = this.respondOne }: {
+      respondOne?: (entity: TEntity) => void;
+    } = {},
   ) {
     return this.tryActionWithBody<T>(async (body) => {
       const id = this.entityId;
@@ -102,7 +108,7 @@ export class BaseEntitiesController<
         this.throwNotFound();
       }
 
-      return this.respondOne(entity);
+      return respondOne(entity!);
     });
   }
 
