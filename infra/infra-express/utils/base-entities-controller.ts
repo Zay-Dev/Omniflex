@@ -72,7 +72,7 @@ export class BaseEntitiesController<
 
   tryCreate<T extends Partial<TEntity> = Partial<TEntity>>(
     additionalBody?: T,
-    { respondOne = this.respondOne }: {
+    { respondOne = this.respondOne.bind(this) }: {
       respondOne?: (entity: TEntity) => void;
     } = {},
   ) {
@@ -92,7 +92,7 @@ export class BaseEntitiesController<
 
   tryUpdate<T extends Partial<TEntity> = Partial<TEntity>>(
     additionalBody?: T,
-    { respondOne = this.respondOne }: {
+    { respondOne = this.respondOne.bind(this) }: {
       respondOne?: (entity: TEntity) => void;
     } = {},
   ) {
