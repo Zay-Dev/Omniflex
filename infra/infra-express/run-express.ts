@@ -12,29 +12,30 @@ export const runExpress = ({
   servers = [],
   middlewares = {},
 }: TStartOptions = {} as any) => {
-  return Promise.all(servers.map(server => {
-    const app = server.server;
+  return Promise.all(servers.map(
+    async (server) => {
+      const app = server.server;
 
-    applyMiddlewares(
-      app,
-      server,
-      middlewares,
-      () => useRouters(app, server.getRouters()),
-    );
+      applyMiddlewares(
+        app,
+        server,
+        middlewares,
+        () => useRouters(app, server.getRouters()),
+      );
 
-    startServer({
-      app,
-      logger,
+      return {
+        app,
+        type: server.type,
+        server: await startServer({
+          app,
+          logger,
 
-      type: server.type,
-      port: server.port,
-    });
-
-    return {
-      app,
-      type: server.type,
-    };
-  }));
+          type: server.type,
+          port: server.port,
+        }),
+      };
+    }
+  ));
 };
 
 const useRouters = (app: Express, routers: Record<string, Router>) => {
