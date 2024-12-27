@@ -26,8 +26,12 @@ export default [
         {
           'vars': 'all',
           'varsIgnorePattern': '^_+$',
-          'args': 'after-used',
+          'args': 'all',
           'argsIgnorePattern': '^_+$',
+          'caughtErrors': 'all',
+          'caughtErrorsIgnorePattern': '^_+$',
+          'destructuredArrayIgnorePattern': '^_+$',
+          'ignoreRestSiblings': false,
         },
       ],
       'semi': ['error', 'always'],
