@@ -250,7 +250,10 @@ export class SequelizeRepository<
     const transformed = {};
 
     for (const [key, value] of Object.entries(filter)) {
-      if (value === undefined) continue;
+      if (value === undefined) {
+        transformed[key] = null;
+        continue;
+      }
 
       if (value === null) {
         transformed[key] = null;
