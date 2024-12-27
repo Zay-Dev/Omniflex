@@ -26,13 +26,13 @@ export const runExpress = ({
       return {
         app,
         type: server.type,
-        server: await startServer({
+        server: !server.noServer ? await startServer({
           app,
           logger,
 
           type: server.type,
           port: server.port,
-        }),
+        }) : null,
       };
     }
   ));

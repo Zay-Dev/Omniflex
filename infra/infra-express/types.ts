@@ -20,6 +20,7 @@ export type TBaseServer = {
 
 export type TServer = TBaseServer & {
   server: Express;
+  noServer?: boolean;
   getRouters: () => Record<string, Router>;
 };
 
