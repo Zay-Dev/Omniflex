@@ -5,7 +5,7 @@ import * as ExpressUtils from './express';
 import { ensureLocals } from './locals-initializer';
 import { TInfraExpressLocals } from '@omniflex/infra-express/internal-types';
 
-export type TBaseExpressControllerOptions {
+export type TBaseExpressControllerOptions = {
   idParamName?: string;
 }
 
