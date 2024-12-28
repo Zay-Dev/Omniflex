@@ -4,7 +4,7 @@ import { IBaseRepository } from '@omniflex/core/types';
 import { TInfraExpressLocals } from '../internal-types';
 import { Request, Response, NextFunction } from 'express';
 
-import { BaseExpressController } from './base-controller';
+import { BaseExpressController, TBaseExpressControllerOptions } from './base-controller';
 
 type TBaseLocals = TInfraExpressLocals;
 
@@ -18,8 +18,9 @@ export class BaseEntitiesController<
     res: Response,
     next: NextFunction,
     protected readonly repository: IBaseRepository<TEntity, TPrimaryKey>,
+    options: TBaseExpressControllerOptions = {},
   ) {
-    super(req, res, next);
+    super(req, res, next, options);
 
     if (!repository) {
       throw errors.custom('repository is required');

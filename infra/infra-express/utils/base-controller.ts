@@ -5,17 +5,24 @@ import * as ExpressUtils from './express';
 import { ensureLocals } from './locals-initializer';
 import { TInfraExpressLocals } from '@omniflex/infra-express/internal-types';
 
+export type TBaseExpressControllerOptions {
+  idParamName?: string;
+}
+
 export class BaseExpressController<TLocals extends TInfraExpressLocals = TInfraExpressLocals> {
   protected locals: TLocals;
   protected user?: TLocals['user'];
+  protected idParamName: string = 'id';
 
   constructor(
     protected req: Request,
     protected res: Response,
-    protected next: NextFunction
+    protected next: NextFunction,
+    options: TBaseExpressControllerOptions = {},
   ) {
     this.locals = ensureLocals(this.res.locals, 'default') as TLocals;
     this.user = this.locals.user;
+    this.idParamName = options.idParamName || 'id';
   }
 
   protected tryActionWithBody<T>(
@@ -69,7 +76,7 @@ export class BaseExpressController<TLocals extends TInfraExpressLocals = TInfraE
   }
 
   protected get pathId() {
-    const value = this.req.params.id;
+    const value = this.req.params[this.idParamName];
     const int = +value;
 
     return isNaN(int) ? value : int;
