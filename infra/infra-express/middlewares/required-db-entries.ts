@@ -122,3 +122,18 @@ export const firstMatch = <T extends {}, TPrimaryKey>(
     });
   });
 };
+
+export const eitherExists = <T extends {}, TPrimaryKey>(
+  repository: IBaseRepository<T, TPrimaryKey>,
+  getQueries: (req: Request, res: Response, next: NextFunction) => TDeepPartial<T>[] | Promise<TDeepPartial<T>[]>,
+) => {
+  return (async (req: Request, res: Response, next: NextFunction) => {
+    const queries = await getQueries(req, res, next);
+
+    return Base.eitherExists(queries, {
+      repository,
+      onError: next,
+      retrieve: () => next(),
+    });
+  });
+};

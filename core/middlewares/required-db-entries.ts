@@ -1,4 +1,6 @@
+import { v4 as uuid } from 'uuid';
 import { errors } from '@omniflex/core';
+import { BaseError } from '@omniflex/core/types/error';
 import { TDeepPartial, IBaseRepository } from '@omniflex/core/types/repository';
 
 type TOptions<T, TPrimaryKey> = {
@@ -64,4 +66,47 @@ export const requiredFirstMatch = async<
     ...options,
     notFoundMessage: options.notFoundMessage || '',
   });
+};
+
+export const eitherExists = async<
+  T extends {} = Record<string, any>
+>(
+  queries: TDeepPartial<T>[],
+  options: Omit<TOptions<T, any>, 'countOnly'>,
+) => {
+  const identifier = uuid();
+  const notFoundMessage = options.notFoundMessage || '';
+
+  const isExists = (query: TDeepPartial<T>) => {
+    return new Promise((resolve, reject) => {
+      validate(query, {
+        ...options,
+        countOnly: true,
+        notFoundMessage: identifier,
+        retrieve: undefined,
+        onError: (error) => {
+          if (error instanceof BaseError && error.message == identifier) {
+            resolve(null);
+          } else {
+            reject(error);
+          }
+        },
+      }).then(() => resolve(true)).catch(reject);
+    });
+  };
+
+  const exists = (await Promise.all(queries.map(isExists)))
+    .some((exists) => exists === true);
+
+  if (!exists) {
+    const error = errors.notFound(notFoundMessage);
+
+    if (options.onError) {
+      return options.onError(error);
+    }
+
+    throw error;
+  }
+
+  return options.retrieve?.(null);
 };
