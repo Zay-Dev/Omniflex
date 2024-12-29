@@ -62,6 +62,10 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
     );
   }
 
+  async count(filter: TDeepPartial<T>): Promise<number> {
+    return this.model.countDocuments(this.transformFilter(filter));
+  }
+
   create(data: Partial<T>): Promise<T> {
     const query = this.model.create(data);
 

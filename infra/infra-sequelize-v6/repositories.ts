@@ -87,6 +87,12 @@ export class SequelizeRepository<
       .map(entity => entity.toJSON());
   }
 
+  async count(filter: TDeepPartial<T>): Promise<number> {
+    return this.model.count({
+      where: this.transformFilter(filter),
+    });
+  }
+
   async create(data: Partial<T>): Promise<T> {
     const instance = await this.model.create(
       data as any,

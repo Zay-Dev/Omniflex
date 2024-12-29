@@ -53,6 +53,7 @@ export interface IBaseRepository<T, TPrimaryKey> {
   findById(id: TPrimaryKey, options?: TQueryOptions<T>): Promise<T | null>;
   findOne(filter: TDeepPartial<T>, options?: TQueryOptions<T>): Promise<T | null>;
   find(filter: TDeepPartial<T>, options?: TQueryOptions<T>): Promise<T[]>;
+  count(filter: TDeepPartial<T>): Promise<number>;
 
   create(data: Partial<T>): Promise<T>;
   updateById(id: TPrimaryKey, data: Partial<T>): Promise<T | null>;
