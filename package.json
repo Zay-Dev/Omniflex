@@ -10,7 +10,7 @@
     "build:server": "yarn workspace apps-server tsc",
     "start:server": "yarn workspace apps-server start",
     "test:server": "yarn workspace apps-server tsc && yarn test apps/server",
-    "eslint:server": "yarn eslint apps/server/**",
+    "eslint:server": "yarn eslint --fix apps/server/**",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "workspaces": [
