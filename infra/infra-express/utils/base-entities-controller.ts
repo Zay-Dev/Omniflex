@@ -73,8 +73,8 @@ export class BaseEntitiesController<
 
   tryCreate<T extends Partial<TEntity> = Partial<TEntity>>(
     additionalBody?: T,
-    { respondOne = this.respondOne.bind(this) }: {
-      respondOne?: (entity: TEntity) => void;
+    { respondOne = ((entity: TEntity) => { this.respondOne(entity); }) }: {
+      respondOne?: (entity: TEntity) => void | Promise<void>;
     } = {},
   ) {
     return this.tryActionWithBody<T>(async (body) => {
@@ -87,14 +87,14 @@ export class BaseEntitiesController<
         throw errors.custom('Failed to create entity');
       }
 
-      return respondOne(entity);
+      await respondOne(entity);
     });
   }
 
   tryUpdate<T extends Partial<TEntity> = Partial<TEntity>>(
     additionalBody?: T,
-    { respondOne = this.respondOne.bind(this) }: {
-      respondOne?: (entity: TEntity) => void;
+    { respondOne = ((entity: TEntity) => { this.respondOne(entity); }) }: {
+      respondOne?: (entity: TEntity) => void | Promise<void>;
     } = {},
   ) {
     return this.tryActionWithBody<T>(async (body) => {
@@ -109,7 +109,7 @@ export class BaseEntitiesController<
         this.throwNotFound();
       }
 
-      return respondOne(entity!);
+      await respondOne(entity!);
     });
   }
 
