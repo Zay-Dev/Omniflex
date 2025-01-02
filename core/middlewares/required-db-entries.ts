@@ -12,6 +12,12 @@ type TOptions<T, TPrimaryKey> = {
   retrieve?: (data: T | null) => void | Promise<void>;
 };
 
+type TEnsureNotExistsOptions<T, TPrimaryKey> = {
+  repository: IBaseRepository<T, TPrimaryKey>;
+  existsMessage?: string;
+  onError?: (error: BaseError, entity: T) => void;
+};
+
 const validate = async (
   query: Record<string, any>,
   options: TOptions<any, any> & { notFoundMessage: string; },
@@ -109,4 +115,23 @@ export const eitherExists = async<
   }
 
   return options.retrieve?.(null);
+};
+
+export const ensureNotExists = async<
+  T extends {} = Record<string, any>
+>(
+  query: TDeepPartial<T>,
+  options: TEnsureNotExistsOptions<T, any>,
+) => {
+  const { onError, repository } = options;
+  const entity = await repository.findOne(query);
+
+  if (entity) {
+    const error = errors.badRequest(
+      options.existsMessage || 'Entity already exists',
+    ) as BaseError;
+
+    if (onError) return onError(error, entity);
+    throw error;
+  }
 };

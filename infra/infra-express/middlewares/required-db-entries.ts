@@ -1,6 +1,7 @@
 import { errors } from '@omniflex/core';
 import * as Base from '@omniflex/core/middlewares/required-db-entries';
 import { TDeepPartial, IBaseRepository } from '@omniflex/core/types/repository';
+import { BaseError } from '@omniflex/core/types/error';
 
 import { asInfraLocals } from '../internal-types';
 import { Request, Response, NextFunction } from 'express';
@@ -134,6 +135,30 @@ export const eitherExists = <T extends {}, TPrimaryKey>(
       repository,
       onError: next,
       retrieve: () => next(),
+    });
+  });
+};
+
+export const ensureNotExists = <T extends {}, TPrimaryKey>(
+  repository: IBaseRepository<T, TPrimaryKey>,
+  getQuery: (req: Request, res: Response, next: NextFunction) => TDeepPartial<T> | Promise<TDeepPartial<T>>,
+  {
+    existsMessage,
+    onError,
+  }: {
+    existsMessage?: string;
+    onError?: (error: BaseError, entity: T, next: NextFunction) => void;
+  } = {},
+) => {
+  return (async (req: Request, res: Response, next: NextFunction) => {
+    const query = await getQuery(req, res, next);
+
+    return Base.ensureNotExists(query, {
+      repository,
+      existsMessage,
+      onError: onError ?
+        (error, entity) => onError(error, entity, next) :
+        (error) => next(error),
     });
   });
 };
