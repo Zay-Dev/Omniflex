@@ -150,15 +150,17 @@ export const ensureNotExists = <T extends {}, TPrimaryKey>(
     onError?: (error: BaseError, entity: T, next: NextFunction) => void;
   } = {},
 ) => {
-  return (async (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     const query = await getQuery(req, res, next);
 
-    return Base.ensureNotExists(query, {
+    await Base.ensureNotExists(query, {
       repository,
       existsMessage,
       onError: onError ?
         (error, entity) => onError(error, entity, next) :
-        (error) => next(error),
+        next,
     });
-  });
+    
+    next();
+  };
 };
