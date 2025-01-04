@@ -5,7 +5,12 @@ export default {
   setupFilesAfterEnv: ['<rootDir>/../jest.setup.ts'],
 
   testMatch: [
-    '**/__tests__/**/*\.(spec|test)\.[jt]s?(x)',
+    // Unit tests co-located with source files
+    '**/*.spec.ts',
+    // Integration tests in __tests__ directory
+    '**/__tests__/**/*.test.ts',
+    // User requirement specs in __tests__ directory
+    '**/__tests__/**/*.spec.ts',
   ],
 
   moduleNameMapper: {
