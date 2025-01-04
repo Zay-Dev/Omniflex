@@ -162,6 +162,45 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
     return this.update(filter, { deletedAt: new Date() } as any);
   }
 
+  async restore(filter: TQueryFilter<T>): Promise<number> {
+    const result = await this.model.updateMany(
+      {
+        ...this.transformFilter(filter),
+      },
+      { deletedAt: null },
+      this.sharedQueryOptions,
+    );
+    return result.modifiedCount;
+  }
+
+  async restoreById(_id: TPrimaryKey): Promise<boolean> {
+    const result = await this.model.findOneAndUpdate(
+      {
+        _id,
+      },
+      { deletedAt: null },
+      {
+        ...this.sharedQueryOptions,
+        new: true,
+      },
+    );
+    return !!result;
+  }
+
+  async restoreOne(filter: TQueryFilter<T>): Promise<boolean> {
+    const result = await this.model.findOneAndUpdate(
+      {
+        ...this.transformFilter(filter),
+      },
+      { deletedAt: null },
+      {
+        ...this.sharedQueryOptions,
+        new: true,
+      },
+    );
+    return !!result;
+  }
+
   protected transformFilter(filter: TQueryFilter<T>) {
     if (!filter) return {};
 

@@ -199,7 +199,7 @@ describe('MongooseBaseRepository', () => {
   });
 
   describe('deleteById', () => {
-    it('[REPO-D0010] should delete record by id', async () => {
+    it('[REPO-D0010] should hard delete record by id', async () => {
       const mockId = createMockObjectId();
       const model = await TestModel.create({ _id: mockId, name: 'test' });
 
@@ -216,8 +216,24 @@ describe('MongooseBaseRepository', () => {
     });
   });
 
+  describe('deleteOne', () => {
+    it('[REPO-D0020] should hard delete one record', async () => {
+      const filter = { isActive: false };
+
+      await repository.deleteOne(filter);
+
+      expect(TestModel.findOneAndDelete).toHaveBeenCalledWith(
+        { isActive: false },
+        {
+          lean: { defaults: true, getters: true, virtuals: true },
+          translateAliases: true,
+        },
+      );
+    });
+  });
+
   describe('delete', () => {
-    it('[REPO-D0020] should delete multiple records', async () => {
+    it('[REPO-D0030] should hard delete multiple records', async () => {
       const filter = { isActive: false };
 
       await repository.delete(filter);
@@ -229,7 +245,7 @@ describe('MongooseBaseRepository', () => {
   });
 
   describe('softDeleteById', () => {
-    it('[REPO-D0030] should soft delete record by id', async () => {
+    it('[REPO-D0040] should soft delete record by id', async () => {
       const mockId = createMockObjectId();
       const model = await TestModel.create({ _id: mockId, name: 'test' });
 
@@ -248,8 +264,26 @@ describe('MongooseBaseRepository', () => {
     });
   });
 
+  describe('softDeleteOne', () => {
+    it('[REPO-D0050] should soft delete one record', async () => {
+      const filter = { isActive: false };
+
+      await repository.softDeleteOne(filter);
+
+      expect(TestModel.findOneAndUpdate).toHaveBeenCalledWith(
+        { isActive: false, deletedAt: null },
+        { deletedAt: expect.any(Date) },
+        {
+          lean: { defaults: true, getters: true, virtuals: true },
+          translateAliases: true,
+          new: true,
+        },
+      );
+    });
+  });
+
   describe('softDelete', () => {
-    it('[REPO-D0040] should soft delete multiple records', async () => {
+    it('[REPO-D0060] should soft delete multiple records', async () => {
       const filter = { isActive: false };
 
       await repository.softDelete(filter);
@@ -260,6 +294,57 @@ describe('MongooseBaseRepository', () => {
         {
           lean: { defaults: true, getters: true, virtuals: true },
           translateAliases: true,
+        },
+      );
+    });
+  });
+
+  describe('restore', () => {
+    it('[REPO-R0060] should restore multiple records', async () => {
+      const filter = { isActive: false };
+
+      await repository.restore(filter);
+
+      expect(TestModel.updateMany).toHaveBeenCalledWith(
+        { isActive: false },
+        { deletedAt: null },
+        {
+          lean: { defaults: true, getters: true, virtuals: true },
+          translateAliases: true,
+        },
+      );
+    });
+
+    it('[REPO-R0070] should restore record by id', async () => {
+      const mockId = createMockObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', deletedAt: new Date() });
+
+      const result = await repository.restoreById(mockId);
+
+      expect(result).toBe(true);
+      expect(TestModel.findOneAndUpdate).toHaveBeenCalledWith(
+        { _id: mockId },
+        { deletedAt: null },
+        {
+          lean: { defaults: true, getters: true, virtuals: true },
+          translateAliases: true,
+          new: true,
+        },
+      );
+    });
+
+    it('[REPO-R0080] should restore one record with filter', async () => {
+      const filter = { isActive: false };
+
+      await repository.restoreOne(filter);
+
+      expect(TestModel.findOneAndUpdate).toHaveBeenCalledWith(
+        { isActive: false },
+        { deletedAt: null },
+        {
+          lean: { defaults: true, getters: true, virtuals: true },
+          translateAliases: true,
+          new: true,
         },
       );
     });

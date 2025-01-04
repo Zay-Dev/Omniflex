@@ -55,7 +55,8 @@ export class InMemoryCollection {
   }
 
   findOneAndUpdate(query: any, update: any, options: any = {}): any {
-    const doc = this.findOne(query, options);
+    const isRestore = update?.deletedAt === null;
+    const doc = this.findOne(query, isRestore ? { paranoid: false } : options);
     if (doc) {
       Object.assign(doc, this._processUpdate(update));
       if (this.schema.get('timestamps')) {
@@ -66,8 +67,12 @@ export class InMemoryCollection {
     return null;
   }
 
-  updateMany(query: any, update: any): { modifiedCount: number; } {
-    const matches = this.documents.filter(doc => this.matchQuery(doc, query));
+  updateMany(query: any, update: any, options: any = {}): { modifiedCount: number; } {
+    const isRestore = update?.deletedAt === null;
+    const matches = this.documents.filter(doc => 
+      this.matchQuery(doc, query) &&
+      (isRestore ? true : this.matchParanoid(doc, options))
+    );
     matches.forEach(doc => {
       Object.assign(doc, this._processUpdate(update));
       if (this.schema.get('timestamps')) {
