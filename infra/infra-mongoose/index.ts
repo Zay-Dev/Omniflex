@@ -7,7 +7,7 @@ import { Containers } from '@omniflex/core';
 import { TMongooseConfig } from './types';
 import { createConnection } from 'mongoose';
 
-export * from './repositories';
+export * from './repository';
 
 export const getConnection = (
   { mongoose } = Containers.configAs<TMongooseConfig>()

@@ -1,6 +1,6 @@
 import { DataTypes, Model, Sequelize } from 'sequelize';
 
-import { SequelizeRepository } from '../repositories';
+import { SequelizeRepository } from '../repository';
 
 interface ITestModel {
   id: string;

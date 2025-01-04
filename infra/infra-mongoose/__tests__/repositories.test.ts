@@ -1,6 +1,6 @@
 import { Schema, Types } from 'mongoose';
 
-import { MongooseBaseRepository } from '../repositories';
+import { MongooseBaseRepository } from '../repository';
 import { createMockMongooseModel } from './utils/mongoose.mock';
 
 interface ITestModel {
