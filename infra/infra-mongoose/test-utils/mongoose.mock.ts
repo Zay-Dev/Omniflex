@@ -28,7 +28,8 @@ export class InMemoryCollection {
     const now = new Date();
     const document = {
       ...doc,
-      _id: doc._id || new Types.ObjectId().toString(),
+      _id: doc._id || doc.id || new Types.ObjectId().toString(),
+      id: doc._id || doc.id || new Types.ObjectId().toString(),
       deletedAt: doc.deletedAt ?? null,
       ...(this.schema.get('timestamps') ? {
         createdAt: now,
@@ -127,8 +128,10 @@ export class InMemoryCollection {
       if (value instanceof Object && '$in' in value) {
         return (value as { $in: any[]; }).$in.includes(doc[key]);
       }
-      if (key === '_id' && value) {
-        return doc._id?.toString() === (value as any).toString();
+      if (key === '_id' || key === 'id') {
+        const docId = doc[key]?.toString() || doc._id?.toString();
+        const queryId = value?.toString();
+        return docId === queryId;
       }
       if (value === null) {
         return doc[key] === null;
@@ -157,7 +160,10 @@ export const createMockMongooseModel = (mockMethods: IMockModel = {}, schema?: S
     updateMany: jest.fn((query, update) => Promise.resolve(collection.updateMany(query, update))),
     findOne: jest.fn((query, options) => Promise.resolve(collection.findOne(query, options))),
     find: jest.fn((query, options) => Promise.resolve(collection.find(query, options))),
-    findById: jest.fn((id, options) => Promise.resolve(collection.findOne({ _id: id }, options))),
+    findById: jest.fn((id, options) => {
+      const result = collection.findOne({ id }, options) || collection.findOne({ _id: id }, options);
+      return Promise.resolve(result);
+    }),
     findOneAndDelete: jest.fn(query => Promise.resolve(collection.findOneAndDelete(query))),
     findOneAndUpdate: jest.fn((query, update, options) => Promise.resolve(collection.findOneAndUpdate(query, update, options))),
     create: jest.fn(data => {

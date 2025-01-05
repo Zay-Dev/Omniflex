@@ -9,13 +9,17 @@ export const createTestSequelize = (): Sequelize => {
 };
 
 export const clearDatabase = async (sequelize: Sequelize): Promise<void> => {
-  await Promise.all(
-    Object.values(sequelize.models).map(model => model.destroy({ 
-      where: {},
-      force: true,
-      truncate: true,
-    }))
-  );
+  for (const model of Object.values(sequelize.models)) {
+    try {
+      await model.destroy({
+        where: {},
+        force: true,
+        truncate: true,
+      });
+    } catch (error) {
+      console.error(`Failed to clear model ${model.name}:`, error);
+    }
+  }
 };
 
 export const closeDatabase = async (sequelize: Sequelize): Promise<void> => {
@@ -33,4 +37,4 @@ export const createTestModel = <T extends Model>(sequelize: Sequelize, modelName
     paranoid: true,
   });
   return model as ModelStatic<T>;
-}; 
+};

@@ -158,6 +158,28 @@ export class SequelizeRepository<
     });
   }
 
+  async restoreById(id: TPrimaryKey): Promise<boolean> {
+    await this.model.restore({
+      where: { id: id as any },
+    });
+    return true;
+  }
+
+  async restoreOne(filter: TQueryFilter<T>): Promise<boolean> {
+    await this.model.restore({
+      where: this.transformFilter(filter),
+      limit: 1,
+    });
+    return true;
+  }
+
+  async restore(filter: TQueryFilter<T>): Promise<number> {
+    await this.model.restore({
+      where: this.transformFilter(filter),
+    });
+    return 1;
+  }
+
   protected transformFilter(filter: TQueryFilter<T>) {
     if (!filter) return {};
 
