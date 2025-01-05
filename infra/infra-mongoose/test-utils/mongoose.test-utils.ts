@@ -1,10 +1,5 @@
 import { Connection, connect } from 'mongoose';
 
-export const createTestMongoose = async () => {
-  const mongoose = await connect('mongodb://localhost:27017/test');
-  return mongoose.connection;
-};
-
 export const setupTestDatabase = async (mongoose: Connection) => {
   await mongoose.dropDatabase();
 };

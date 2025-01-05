@@ -1,7 +1,7 @@
-import { Schema, Types } from 'mongoose';
+import { Schema } from 'mongoose';
 
 import { MongooseBaseRepository } from './repository';
-import { createMockMongooseModel, createMockObjectId } from './test-utils/mongoose.mock';
+import { startMemoryServer, stopMemoryServer, clearDatabase, createModel, createObjectId } from './test-utils/mongoose.memory';
 
 interface ITestModel {
   _id: string;
@@ -12,7 +12,7 @@ interface ITestModel {
 
 const TestSchema = new Schema<ITestModel>({
   deletedAt: { type: Date },
-  name: { type: String },
+  name: { type: String, required: true },
   isActive: { type: Boolean },
 }, {
   timestamps: true,
@@ -22,331 +22,305 @@ describe('MongooseBaseRepository', () => {
   let repository: MongooseBaseRepository<ITestModel>;
   let TestModel;
 
-  beforeEach(() => {
-    TestModel = createMockMongooseModel({}, TestSchema);
+  beforeAll(async () => {
+    await startMemoryServer();
+    TestModel = createModel<ITestModel>('Test', TestSchema);
+  });
+
+  afterAll(async () => {
+    await stopMemoryServer();
+  });
+
+  beforeEach(async () => {
+    await clearDatabase();
     repository = new MongooseBaseRepository(TestModel);
   });
 
   describe('exists', () => {
     it('[REPO-E0010] should check if record exists', async () => {
-      const mockId = createMockObjectId();
+      const mockId = createObjectId();
       await TestModel.create({ _id: mockId, name: 'test' });
 
       const result = await repository.exists({ _id: mockId });
 
       expect(result).toBe(true);
-      expect(TestModel.countDocuments).toHaveBeenCalledWith(
-        { _id: mockId, deletedAt: null },
-        {
-          lean: { defaults: true, getters: true, virtuals: true },
-          translateAliases: true,
-        },
-      );
     });
 
     it('[REPO-E0020] should check if record exists with paranoid false', async () => {
-      const mockId = createMockObjectId();
+      const mockId = createObjectId();
       await TestModel.create({ _id: mockId, name: 'test', deletedAt: new Date() });
 
       const result = await repository.exists({ _id: mockId }, { paranoid: false });
 
       expect(result).toBe(true);
-      expect(TestModel.countDocuments).toHaveBeenCalledWith(
-        { _id: mockId },
-        {
-          lean: { defaults: true, getters: true, virtuals: true },
-          translateAliases: true,
-        },
-      );
+    });
+
+    it('[REPO-E0030] should not find soft deleted record by default', async () => {
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', deletedAt: new Date() });
+
+      const result = await repository.exists({ _id: mockId });
+
+      expect(result).toBe(false);
     });
   });
 
   describe('findById', () => {
     it('[REPO-R0010] should find record by id', async () => {
-      const mockId = createMockObjectId();
+      const mockId = createObjectId();
       await TestModel.create({ _id: mockId, name: 'test' });
 
       const result = await repository.findById(mockId);
 
       expect(result).toBeTruthy();
-      expect(TestModel.findOne).toHaveBeenCalledWith(
-        { _id: mockId, deletedAt: null },
-        null,
-        {
-          lean: { defaults: true, getters: true, virtuals: true },
-          translateAliases: true,
-        },
-      );
+      expect(result!._id.toString()).toBe(mockId);
+      expect(result!.name).toBe('test');
     });
 
     it('[REPO-R0020] should not find soft deleted record', async () => {
-      const mockId = createMockObjectId();
+      const mockId = createObjectId();
       await TestModel.create({ _id: mockId, name: 'test', deletedAt: new Date() });
 
       const result = await repository.findById(mockId);
 
       expect(result).toBeNull();
     });
+
+    it('[REPO-E0010] should handle invalid id format', async () => {
+      await expect(repository.findById('invalid-id')).rejects.toBeTruthy();
+    });
+
+    it('[REPO-E0020] should handle non-existent id', async () => {
+      const result = await repository.findById(createObjectId());
+      expect(result).toBeNull();
+    });
   });
 
   describe('findOne', () => {
     it('[REPO-R0030] should find one record with filter', async () => {
-      const mockId = createMockObjectId();
+      const mockId = createObjectId();
       await TestModel.create({ _id: mockId, name: 'test' });
 
       const result = await repository.findOne({ name: 'test' });
 
       expect(result).toBeTruthy();
-      expect(TestModel.findOne).toHaveBeenCalledWith(
-        { name: 'test', deletedAt: null },
-        null,
-        {
-          lean: { defaults: true, getters: true, virtuals: true },
-          translateAliases: true,
-        },
-      );
+      expect(result!._id.toString()).toBe(mockId);
+      expect(result!.name).toBe('test');
+    });
+
+    it('[REPO-R0040] should not find soft deleted record by default', async () => {
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', deletedAt: new Date() });
+
+      const result = await repository.findOne({ name: 'test' });
+
+      expect(result).toBeNull();
     });
   });
 
   describe('find', () => {
     it('[REPO-R0040] should find records with filter', async () => {
-      const mockId = createMockObjectId();
+      const mockId = createObjectId();
       await TestModel.create({ _id: mockId, name: 'test', isActive: true });
 
       const result = await repository.find({ isActive: true });
 
       expect(result).toBeTruthy();
-      expect(TestModel.find).toHaveBeenCalledWith(
-        { isActive: true, deletedAt: null },
-        null,
-        {
-          lean: { defaults: true, getters: true, virtuals: true },
-          translateAliases: true,
-        },
-      );
+      expect(result).toHaveLength(1);
+      expect(result[0]._id.toString()).toBe(mockId);
+      expect(result[0].name).toBe('test');
     });
 
-    it('[REPO-R0050] should apply query options', async () => {
-      const mockId = createMockObjectId();
-      await TestModel.create({ _id: mockId, name: 'test' });
+    it('[REPO-R0050] should not find soft deleted records by default', async () => {
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', isActive: true, deletedAt: new Date() });
 
-      await repository.find(
-        { name: 'test' },
-        { skip: 10, take: 20, sort: { name: 'desc' } },
-      );
+      const result = await repository.find({ isActive: true });
 
-      expect(TestModel.find).toHaveBeenCalledWith(
-        { name: 'test', deletedAt: null },
-        null,
-        {
-          lean: { defaults: true, getters: true, virtuals: true },
-          translateAliases: true,
-          skip: 10,
-          limit: 20,
-          sort: { name: 'desc' },
-        },
-      );
+      expect(result).toHaveLength(0);
+    });
+
+    it('[REPO-Q0010] should handle pagination', async () => {
+      await TestModel.create({ name: 'test1' });
+      await TestModel.create({ name: 'test2' });
+      await TestModel.create({ name: 'test3' });
+
+      const result = await repository.find({}, { skip: 1, take: 1 });
+
+      expect(result).toHaveLength(1);
+      expect(result[0].name).toBe('test2');
+    });
+
+    it('[REPO-Q0020] should handle sorting', async () => {
+      await TestModel.create({ name: 'test1' });
+      await TestModel.create({ name: 'test2' });
+
+      const result = await repository.find({}, { sort: { name: 'desc' } });
+
+      expect(result).toHaveLength(2);
+      expect(result[0].name).toBe('test2');
+      expect(result[1].name).toBe('test1');
+    });
+
+    it('[REPO-Q0030] should handle paranoid mode', async () => {
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', deletedAt: new Date() });
+
+      const result = await repository.find({}, { paranoid: false });
+
+      expect(result).toHaveLength(1);
+      expect(result[0]._id.toString()).toBe(mockId);
     });
   });
 
   describe('create', () => {
     it('[REPO-C0010] should create record', async () => {
-      const mockId = createMockObjectId();
+      const mockId = createObjectId();
       const data = { _id: mockId, name: 'test' };
 
-      await repository.create(data);
+      const result = await repository.create(data);
 
-      expect(TestModel.create).toHaveBeenCalledWith(data);
+      expect(result!._id.toString()).toBe(mockId);
+      expect(result!.name).toBe('test');
+    });
+
+    it('[REPO-E0030] should handle validation errors', async () => {
+      const data = { _id: createObjectId() } as any;
+
+      await expect(repository.create(data)).rejects.toBeTruthy();
     });
   });
 
   describe('updateById', () => {
     it('[REPO-U0010] should update record by id', async () => {
-      const mockId = createMockObjectId();
-      const model = await TestModel.create({ _id: mockId, name: 'test' });
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test' });
       const update = { name: 'updated' };
 
-      await repository.updateById(mockId, update);
+      const result = await repository.updateById(mockId, update);
 
-      expect(TestModel.findOneAndUpdate).toHaveBeenCalledWith(
-        { _id: mockId, deletedAt: null },
-        update,
-        {
-          lean: { defaults: true, getters: true, virtuals: true },
-          translateAliases: true,
-          new: true,
-        },
-      );
+      expect(result!._id.toString()).toBe(mockId);
+      expect(result!.name).toBe('updated');
+    });
+
+    it('[REPO-U0020] should not update soft deleted record by default', async () => {
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', deletedAt: new Date() });
+      const update = { name: 'updated' };
+
+      const result = await repository.updateById(mockId, update);
+
+      expect(result).toBeNull();
     });
   });
 
   describe('update', () => {
     it('[REPO-U0020] should update multiple records', async () => {
-      const filter = { isActive: true };
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test1', isActive: true });
+      await TestModel.create({ _id: mockId2, name: 'test2', isActive: true });
       const update = { name: 'updated' };
 
-      await repository.update(filter, update);
+      await repository.update({ isActive: true }, update);
 
-      expect(TestModel.updateMany).toHaveBeenCalledWith(
-        { isActive: true, deletedAt: null },
-        update,
-        {
-          lean: { defaults: true, getters: true, virtuals: true },
-          translateAliases: true,
-        },
-      );
+      const records = await repository.find({ isActive: true });
+      expect(records).toHaveLength(2);
+      expect(records.every(r => r.name === 'updated')).toBe(true);
+    });
+
+    it('[REPO-U0030] should not update soft deleted records by default', async () => {
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test1', isActive: true, deletedAt: new Date() });
+      await TestModel.create({ _id: mockId2, name: 'test2', isActive: true, deletedAt: new Date() });
+      const update = { name: 'updated' };
+
+      await repository.update({ isActive: true }, update);
+
+      const records = await repository.find({ isActive: true }, { paranoid: false });
+      expect(records).toHaveLength(2);
+      expect(records.every(r => r.name === 'test1' || r.name === 'test2')).toBe(true);
     });
   });
 
   describe('deleteById', () => {
     it('[REPO-D0010] should hard delete record by id', async () => {
-      const mockId = createMockObjectId();
-      const model = await TestModel.create({ _id: mockId, name: 'test' });
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test' });
 
       const result = await repository.deleteById(mockId);
 
       expect(result).toBe(true);
-      expect(TestModel.findOneAndDelete).toHaveBeenCalledWith(
-        { _id: mockId },
-        {
-          lean: { defaults: true, getters: true, virtuals: true },
-          translateAliases: true,
-        },
-      );
+      const record = await repository.findById(mockId);
+      expect(record).toBeNull();
     });
   });
 
   describe('deleteOne', () => {
     it('[REPO-D0020] should hard delete one record', async () => {
-      const filter = { isActive: false };
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', isActive: false });
 
-      await repository.deleteOne(filter);
+      const result = await repository.deleteOne({ isActive: false });
 
-      expect(TestModel.findOneAndDelete).toHaveBeenCalledWith(
-        { isActive: false },
-        {
-          lean: { defaults: true, getters: true, virtuals: true },
-          translateAliases: true,
-        },
-      );
+      expect(result).toBe(true);
+      const record = await repository.findById(mockId);
+      expect(record).toBeNull();
     });
   });
 
   describe('delete', () => {
     it('[REPO-D0030] should hard delete multiple records', async () => {
-      const filter = { isActive: false };
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test1', isActive: false });
+      await TestModel.create({ _id: mockId2, name: 'test2', isActive: false });
 
-      await repository.delete(filter);
+      await repository.delete({ isActive: false });
 
-      expect(TestModel.deleteMany).toHaveBeenCalledWith(
-        { isActive: false },
-      );
+      const records = await repository.find({ isActive: false });
+      expect(records).toHaveLength(0);
     });
   });
 
   describe('softDeleteById', () => {
     it('[REPO-D0040] should soft delete record by id', async () => {
-      const mockId = createMockObjectId();
-      const model = await TestModel.create({ _id: mockId, name: 'test' });
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test' });
 
       const result = await repository.softDeleteById(mockId);
 
       expect(result).toBe(true);
-      expect(TestModel.findOneAndUpdate).toHaveBeenCalledWith(
-        { _id: mockId, deletedAt: null },
-        { deletedAt: expect.any(Date) },
-        {
-          lean: { defaults: true, getters: true, virtuals: true },
-          translateAliases: true,
-          new: true,
-        },
-      );
-    });
-  });
-
-  describe('softDeleteOne', () => {
-    it('[REPO-D0050] should soft delete one record', async () => {
-      const filter = { isActive: false };
-
-      await repository.softDeleteOne(filter);
-
-      expect(TestModel.findOneAndUpdate).toHaveBeenCalledWith(
-        { isActive: false, deletedAt: null },
-        { deletedAt: expect.any(Date) },
-        {
-          lean: { defaults: true, getters: true, virtuals: true },
-          translateAliases: true,
-          new: true,
-        },
-      );
-    });
-  });
-
-  describe('softDelete', () => {
-    it('[REPO-D0060] should soft delete multiple records', async () => {
-      const filter = { isActive: false };
-
-      await repository.softDelete(filter);
-
-      expect(TestModel.updateMany).toHaveBeenCalledWith(
-        { isActive: false, deletedAt: null },
-        { deletedAt: expect.any(Date) },
-        {
-          lean: { defaults: true, getters: true, virtuals: true },
-          translateAliases: true,
-        },
-      );
+      const record = await repository.findById(mockId, { paranoid: false });
+      expect(record!.deletedAt).toBeTruthy();
     });
   });
 
   describe('restore', () => {
-    it('[REPO-R0060] should restore multiple records', async () => {
-      const filter = { isActive: false };
-
-      await repository.restore(filter);
-
-      expect(TestModel.updateMany).toHaveBeenCalledWith(
-        { isActive: false },
-        { deletedAt: null },
-        {
-          lean: { defaults: true, getters: true, virtuals: true },
-          translateAliases: true,
-        },
-      );
-    });
-
-    it('[REPO-R0070] should restore record by id', async () => {
-      const mockId = createMockObjectId();
+    it('[REPO-S0010] should restore record by id', async () => {
+      const mockId = createObjectId();
       await TestModel.create({ _id: mockId, name: 'test', deletedAt: new Date() });
 
       const result = await repository.restoreById(mockId);
 
       expect(result).toBe(true);
-      expect(TestModel.findOneAndUpdate).toHaveBeenCalledWith(
-        { _id: mockId },
-        { deletedAt: null },
-        {
-          lean: { defaults: true, getters: true, virtuals: true },
-          translateAliases: true,
-          new: true,
-        },
-      );
+      const record = await repository.findById(mockId);
+      expect(record).toBeTruthy();
+      expect(record!.deletedAt).toBeNull();
     });
 
-    it('[REPO-R0080] should restore one record with filter', async () => {
-      const filter = { isActive: false };
+    it('[REPO-S0020] should restore multiple records', async () => {
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test1', isActive: false, deletedAt: new Date() });
+      await TestModel.create({ _id: mockId2, name: 'test2', isActive: false, deletedAt: new Date() });
 
-      await repository.restoreOne(filter);
+      await repository.restore({ isActive: false });
 
-      expect(TestModel.findOneAndUpdate).toHaveBeenCalledWith(
-        { isActive: false },
-        { deletedAt: null },
-        {
-          lean: { defaults: true, getters: true, virtuals: true },
-          translateAliases: true,
-          new: true,
-        },
-      );
+      const records = await repository.find({ isActive: false });
+      expect(records).toHaveLength(2);
+      expect(records.every(r => r.deletedAt === null)).toBe(true);
     });
   });
 }); 

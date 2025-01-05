@@ -23,5 +23,7 @@
     "mongoose-lean-getters": "^2.1.1",
     "mongoose-lean-virtuals": "^1.0.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "mongodb-memory-server": "^10.1.3"
+  }
 }

@@ -1,6 +1,6 @@
 import { BaseRepository } from './repositories/base';
 import { RawRepository } from './repositories/raw-repository';
-import { 
+import {
   TQueryFilter,
   TQueryOptions,
   TQueryOperators,
@@ -10,7 +10,7 @@ import {
 export class MongooseBaseRepository<T, TPrimaryKey = string>
   extends BaseRepository<T>
   implements IBaseRepository<T, TPrimaryKey> {
-  
+
   raw() {
     return new RawRepository(this.model, {
       ...this.options,
@@ -30,9 +30,11 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
     return this.model.countDocuments(
       {
         ...this.transformFilter(filter),
-        ...this.getParanoidFilter(options),
       },
-      this.sharedQueryOptions,
+      {
+        ...this.sharedQueryOptions,
+        paranoid: options?.paranoid,
+      },
     );
   }
 
@@ -40,10 +42,12 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
     return this.model.findOne(
       {
         _id,
-        ...this.getParanoidFilter(options),
       },
       null,
-      this.sharedQueryOptions,
+      {
+        ...this.sharedQueryOptions,
+        paranoid: options?.paranoid,
+      },
     );
   }
 
@@ -51,10 +55,12 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
     return this.model.findOne(
       {
         ...this.transformFilter(filter),
-        ...this.getParanoidFilter(options),
       },
       null,
-      this.sharedQueryOptions,
+      {
+        ...this.sharedQueryOptions,
+        paranoid: options?.paranoid,
+      },
     );
   }
 
@@ -62,11 +68,11 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
     return this.model.find(
       {
         ...this.transformFilter(filter),
-        ...this.getParanoidFilter(options),
       },
       null,
       {
         ...this.sharedQueryOptions,
+        paranoid: options?.paranoid,
         skip: options?.skip,
         limit: options?.take,
         sort: options?.sort,
@@ -83,11 +89,11 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
     return this.model.findOneAndUpdate(
       {
         _id,
-        ...this.getParanoidFilter(options),
       },
       data,
       {
         ...this.sharedQueryOptions,
+        paranoid: options?.paranoid,
         new: true,
       },
     );
@@ -97,11 +103,11 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
     return this.model.findOneAndUpdate(
       {
         ...this.transformFilter(filter),
-        ...this.getParanoidFilter(options),
       },
       data,
       {
         ...this.sharedQueryOptions,
+        paranoid: options?.paranoid,
         new: true,
       },
     );
@@ -111,10 +117,12 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
     const result = await this.model.updateMany(
       {
         ...this.transformFilter(filter),
-        ...this.getParanoidFilter(options),
       },
       data,
-      this.sharedQueryOptions,
+      {
+        ...this.sharedQueryOptions,
+        paranoid: options?.paranoid,
+      },
     );
     return result.modifiedCount;
   }
@@ -168,7 +176,10 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
         ...this.transformFilter(filter),
       },
       { deletedAt: null },
-      this.sharedQueryOptions,
+      {
+        ...this.sharedQueryOptions,
+        paranoid: false,
+      },
     );
     return result.modifiedCount;
   }
@@ -181,7 +192,7 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
       { deletedAt: null },
       {
         ...this.sharedQueryOptions,
-        new: true,
+        paranoid: false,
       },
     );
     return !!result;
@@ -195,7 +206,7 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
       { deletedAt: null },
       {
         ...this.sharedQueryOptions,
-        new: true,
+        paranoid: false,
       },
     );
     return !!result;
@@ -237,10 +248,5 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
       }
     }
     return transformed;
-  }
-
-  protected getParanoidFilter(options?: Pick<TQueryOptions<T>, 'paranoid'>) {
-    if (options?.paranoid === false) return {};
-    return { deletedAt: null };
   }
 }
