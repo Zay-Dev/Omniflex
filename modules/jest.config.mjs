@@ -13,4 +13,5 @@ for (const key in moduleNameMapper) {
 export default {
   ...baseConfig,
   moduleNameMapper,
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
 };

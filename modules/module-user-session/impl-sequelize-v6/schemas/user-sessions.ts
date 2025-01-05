@@ -20,7 +20,7 @@ export class UserSessions
   async deactivateByUserId(userId: string) {
     await this.model.update(
       { isActive: false },
-      { where: { userId, isActive: true } }
+      { where: { userId, isActive: true } },
     );
   }
 
@@ -31,9 +31,9 @@ export class UserSessions
         where: {
           userId,
           sessionType,
-          isActive: true
-        }
-      }
+          isActive: true,
+        },
+      },
     );
   }
 }
@@ -91,7 +91,7 @@ export const createRepository = (
 
   if (modelOrSchemas instanceof Model) {
     return new UserSessions(
-      modelOrSchemas as TModel<Model<TUserSession>>
+      modelOrSchemas as TModel<Model<TUserSession>>,
     );
   }
 
