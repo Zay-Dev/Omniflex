@@ -62,4 +62,9 @@ export interface IBaseRepository<T, TPrimaryKey> {
   softDeleteById(id: TPrimaryKey): Promise<boolean>;
   softDeleteOne(filter: TQueryFilter<T>): Promise<boolean>;
   softDelete(filter: TQueryFilter<T>): Promise<number>;
+
+  // Restore operations
+  restoreById(id: TPrimaryKey): Promise<boolean>;
+  restoreOne(filter: TQueryFilter<T>): Promise<boolean>;
+  restore(filter: TQueryFilter<T>): Promise<number>;
 }
