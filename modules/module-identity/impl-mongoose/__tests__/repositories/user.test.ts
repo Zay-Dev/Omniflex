@@ -35,8 +35,10 @@ describe('User Repository Integration', () => {
 
       const found = await repository.findById(created.id);
       expect(found).toBeDefined();
-      expect(found?.id).toBe(created.id);
-      expect(found?.identifier).toBe(user.identifier);
+      expect(found).toMatchObject({
+        id: created.id,
+        identifier: user.identifier,
+      });
     });
 
     it('[REPO-I0020] should return null for non-existent id', async () => {
@@ -65,7 +67,9 @@ describe('User Repository Integration', () => {
 
       const found = await repository.findOne({ identifier: user.identifier });
       expect(found).toBeDefined();
-      expect(found?.identifier).toBe(user.identifier);
+      expect(found).toMatchObject({
+        identifier: user.identifier,
+      });
     });
 
     it('[REPO-I0050] should return null for non-existent identifier', async () => {
@@ -93,9 +97,11 @@ describe('User Repository Integration', () => {
       const created = await repository.create(user);
 
       expect(created).toBeDefined();
-      expect(created.identifier).toBe(user.identifier);
-      expect(created.isVerified).toBe(user.isVerified);
-      expect(created.deletedAt).toBeNull();
+      expect(created).toMatchObject({
+        identifier: user.identifier,
+        isVerified: user.isVerified,
+        deletedAt: null,
+      });
     });
 
     it('[REPO-I0080] should not create duplicate identifier', async () => {
@@ -121,7 +127,8 @@ describe('User Repository Integration', () => {
       const created = await repository.create(user);
       await repository.softDeleteById(created.id);
 
-      const found = await repository.findById(created.id);
+      const found = await repository.findById(created.id, { paranoid: false });
+      expect(found).toBeDefined();
       expect(found?.deletedAt).toBeDefined();
     });
 
@@ -139,7 +146,9 @@ describe('User Repository Integration', () => {
 
       const result = await repository.create(newUser);
       expect(result).toBeDefined();
-      expect(result.identifier).toBe(user.identifier);
+      expect(result).toMatchObject({
+        identifier: user.identifier,
+      });
     });
   });
 }); 

@@ -29,14 +29,18 @@ describe('LoginAttempt Repository Integration', () => {
     it('[REPO-I0010] should find attempts by identifier', async () => {
       const attempt = createTestLoginAttempt({
         id: mongoId() as any,
+        userId: mongoId() as any,
       });
       await repository.create(attempt);
 
       const found = await repository.find({ identifier: attempt.identifier });
       expect(found).toBeDefined();
-      expect(found[0]?.identifier).toBe(attempt.identifier);
-      expect(found[0]?.loginType).toBe(attempt.loginType);
-      expect(found[0]?.success).toBe(attempt.success);
+      expect(found[0]).toMatchObject({
+        identifier: attempt.identifier,
+        loginType: attempt.loginType,
+        success: attempt.success,
+        userId: attempt.userId,
+      });
     });
 
     it('[REPO-I0020] should return empty array for non-existent identifier', async () => {
@@ -47,6 +51,7 @@ describe('LoginAttempt Repository Integration', () => {
     it('[REPO-I0030] should not find soft deleted attempts', async () => {
       const attempt = createTestLoginAttempt({
         id: mongoId() as any,
+        userId: mongoId() as any,
       });
       const created = await repository.create(attempt);
       await repository.softDeleteById(created.id);
@@ -60,30 +65,39 @@ describe('LoginAttempt Repository Integration', () => {
     it('[REPO-I0040] should create login attempt', async () => {
       const attempt = createTestLoginAttempt({
         id: mongoId() as any,
+        userId: mongoId() as any,
       });
       const created = await repository.create(attempt);
 
       expect(created).toBeDefined();
-      expect(created.identifier).toBe(attempt.identifier);
-      expect(created.loginType).toBe(attempt.loginType);
-      expect(created.success).toBe(attempt.success);
-      expect(created.deletedAt).toBeNull();
+      expect(created).toMatchObject({
+        identifier: attempt.identifier,
+        loginType: attempt.loginType,
+        success: attempt.success,
+        userId: attempt.userId,
+        deletedAt: null,
+      });
     });
 
     it('[REPO-I0050] should create multiple attempts for same identifier', async () => {
       const attempt = createTestLoginAttempt({
         id: mongoId() as any,
+        userId: mongoId() as any,
       });
       await repository.create(attempt);
 
       const another = createTestLoginAttempt({
         id: mongoId() as any,
+        userId: mongoId() as any,
         identifier: attempt.identifier,
       });
 
       const result = await repository.create(another);
       expect(result).toBeDefined();
-      expect(result.identifier).toBe(attempt.identifier);
+      expect(result).toMatchObject({
+        identifier: attempt.identifier,
+        userId: another.userId,
+      });
 
       const found = await repository.find({ identifier: attempt.identifier });
       expect(found).toHaveLength(2);
@@ -94,11 +108,13 @@ describe('LoginAttempt Repository Integration', () => {
     it('[REPO-I0060] should soft delete attempt', async () => {
       const attempt = createTestLoginAttempt({
         id: mongoId() as any,
+        userId: mongoId() as any,
       });
       const created = await repository.create(attempt);
       await repository.softDeleteById(created.id);
 
-      const found = await repository.findById(created.id);
+      const found = await repository.findById(created.id, { paranoid: false });
+      expect(found).toBeDefined();
       expect(found?.deletedAt).toBeDefined();
     });
   });

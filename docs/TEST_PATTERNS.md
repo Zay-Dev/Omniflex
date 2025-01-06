@@ -708,3 +708,119 @@ describe('Repository Tests', () => {
    - Reuse database connection across tests
    - Use transactions over full cleanup when possible
    - Consider batch operations for setup/cleanup 
+
+## Container Mocking Patterns
+
+### Unit Tests (.spec.ts)
+```typescript
+// Define container type for test
+type TTestContainer = {
+  dependency: {
+    method: jest.Mock;
+  };
+};
+
+// Mock at module level
+jest.mock('@omniflex/core', () => {
+  const mockDependency = {
+    method: jest.fn()
+  };
+
+  const mockContainer = {
+    cradle: {
+      dependency: mockDependency
+    },
+    resolve: jest.fn((key: string) => mockContainer.cradle[key]),
+  } as unknown as AwilixContainer<TTestContainer>;
+
+  return {
+    Containers: {
+      appContainerAs: jest.fn().mockReturnValue(mockContainer)
+    }
+  };
+});
+
+// Use in tests
+it('should use container', () => {
+  const container = Containers.appContainerAs<TTestContainer>();
+  expect(container.cradle.dependency.method)
+    .toHaveBeenCalled();
+});
+```
+
+### Integration Tests (.test.ts)
+```typescript
+// Use real container with test dependencies
+beforeAll(async () => {
+  const container = Containers.appContainerAs<TTestContainer>();
+  container.register({
+    dependency: asValue(createTestDependency())
+  });
+});
+```
+
+### Container Mocking Guidelines
+
+1. Module-Level Mocking:
+   - Mock external dependencies at module level
+   - Use jest.mock for container dependencies
+   - Define proper types for test containers
+   - Structure mocks to match real implementations
+
+2. Type Safety:
+   - Define explicit types for test containers
+   - Use TypeScript generics with appContainerAs
+   - Avoid type casting with 'as any'
+   - Match real container structure with cradle
+
+3. Mock Structure:
+   - Include all required methods and properties
+   - Match the real implementation's structure
+   - Include resolve method for container
+   - Clear mocks between tests
+
+4. Best Practices:
+   - Keep mocks minimal but complete
+   - Clear mocks in beforeEach
+   - Type container contents explicitly
+   - Mock only what the test needs
+
+### Example: Mongoose Model Mock
+```typescript
+// Good: Complete mock with proper structure
+const mockModel = {
+  schema: {
+    alias: jest.fn(),
+    get: jest.fn(),
+    set: jest.fn(),
+  },
+  recompileSchema: jest.fn(),
+};
+
+// Bad: Incomplete mock missing required methods
+const mockModel = {
+  schema: {},  // Missing required methods
+};
+```
+
+### Example: Container Mock
+```typescript
+// Good: Properly typed with cradle
+type TTestContainer = {
+  dependency: {
+    method: jest.Mock;
+  };
+};
+
+const mockContainer = {
+  cradle: {
+    dependency: mockDependency
+  },
+  resolve: jest.fn((key: string) => mockContainer.cradle[key]),
+} as unknown as AwilixContainer<TTestContainer>;
+
+// Bad: Missing cradle or improper structure
+const mockContainer = {
+  dependency: mockDependency  // Missing cradle structure
+};
+```

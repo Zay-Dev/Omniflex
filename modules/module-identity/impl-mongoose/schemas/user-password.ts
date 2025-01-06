@@ -40,6 +40,7 @@ export const defineSchema = (
 
   password.index({ username: 1 }, {
     unique: true,
+    background: true,
     partialFilterExpression: { deletedAt: null }
   });
 

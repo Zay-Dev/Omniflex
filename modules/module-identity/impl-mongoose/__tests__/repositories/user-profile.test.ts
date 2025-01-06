@@ -29,15 +29,18 @@ describe('UserProfile Repository Integration', () => {
     it('[REPO-I0010] should find profile by id', async () => {
       const profile = createTestUserProfile({
         id: mongoId() as any,
+        userId: mongoId() as any,
       });
       const created = await repository.create(profile);
 
       const found = await repository.findById(created.id);
       expect(found).toBeDefined();
-      expect(found?.id).toBe(created.id);
-      expect(found?.userId).toBe(profile.userId);
-      expect(found?.firstName).toBe(profile.firstName);
-      expect(found?.lastName).toBe(profile.lastName);
+      expect(found).toMatchObject({
+        id: created.id,
+        userId: profile.userId,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+      });
     });
 
     it('[REPO-I0020] should return null for non-existent id', async () => {
@@ -48,6 +51,7 @@ describe('UserProfile Repository Integration', () => {
     it('[REPO-I0030] should not find soft deleted profile', async () => {
       const profile = createTestUserProfile({
         id: mongoId() as any,
+        userId: mongoId() as any,
       });
       const created = await repository.create(profile);
       await repository.softDeleteById(created.id);
@@ -67,9 +71,11 @@ describe('UserProfile Repository Integration', () => {
 
       const found = await repository.findOne({ userId: profile.userId });
       expect(found).toBeDefined();
-      expect(found?.userId).toBe(profile.userId);
-      expect(found?.firstName).toBe(profile.firstName);
-      expect(found?.lastName).toBe(profile.lastName);
+      expect(found).toMatchObject({
+        userId: profile.userId,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+      });
     });
 
     it('[REPO-I0050] should return null for non-existent user id', async () => {
@@ -99,10 +105,12 @@ describe('UserProfile Repository Integration', () => {
       const created = await repository.create(profile);
 
       expect(created).toBeDefined();
-      expect(created.userId).toBe(profile.userId);
-      expect(created.firstName).toBe(profile.firstName);
-      expect(created.lastName).toBe(profile.lastName);
-      expect(created.deletedAt).toBeNull();
+      expect(created).toMatchObject({
+        userId: profile.userId,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        deletedAt: null,
+      });
     });
 
     it('[REPO-I0080] should not create duplicate user id', async () => {
@@ -130,7 +138,8 @@ describe('UserProfile Repository Integration', () => {
       const created = await repository.create(profile);
       await repository.softDeleteById(created.id);
 
-      const found = await repository.findById(created.id);
+      const found = await repository.findById(created.id, { paranoid: false });
+      expect(found).toBeDefined();
       expect(found?.deletedAt).toBeDefined();
     });
 
@@ -149,7 +158,9 @@ describe('UserProfile Repository Integration', () => {
 
       const result = await repository.create(newProfile);
       expect(result).toBeDefined();
-      expect(result.userId).toBe(profile.userId);
+      expect(result).toMatchObject({
+        userId: profile.userId,
+      });
     });
   });
 }); 

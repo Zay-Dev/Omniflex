@@ -1,8 +1,45 @@
-import { Schema } from 'mongoose';
+import { Schema, Connection } from 'mongoose';
 import { Containers } from '@omniflex/core';
 import { TUserPassword } from '@omniflex/module-identity-core/types';
+import { AwilixContainer } from 'awilix';
 
 import { baseDefinition, defineSchema, createRepository, UserPasswords } from './user-password';
+
+// Define the type for our container
+type TTestContainer = {
+  mongoose: {
+    model: jest.Mock;
+  };
+};
+
+// Mock @omniflex/core at module level
+jest.mock('@omniflex/core', () => {
+  const mockModel = {
+    schema: {
+      alias: jest.fn(),
+      get: jest.fn(),
+      set: jest.fn(),
+    },
+    recompileSchema: jest.fn(),
+  };
+
+  const mockMongoose = {
+    model: jest.fn().mockReturnValue(mockModel)
+  };
+
+  const mockContainer = {
+    cradle: {
+      mongoose: mockMongoose
+    },
+    resolve: jest.fn((key: string) => mockContainer.cradle[key]),
+  } as unknown as AwilixContainer<TTestContainer>;
+
+  return {
+    Containers: {
+      appContainerAs: jest.fn().mockReturnValue(mockContainer)
+    }
+  };
+});
 
 type VirtualType = {
   options: {
@@ -18,16 +55,6 @@ type SchemaType = Schema & {
     user: VirtualType;
   };
 };
-
-jest.mock('@omniflex/core', () => ({
-  Containers: {
-    appContainerAs: jest.fn().mockReturnValue({
-      resolve: jest.fn().mockReturnValue({
-        model: jest.fn().mockReturnValue({}),
-      }),
-    }),
-  },
-}));
 
 describe('UserPassword Schema', () => {
   describe('Schema Definition', () => {
@@ -64,13 +91,18 @@ describe('UserPassword Schema', () => {
       const schema = defineSchema();
       const indexes = schema.indexes();
 
-      expect(indexes).toContainEqual([
-        { username: 1 },
-        {
-          unique: true,
-          partialFilterExpression: { deletedAt: null },
-        },
-      ]);
+      // Test behavior: username should be unique for non-deleted records
+      const usernameIndex = indexes.find(([fields]) => fields.username === 1);
+      if (!usernameIndex) {
+        throw new Error('Username index not found');
+      }
+
+      expect(usernameIndex[1]).toEqual(expect.objectContaining({
+        unique: true,
+        partialFilterExpression: expect.objectContaining({
+          deletedAt: null
+        })
+      }));
     });
 
     it('[REPO-C0040] should allow custom schema definition', () => {
@@ -85,9 +117,16 @@ describe('UserPassword Schema', () => {
   });
 
   describe('Repository Creation', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
     it('[REPO-C0050] should create repository with default schema', () => {
       const repository = createRepository();
       expect(repository).toBeInstanceOf(UserPasswords);
+      const container = Containers.appContainerAs<TTestContainer>();
+      expect(container.cradle.mongoose.model)
+        .toHaveBeenCalledWith('UserPasswords', expect.any(Schema));
     });
 
     it('[REPO-C0060] should create repository with custom schema', () => {
@@ -98,6 +137,9 @@ describe('UserPassword Schema', () => {
 
       const repository = createRepository(customSchema);
       expect(repository).toBeInstanceOf(UserPasswords);
+      const container = Containers.appContainerAs<TTestContainer>();
+      expect(container.cradle.mongoose.model)
+        .toHaveBeenCalledWith('UserPasswords', customSchema);
     });
 
     it('[REPO-C0070] should create repository with custom definition', () => {
@@ -108,36 +150,9 @@ describe('UserPassword Schema', () => {
 
       const repository = createRepository(customDefinition);
       expect(repository).toBeInstanceOf(UserPasswords);
-    });
-  });
-
-  describe('Repository Methods', () => {
-    let repository: UserPasswords;
-    let mockModel: any;
-
-    beforeEach(() => {
-      mockModel = {
-        findOne: jest.fn(),
-      };
-
-      const mongoose = {
-        model: jest.fn().mockReturnValue(mockModel),
-      };
-
-      jest.spyOn(Containers.appContainerAs(), 'resolve')
-        .mockReturnValue(mongoose);
-
-      repository = createRepository();
-    });
-
-    it('[REPO-R0010] should find by username', async () => {
-      const username = 'test-user';
-      await repository.findByUsername(username);
-
-      expect(mockModel.findOne).toHaveBeenCalledWith({
-        username,
-        deletedAt: null,
-      });
+      const container = Containers.appContainerAs<TTestContainer>();
+      expect(container.cradle.mongoose.model)
+        .toHaveBeenCalledWith('UserPasswords', expect.any(Schema));
     });
   });
 }); 

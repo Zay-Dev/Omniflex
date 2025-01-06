@@ -37,6 +37,11 @@ export const defineSchema = (
     localField: 'userId',
   });
 
+  profile.index({ userId: 1 }, {
+    unique: true,
+    partialFilterExpression: { deletedAt: null },
+  });
+
   return profile;
 };
 
