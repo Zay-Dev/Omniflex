@@ -334,6 +334,31 @@ describe('MongooseBaseRepository', () => {
       const records = await repository.find({ isActive: false });
       expect(records).toHaveLength(0);
     });
+
+    it('[REPO-D0031] should use shared query options when deleting', async () => {
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', isActive: false });
+      
+      const spy = jest.spyOn(TestModel, 'deleteMany');
+      await repository.delete({ isActive: false });
+      
+      expect(spy).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining(repository['sharedQueryOptions'])
+      );
+      spy.mockRestore();
+    });
+
+    it('[REPO-D0032] should physically remove records from database', async () => {
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', isActive: false });
+
+      await repository.delete({ _id: mockId });
+
+      // Verify record is not found even with paranoid mode disabled
+      const record = await repository.findById(mockId, { paranoid: false });
+      expect(record).toBeNull();
+    });
   });
 
   describe('softDeleteById', () => {

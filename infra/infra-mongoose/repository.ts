@@ -152,6 +152,7 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
       {
         ...this.transformFilter(filter),
       },
+      this.sharedQueryOptions,
     );
     return result.deletedCount;
   }
