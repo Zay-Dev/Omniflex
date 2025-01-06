@@ -1,30 +1,31 @@
-import { Schema } from 'mongoose';
+import { Schema, Types } from 'mongoose';
 
 import { MongooseBaseRepository } from './repository';
 import { startMemoryServer, stopMemoryServer, clearDatabase, createModel, createObjectId } from './test-utils/mongoose.memory';
 
 interface ITestModel {
-  _id: string;
+  _id: Types.ObjectId;
   deletedAt?: Date;
   name: string;
   isActive?: boolean;
+  refId?: Types.ObjectId;
 }
 
 const TestSchema = new Schema<ITestModel>({
   deletedAt: { type: Date },
   name: { type: String, required: true },
   isActive: { type: Boolean },
+  refId: { type: Schema.Types.ObjectId },
 }, {
   timestamps: true,
 });
 
 describe('MongooseBaseRepository', () => {
-  let repository: MongooseBaseRepository<ITestModel>;
+  let repository: MongooseBaseRepository<ITestModel, Types.ObjectId>;
   let TestModel;
 
   beforeAll(async () => {
     await startMemoryServer();
-    TestModel = createModel<ITestModel>('Test', TestSchema);
   });
 
   afterAll(async () => {
@@ -33,6 +34,7 @@ describe('MongooseBaseRepository', () => {
 
   beforeEach(async () => {
     await clearDatabase();
+    TestModel = createModel<ITestModel>('Test', TestSchema);
     repository = new MongooseBaseRepository(TestModel);
   });
 
@@ -73,7 +75,7 @@ describe('MongooseBaseRepository', () => {
       const result = await repository.findById(mockId);
 
       expect(result).toBeTruthy();
-      expect(result!._id.toString()).toBe(mockId);
+      expect(result!._id.equals(mockId)).toBe(true);
       expect(result!.name).toBe('test');
     });
 
@@ -87,7 +89,7 @@ describe('MongooseBaseRepository', () => {
     });
 
     it('[REPO-E0010] should handle invalid id format', async () => {
-      await expect(repository.findById('invalid-id')).rejects.toBeTruthy();
+      await expect(repository.findById('invalid-id' as any)).rejects.toBeTruthy();
     });
 
     it('[REPO-E0020] should handle non-existent id', async () => {
@@ -104,7 +106,7 @@ describe('MongooseBaseRepository', () => {
       const result = await repository.findOne({ name: 'test' });
 
       expect(result).toBeTruthy();
-      expect(result!._id.toString()).toBe(mockId);
+      expect(result!._id.equals(mockId)).toBe(true);
       expect(result!.name).toBe('test');
     });
 
@@ -127,8 +129,58 @@ describe('MongooseBaseRepository', () => {
 
       expect(result).toBeTruthy();
       expect(result).toHaveLength(1);
-      expect(result[0]._id.toString()).toBe(mockId);
+      expect(result[0]._id.equals(mockId)).toBe(true);
       expect(result[0].name).toBe('test');
+    });
+
+    it('[REPO-R0045] should find records with ObjectId in filter', async () => {
+      const refId = createObjectId();
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', refId });
+
+      const result = await repository.find({ refId });
+
+      expect(result).toBeTruthy();
+      expect(result).toHaveLength(1);
+      expect(result[0]._id.equals(mockId)).toBe(true);
+      expect(result[0].name).toBe('test');
+    });
+
+    it('[REPO-R0046] should find records with ObjectId using operators', async () => {
+      const refId1 = createObjectId();
+      const refId2 = createObjectId();
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+
+      await TestModel.create({ _id: mockId1, name: 'test1', refId: refId1 });
+      await TestModel.create({ _id: mockId2, name: 'test2', refId: refId2 });
+
+      const result = await repository.find({
+        refId: { $in: [refId1, refId2] }
+      });
+
+      expect(result).toBeTruthy();
+      expect(result).toHaveLength(2);
+      expect(result.map(r => r.name).sort()).toEqual(['test1', 'test2']);
+    });
+
+    it('[REPO-R0047] should handle mixed ObjectId and operator filters', async () => {
+      const refId = createObjectId();
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+
+      await TestModel.create({ _id: mockId1, name: 'test1', refId, isActive: true });
+      await TestModel.create({ _id: mockId2, name: 'test2', refId, isActive: false });
+
+      const result = await repository.find({
+        refId,
+        isActive: { $eq: true }
+      });
+
+      expect(result).toBeTruthy();
+      expect(result).toHaveLength(1);
+      expect(result[0]._id.equals(mockId1)).toBe(true);
+      expect(result[0].name).toBe('test1');
     });
 
     it('[REPO-R0050] should not find soft deleted records by default', async () => {
@@ -169,7 +221,7 @@ describe('MongooseBaseRepository', () => {
       const result = await repository.find({}, { paranoid: false });
 
       expect(result).toHaveLength(1);
-      expect(result[0]._id.toString()).toBe(mockId);
+      expect(result[0]._id.equals(mockId)).toBe(true);
     });
   });
 
@@ -180,7 +232,7 @@ describe('MongooseBaseRepository', () => {
 
       const result = await repository.create(data);
 
-      expect(result!._id.toString()).toBe(mockId);
+      expect(result!._id.equals(mockId)).toBe(true);
       expect(result!.name).toBe('test');
     });
 
@@ -199,7 +251,7 @@ describe('MongooseBaseRepository', () => {
 
       const result = await repository.updateById(mockId, update);
 
-      expect(result!._id.toString()).toBe(mockId);
+      expect(result!._id.equals(mockId)).toBe(true);
       expect(result!.name).toBe('updated');
     });
 
@@ -323,4 +375,94 @@ describe('MongooseBaseRepository', () => {
       expect(records.every(r => r.deletedAt === null)).toBe(true);
     });
   });
-}); 
+
+  describe('transformFilter', () => {
+    it('[REPO-T0010] should handle plain objects with operators', () => {
+      const filter = {
+        field: { $eq: 'value' }
+      };
+
+      const result = (repository as any).transformFilter(filter);
+
+      expect(result).toEqual({
+        field: { $eq: 'value' }
+      });
+    });
+
+    it('[REPO-T0020] should pass through non-plain objects', () => {
+      class CustomClass {
+        constructor(private value: string) { }
+        toString() { return this.value; }
+      }
+
+      const customInstance = new CustomClass('test');
+      const filter = {
+        field: customInstance
+      };
+
+      const result = (repository as any).transformFilter(filter);
+
+      expect(result.field).toBe(customInstance);
+    });
+
+    it('[REPO-T0030] should handle null and undefined values', () => {
+      const filter = {
+        field1: null,
+        field2: undefined,
+        field3: { $eq: null }
+      };
+
+      const result = (repository as any).transformFilter(filter);
+
+      expect(result).toEqual({
+        field1: null,
+        field3: { $eq: null }
+      });
+    });
+  });
+
+  describe('transformOperators', () => {
+    it('[REPO-T0040] should handle MongoDB operators', () => {
+      const operators = {
+        $eq: 'value',
+        $gt: 5,
+        $in: ['a', 'b']
+      };
+
+      const result = (repository as any).transformOperators(operators);
+
+      expect(result).toEqual({
+        $eq: 'value',
+        $gt: 5,
+        $in: ['a', 'b']
+      });
+    });
+
+    it('[REPO-T0050] should pass through non-operator objects', () => {
+      class CustomClass {
+        constructor(private value: string) { }
+        toString() { return this.value; }
+      }
+
+      const customInstance = new CustomClass('test');
+
+      const result = (repository as any).transformOperators(customInstance);
+
+      expect(result).toBe(customInstance);
+    });
+
+    it('[REPO-T0060] should handle mixed operator and non-operator fields', () => {
+      const operators = {
+        $eq: 'value',
+        normalField: 'test'
+      };
+
+      const result = (repository as any).transformOperators(operators);
+
+      expect(result).toEqual({
+        $eq: 'value',
+        normalField: 'test'
+      });
+    });
+  });
+});

@@ -8,7 +8,7 @@ import { paranoidPlugin } from '../plugins/paranoid';
 let mongod: MongoMemoryServer;
 let connection: Connection;
 
-export const startMemoryServer = async (): Promise<void> => {
+export const startMemoryServer = async (): Promise<Connection> => {
   mongod = await MongoMemoryServer.create();
   const uri = mongod.getUri();
   connection = await mongoose.createConnection(uri).asPromise();
@@ -18,6 +18,8 @@ export const startMemoryServer = async (): Promise<void> => {
   connection.plugin(mongooseLeanVirtuals);
   connection.plugin((mongooseLeanDefaults as any).default || mongooseLeanDefaults);
   connection.plugin(paranoidPlugin);
+
+  return connection;
 };
 
 export const stopMemoryServer = async (): Promise<void> => {
@@ -51,4 +53,4 @@ export const createModel = <T>(name: string, schema: Schema): Model<T> => {
   return connection.model<T>(name, schema);
 };
 
-export const createObjectId = () => new mongoose.Types.ObjectId().toString(); 
+export const createObjectId = () => new mongoose.Types.ObjectId();

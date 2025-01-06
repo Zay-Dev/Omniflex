@@ -219,7 +219,11 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
     for (const [key, value] of Object.entries(filter)) {
       if (value === undefined) continue;
 
-      if (typeof value === 'object' && !Array.isArray(value)) {
+      // Handle non-plain objects (instances of classes)
+      if (value !== null &&
+          typeof value === 'object' &&
+          !Array.isArray(value) &&
+          value.constructor === Object) {
         transformed[key] = this.transformOperators(value as TQueryOperators<any>);
       } else {
         transformed[key] = value;
@@ -229,22 +233,35 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
   }
 
   protected transformOperators(operators: TQueryOperators<any>) {
-    if (!operators) return {};
+    // Return early if not a plain object
+    if (!operators ||
+        operators === null ||
+        typeof operators !== 'object' ||
+        Array.isArray(operators) ||
+        operators.constructor !== Object) {
+      return operators;
+    }
 
     const transformed = {};
     for (const [key, value] of Object.entries(operators)) {
       if (value === undefined) continue;
 
-      switch (key) {
-        case '$eq': transformed['$eq'] = value; break;
-        case '$ne': transformed['$ne'] = value; break;
-        case '$gt': transformed['$gt'] = value; break;
-        case '$gte': transformed['$gte'] = value; break;
-        case '$lt': transformed['$lt'] = value; break;
-        case '$lte': transformed['$lte'] = value; break;
-        case '$in': transformed['$in'] = value; break;
-        case '$nin': transformed['$nin'] = value; break;
-        case '$regex': transformed['$regex'] = value; break;
+      // Only transform known MongoDB operators
+      if (key.startsWith('$')) {
+        switch (key) {
+          case '$eq': transformed['$eq'] = value; break;
+          case '$ne': transformed['$ne'] = value; break;
+          case '$gt': transformed['$gt'] = value; break;
+          case '$gte': transformed['$gte'] = value; break;
+          case '$lt': transformed['$lt'] = value; break;
+          case '$lte': transformed['$lte'] = value; break;
+          case '$in': transformed['$in'] = value; break;
+          case '$nin': transformed['$nin'] = value; break;
+          case '$regex': transformed['$regex'] = value; break;
+          default: transformed[key] = value; break;
+        }
+      } else {
+        transformed[key] = value;
       }
     }
     return transformed;

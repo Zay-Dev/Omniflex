@@ -21,4 +21,4 @@ export const paranoidPlugin = (schema: Schema) => {
   schema.pre(/^find/, queryHelper);
   schema.pre(/^count/, queryHelper);
   schema.pre(/^update/, queryHelper);
-}; 
+};
