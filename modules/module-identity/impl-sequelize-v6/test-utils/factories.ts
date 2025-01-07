@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { TLoginAttempt, TUserPassword, TUserProfile, TUser } from '@omniflex/module-identity-core/types';
 
-const createTestUser = (overrides: Partial<TUser> = {}): TUser => ({
+export const createTestUser = (overrides: Partial<TUser> = {}): TUser => ({
   id: uuidv4(),
   identifier: `test-user-${uuidv4()}`,
   isVerified: false,
