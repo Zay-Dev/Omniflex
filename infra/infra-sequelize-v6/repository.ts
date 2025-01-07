@@ -27,11 +27,15 @@ export class SequelizeRepository<
 
     switch (type) {
       case 'INTEGER':
-        return !isNaN(Number(id));
+        if (isNaN(Number(id))) {
+          throw new Error('Invalid integer ID format');
+        }
+        return true;
       case 'UUID':
-        return id &&
-          typeof id === 'string' &&
-          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+        if (!id || typeof id !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+          throw new Error('Invalid UUID format');
+        }
+        return true;
     }
 
     logger.warn(
@@ -54,6 +58,7 @@ export class SequelizeRepository<
   }
 
   async findById(id: TPrimaryKey, options?: Pick<TQueryOptions<T>, 'paranoid'>): Promise<T | null> {
+    this.isValidPrimaryKey(id);
     const result = await this.model.findByPk(id, {
       paranoid: options?.paranoid ?? true,
     });
@@ -87,6 +92,7 @@ export class SequelizeRepository<
   }
 
   async updateById(id: TPrimaryKey, data: Partial<T>, options?: Pick<TQueryOptions<T>, 'paranoid'>): Promise<T | null> {
+    this.isValidPrimaryKey(id);
     const [count] = await this.model.update(data as any, {
       where: { id: id as any },
       paranoid: options?.paranoid ?? true,
@@ -114,6 +120,7 @@ export class SequelizeRepository<
   }
 
   async deleteById(id: TPrimaryKey): Promise<boolean> {
+    this.isValidPrimaryKey(id);
     const count = await this.model.destroy({
       where: { id: id as any },
       force: true,
@@ -138,6 +145,7 @@ export class SequelizeRepository<
   }
 
   async softDeleteById(id: TPrimaryKey): Promise<boolean> {
+    this.isValidPrimaryKey(id);
     const count = await this.model.destroy({
       where: { id: id as any },
     });
@@ -159,6 +167,7 @@ export class SequelizeRepository<
   }
 
   async restoreById(id: TPrimaryKey): Promise<boolean> {
+    this.isValidPrimaryKey(id);
     await this.model.restore({
       where: { id: id as any },
     });
