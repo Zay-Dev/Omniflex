@@ -196,7 +196,7 @@ describe('UserSessionRepository (Sequelize)', () => {
 
   describe('error cases', () => {
     it('[REPO-E0010] should handle non-existent record', async () => {
-      const result = await repository.findById('valid-but-non-existent-id');
+      const result = await repository.findById('00000000-0000-0000-0000-000000000000');
       expect(result).toBeFalsy();
     });
 
