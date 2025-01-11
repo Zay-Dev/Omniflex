@@ -1,0 +1,240 @@
+import { Model, DataTypes, Sequelize, ModelStatic, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize'
+import { BaseEntitiesController } from './base-entities-controller'
+import { SQLiteRepository } from '@omniflex/infra-sqlite'
+import { createMockRequest, createMockResponse } from '../jest.setup'
+import { NextFunction } from 'express'
+
+interface TestEntity {
+  id: string
+  name: string
+  deletedAt: Date | null
+}
+
+class TestModel extends Model<InferAttributes<TestModel>, InferCreationAttributes<TestModel>> {
+  declare id: CreationOptional<string>
+  declare name: string
+  declare deletedAt: CreationOptional<Date>
+
+  toJSON(): TestEntity {
+    return {
+      id: this.id,
+      name: this.name,
+      deletedAt: this.deletedAt ?? null
+    }
+  }
+}
+
+type TestController = BaseEntitiesController<TestEntity, string>
+const TestController = BaseEntitiesController<TestEntity, string>
+
+describe('BaseEntitiesController', () => {
+  const createTestModel = async (name: string) => TestModel.create({ name })
+  let sequelize: Sequelize
+  let controller: TestController
+  let repository: SQLiteRepository<TestEntity, string>
+  let req: any
+  let res: any
+  let next: jest.Mock<NextFunction>
+
+  beforeAll(async () => {
+    sequelize = new Sequelize({
+      logging: false,
+      dialect: 'sqlite',
+      storage: ':memory:',
+    })
+
+    TestModel.init({
+      id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      deletedAt: DataTypes.DATE
+    }, {
+      sequelize,
+      modelName: 'test',
+      paranoid: true,
+      timestamps: true
+    })
+
+    await sequelize.sync({ force: true })
+  })
+
+  beforeEach(async () => {
+    await TestModel.destroy({ where: {}, force: true })
+    req = createMockRequest()
+    res = createMockResponse()
+    next = jest.fn() as jest.Mock<NextFunction>
+    repository = new SQLiteRepository<TestEntity, string>(TestModel as unknown as ModelStatic<Model<TestEntity>>)
+    controller = new TestController(req, res, next, repository)
+  })
+
+  afterAll(() => sequelize.close())
+
+  describe('initialization', () => {
+    it('[UTIL-C0010] should throw error if repository is not provided', () => {
+      expect(() => new TestController(req, res, next, null as any))
+        .toThrow('repository is required')
+    })
+  })
+
+  describe('read operations', () => {
+    describe('tryGetOne', () => {
+      it('[UTIL-R0010] should return entity if found', async () => {
+        const entity = await createTestModel('test')
+        req.params.id = entity.id
+
+        await controller.tryGetOne()
+
+        expect(res.json).toHaveBeenCalledWith({
+          data: expect.objectContaining({ id: entity.id, name: 'test' })
+        })
+      })
+
+      it('[UTIL-R0020] should throw not found if entity does not exist', async () => {
+        req.params.id = '123e4567-e89b-12d3-a456-426614174000'
+        await controller.tryGetOne()
+        expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringContaining('Not Found') }))
+      })
+
+      it('[UTIL-R0030] should not return soft-deleted entity', async () => {
+        const entity = await createTestModel('test')
+        await repository.softDeleteById(entity.id)
+        req.params.id = entity.id
+
+        await controller.tryGetOne()
+
+        expect(next).toHaveBeenCalledWith(
+          expect.objectContaining({ message: expect.stringContaining('Not Found') })
+        )
+      })
+    })
+
+    describe('list operations', () => {
+      it('[UTIL-R0040] should return all entities for tryListAll', async () => {
+        const entities = await Promise.all([
+          createTestModel('test1'),
+          createTestModel('test2')
+        ])
+
+        await controller.tryListAll()
+
+        expect(res.json).toHaveBeenCalledWith({
+          data: expect.arrayContaining(entities.map(e => expect.objectContaining({ id: e.id }))),
+          total: 2
+        })
+      })
+
+      it('[UTIL-R0050] should handle pagination in tryListPaginated', async () => {
+        await Promise.all([
+          createTestModel('test1'),
+          createTestModel('test2'),
+          createTestModel('test3')
+        ])
+
+        req.query = { page: '1', pageSize: '2' }
+        await controller.tryListPaginated()
+
+        expect(res.json).toHaveBeenCalledWith({
+          data: expect.arrayContaining([
+            expect.objectContaining({ name: 'test1' }),
+            expect.objectContaining({ name: 'test2' })
+          ]),
+          total: 2
+        })
+      })
+
+      it('[UTIL-R0060] should not return soft-deleted entities in tryListAll', async () => {
+        const active = await createTestModel('active')
+        const deleted = await createTestModel('deleted')
+        await repository.softDeleteById(deleted.id)
+
+        await controller.tryListAll()
+
+        expect(res.json).toHaveBeenCalledWith({
+          data: [expect.objectContaining({ id: active.id, name: 'active' })],
+          total: 1
+        })
+      })
+
+      it('[UTIL-R0070] should not return soft-deleted entities in tryListPaginated', async () => {
+        const active1 = await createTestModel('active1')
+        const deleted = await createTestModel('deleted')
+        const active2 = await createTestModel('active2')
+        await repository.softDeleteById(deleted.id)
+
+        req.query = { page: '1', pageSize: '2' }
+        await controller.tryListPaginated()
+
+        expect(res.json).toHaveBeenCalledWith({
+          data: expect.arrayContaining([
+            expect.objectContaining({ name: 'active1' }),
+            expect.objectContaining({ name: 'active2' })
+          ]),
+          total: 2
+        })
+      })
+    })
+  })
+
+  describe('write operations', () => {
+    describe('tryCreate', () => {
+      it('[UTIL-C0020] should create and return new entity', async () => {
+        req.body = { name: 'test' }
+        await controller.tryCreate()
+
+        expect(res.json).toHaveBeenCalledWith({
+          data: expect.objectContaining({ name: 'test' })
+        })
+      })
+
+      it('[UTIL-C0030] should handle creation failure', async () => {
+        jest.spyOn(repository, 'create').mockRejectedValueOnce(new Error('Creation failed'))
+        req.body = { name: 'test' }
+
+        await controller.tryCreate()
+        expect(next).toHaveBeenCalledWith(expect.any(Error))
+      })
+    })
+
+    describe('modification operations', () => {
+      it('[UTIL-U0010] should update entity successfully', async () => {
+        const entity = await createTestModel('test')
+        req.params.id = entity.id
+        req.body = { name: 'updated' }
+
+        await controller.tryUpdate()
+
+        expect(res.json).toHaveBeenCalledWith({
+          data: expect.objectContaining({ id: entity.id, name: 'updated' })
+        })
+      })
+
+      it('[UTIL-D0010] should handle soft delete', async () => {
+        const entity = await createTestModel('test')
+        req.params.id = entity.id
+
+        await controller.trySoftDelete()
+
+        expect(res.json).toHaveBeenCalledWith({ data: { success: true } })
+        const softDeleted = await repository.findById(entity.id)
+        expect(softDeleted).toBeNull()
+      })
+
+      it('[UTIL-D0020] should handle hard delete', async () => {
+        const entity = await createTestModel('test')
+        req.params.id = entity.id
+
+        await controller.tryDelete()
+
+        expect(res.json).toHaveBeenCalledWith({ data: { success: true } })
+        const deleted = await repository.findById(entity.id)
+        expect(deleted).toBeNull()
+      })
+    })
+  })
+}) 

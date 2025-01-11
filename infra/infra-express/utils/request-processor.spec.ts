@@ -1,20 +1,10 @@
 import { Request } from 'express';
-import { processRequest } from '../../../utils/request-processor';
+import { processRequest } from './request-processor';
+import { createMockRequest } from '../jest.setup';
 
 describe('Request Processor', () => {
-  const createMockRequest = (overrides = {}): Request => ({
-    body: {},
-    query: {},
-    params: {},
-    headers: {},
-    path: '/test',
-    method: 'GET',
-    url: '/test',
-    ...overrides,
-  } as Request);
-
   describe('processRequest', () => {
-    test('should mask sensitive data in body', () => {
+    it('[UTIL-R0010] should mask sensitive data in body', () => {
       const req = createMockRequest({
         body: {
           username: 'testuser',
@@ -30,7 +20,7 @@ describe('Request Processor', () => {
       expect(processed.body.email).toMatch(/^te\*{12}om$/);
     });
 
-    test('should mask sensitive data in query', () => {
+    it('[UTIL-R0020] should mask sensitive data in query', () => {
       const req = createMockRequest({
         query: {
           token: 'abc123',
@@ -44,7 +34,7 @@ describe('Request Processor', () => {
       expect(processed.query.apiKey).toMatch(/^xy\*{2}89$/);
     });
 
-    test('should mask sensitive data in headers', () => {
+    it('[UTIL-R0030] should mask sensitive data in headers', () => {
       const req = createMockRequest({
         headers: {
           authorization: 'Bearer token123',
@@ -58,7 +48,7 @@ describe('Request Processor', () => {
       expect(processed.headers['content-type']).toBe('application/json');
     });
 
-    test('should handle nested objects', () => {
+    it('[UTIL-R0040] should handle nested objects', () => {
       const req = createMockRequest({
         body: {
           user: {
@@ -78,7 +68,7 @@ describe('Request Processor', () => {
       expect(processed.body.user.credentials.token).toMatch(/^ab\*{2}23$/);
     });
 
-    test('should handle arrays', () => {
+    it('[UTIL-R0050] should handle arrays', () => {
       const req = createMockRequest({
         body: {
           users: [
@@ -96,7 +86,7 @@ describe('Request Processor', () => {
       expect(processed.body.users[1].email).toMatch(/^te\*{13}om$/);
     });
 
-    test('should preserve request metadata', () => {
+    it('[UTIL-R0060] should preserve request metadata', () => {
       const req = createMockRequest({
         path: '/api/test',
         method: 'POST',
@@ -110,7 +100,7 @@ describe('Request Processor', () => {
       expect(processed.url).toBe('/api/test?query=1');
     });
 
-    test('should handle null and undefined values', () => {
+    it('[UTIL-R0070] should handle null and undefined values', () => {
       const req = createMockRequest({
         body: {
           nullValue: null,
@@ -128,4 +118,4 @@ describe('Request Processor', () => {
       expect(processed.body.password).toMatch(/^se\*{2}et$/);
     });
   });
-});
+}); 
