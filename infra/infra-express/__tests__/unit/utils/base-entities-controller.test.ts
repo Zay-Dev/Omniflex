@@ -116,7 +116,7 @@ describe('BaseEntitiesController', () => {
 
       it('should not return soft-deleted entity', async () => {
         const entity = await createTestModel('test');
-        await repository.softDelete(entity.id);
+        await repository.softDeleteById(entity.id);
         req.params.id = entity.id;
 
         await controller.tryGetOne();
@@ -164,7 +164,7 @@ describe('BaseEntitiesController', () => {
       it('should not return soft-deleted entities in tryListAll', async () => {
         const active = await createTestModel('active');
         const deleted = await createTestModel('deleted');
-        await repository.softDelete(deleted.id);
+        await repository.softDeleteById(deleted.id);
 
         await controller.tryListAll();
 
@@ -178,7 +178,7 @@ describe('BaseEntitiesController', () => {
         const active1 = await createTestModel('active1');
         const deleted = await createTestModel('deleted');
         const active2 = await createTestModel('active2');
-        await repository.softDelete(deleted.id);
+        await repository.softDeleteById(deleted.id);
 
         req.query = { page: '1', pageSize: '2' };
         await controller.tryListPaginated();
