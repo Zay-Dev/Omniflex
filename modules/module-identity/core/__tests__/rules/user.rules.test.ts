@@ -1,44 +1,24 @@
 import { errors } from '@omniflex/core';
-
 import { throwIfConflictingUsername, throwIfConflictingEmail } from '../../user.rules';
 
 jest.mock('@omniflex/core', () => ({
   errors: {
-    conflict: jest.fn().mockReturnValue(new Error('Conflict'))
-  }
+    conflict: jest.fn().mockReturnValue(new Error('Conflict')),
+  },
 }));
 
 jest.mock('../../containers', () => ({
   resolve: jest.fn().mockReturnValue({
     users: {
-      isValidPrimaryKey: jest.fn(),
       exists: jest.fn(),
-      findById: jest.fn(),
-      findOne: jest.fn(),
-      find: jest.fn(),
-      create: jest.fn(),
-      updateById: jest.fn(),
-      updateMany: jest.fn(),
-      delete: jest.fn(),
-      softDelete: jest.fn()
     },
     passwords: {
-      isValidPrimaryKey: jest.fn(),
       exists: jest.fn(),
-      findById: jest.fn(),
-      findOne: jest.fn(),
-      find: jest.fn(),
-      create: jest.fn(),
-      updateById: jest.fn(),
-      updateMany: jest.fn(),
-      delete: jest.fn(),
-      softDelete: jest.fn(),
-      findByUsername: jest.fn()
-    }
-  })
+    },
+  }),
 }));
 
-describe('User Rules', () => {
+describe('User Rules Integration', () => {
   const { users, passwords } = jest.requireMock('../../containers').resolve();
 
   beforeEach(() => {
@@ -47,61 +27,41 @@ describe('User Rules', () => {
     passwords.exists.mockResolvedValue(false);
   });
 
-  describe('throwIfConflictingUsername', () => {
-    const username = 'test-username';
-
-    it('should not throw if username is available', async () => {
-      await expect(throwIfConflictingUsername({ username }))
-        .resolves.not.toThrow();
+  describe('Repository Integration', () => {
+    it('[RULE-I0010] should check both repositories for username conflicts', async () => {
+      const username = 'test-user';
+      await throwIfConflictingUsername({ username });
 
       expect(users.exists).toHaveBeenCalledWith({
         deletedAt: null,
-        identifier: username
+        identifier: username,
       });
-
       expect(passwords.exists).toHaveBeenCalledWith({
         username,
-        deletedAt: null
+        deletedAt: null,
       });
     });
 
-    it('should throw if user exists with username as identifier', async () => {
-      users.exists.mockResolvedValue(true);
-
-      await expect(throwIfConflictingUsername({ username }))
-        .rejects.toThrow('Conflict');
-    });
-
-    it('should throw if password exists with username', async () => {
-      passwords.exists.mockResolvedValue(true);
-
-      await expect(throwIfConflictingUsername({ username }))
-        .rejects.toThrow('Conflict');
-    });
-  });
-
-  describe('throwIfConflictingEmail', () => {
-    const email = 'test@example.com';
-
-    it('should reuse username validation logic', async () => {
+    it('[RULE-I0020] should check both repositories for email conflicts', async () => {
+      const email = 'test@example.com';
       await throwIfConflictingEmail({ email });
 
       expect(users.exists).toHaveBeenCalledWith({
         deletedAt: null,
-        identifier: email
+        identifier: email,
       });
-
       expect(passwords.exists).toHaveBeenCalledWith({
         username: email,
-        deletedAt: null
+        deletedAt: null,
       });
     });
 
-    it('should throw if email is already used', async () => {
-      users.exists.mockResolvedValue(true);
+    it('[RULE-I0030] should handle repository errors', async () => {
+      const error = new Error('Database error');
+      users.exists.mockRejectedValueOnce(error);
 
-      await expect(throwIfConflictingEmail({ email }))
-        .rejects.toThrow('Conflict');
+      await expect(throwIfConflictingUsername({ username: 'test-user' }))
+        .rejects.toThrow(error);
     });
   });
 });

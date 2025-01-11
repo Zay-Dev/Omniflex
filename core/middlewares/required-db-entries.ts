@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { errors } from '@omniflex/core';
 import { BaseError } from '@omniflex/core/types/error';
-import { TDeepPartial, IBaseRepository } from '@omniflex/core/types/repository';
+import { TQueryFilter, IBaseRepository } from '@omniflex/core/types/repository';
 
 type TOptions<T, TPrimaryKey> = {
   notFoundMessage?: string;
@@ -65,7 +65,7 @@ export const requiredById = async <
 export const requiredFirstMatch = async<
   T extends {} = Record<string, any>
 >(
-  query: TDeepPartial<T>,
+  query: TQueryFilter<T>,
   options: TOptions<T, any>,
 ) => {
   return await validate(query, {
@@ -77,13 +77,13 @@ export const requiredFirstMatch = async<
 export const eitherExists = async<
   T extends {} = Record<string, any>
 >(
-  queries: TDeepPartial<T>[],
+  queries: TQueryFilter<T>[],
   options: Omit<TOptions<T, any>, 'countOnly'>,
 ) => {
   const identifier = uuid();
   const notFoundMessage = options.notFoundMessage || '';
 
-  const isExists = (query: TDeepPartial<T>) => {
+  const isExists = (query: TQueryFilter<T>) => {
     return new Promise((resolve, reject) => {
       validate(query, {
         ...options,
@@ -120,7 +120,7 @@ export const eitherExists = async<
 export const ensureNotExists = async<
   T extends {} = Record<string, any>
 >(
-  query: TDeepPartial<T>,
+  query: TQueryFilter<T>,
   options: TEnsureNotExistsOptions<T, any>,
 ) => {
   const { onError, repository } = options;

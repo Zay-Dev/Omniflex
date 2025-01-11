@@ -11,7 +11,7 @@ export class UserSessions extends MongooseBaseRepository<TUserSession>
   async deactivateByUserId(userId: string) {
     await this.model.updateMany(
       { userId, isActive: true, deletedAt: null },
-      { isActive: false }
+      { isActive: false },
     );
   }
 
@@ -21,9 +21,9 @@ export class UserSessions extends MongooseBaseRepository<TUserSession>
         userId,
         sessionType,
         isActive: true,
-        deletedAt: null
+        deletedAt: null,
       },
-      { isActive: false }
+      { isActive: false },
     );
   }
 }
@@ -50,7 +50,7 @@ export const defineSchema = (
 ) => {
   const session = new Schema<TUserSession>(
     schema,
-    { timestamps: true }
+    { timestamps: true },
   );
 
   session.virtual('user', {
@@ -62,7 +62,7 @@ export const defineSchema = (
 
   session.index(
     { userId: 1, sessionType: 1, isActive: 1 },
-    { partialFilterExpression: { deletedAt: null } }
+    { partialFilterExpression: { deletedAt: null } },
   );
 
   return session;

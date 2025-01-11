@@ -6,8 +6,9 @@ import { Containers } from '@omniflex/core';
 
 import { TMongooseConfig } from './types';
 import { createConnection } from 'mongoose';
+import { paranoidPlugin } from './plugins/paranoid';
 
-export * from './repositories';
+export * from './repository';
 
 export const getConnection = (
   { mongoose } = Containers.configAs<TMongooseConfig>()
@@ -21,6 +22,7 @@ export const getConnection = (
   connection.plugin(mongooseLeanGetters);
   connection.plugin(mongooseLeanVirtuals);
   connection.plugin((mongooseLeanDefaults as any).default);
+  connection.plugin(paranoidPlugin);
 
   return connection.asPromise();
 };

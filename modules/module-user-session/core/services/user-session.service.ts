@@ -40,7 +40,7 @@ export class UserSessionService {
 
   static async inactivateByPairIdentifier(pairIdentifier: string) {
     await resolve().sessions
-      .updateMany({ pairIdentifier }, { isActive: false });
+      .update({ pairIdentifier }, { isActive: false });
   }
 
   static async throwIfInvalidSession(identifier: string) {

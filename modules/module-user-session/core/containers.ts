@@ -10,7 +10,7 @@ export const container = Awilix.createContainer<TUserSessionContainer>();
 export const registerRepositories = (repositories: Partial<TUserSessionContainer>) => {
   for (const [key, value] of Object.entries(repositories)) {
     container.register({
-      [key]: Awilix.asValue(value)
+      [key]: Awilix.asValue(value),
     });
   }
 };

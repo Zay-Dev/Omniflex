@@ -1,6 +1,6 @@
 import { errors } from '@omniflex/core';
 import * as Base from '@omniflex/core/middlewares/required-db-entries';
-import { TDeepPartial, IBaseRepository } from '@omniflex/core/types/repository';
+import { TQueryFilter, IBaseRepository } from '@omniflex/core/types/repository';
 import { BaseError } from '@omniflex/core/types/error';
 
 import { asInfraLocals } from '../internal-types';
@@ -66,8 +66,12 @@ export const byId = <T extends {}, TPrimaryKey>(
   return (async (req: Request, res: Response, next: NextFunction) => {
     const id = await getId(req, res, next);
 
-    if (!repository.isValidPrimaryKey(id)) {
-      return next(errors.badRequest('Invalid ID'));
+    try {
+      if (!repository.isValidPrimaryKey(id)) {
+        return next(errors.badRequest('Invalid ID'));
+      }
+    } catch (error) {
+      return next(errors.badRequest('Invalid ID', { data: error }));
     }
 
     const countOnly = countOnlyOrKeyName === true;
@@ -95,7 +99,7 @@ export const byId = <T extends {}, TPrimaryKey>(
 
 export const firstMatch = <T extends {}, TPrimaryKey>(
   repository: IBaseRepository<T, TPrimaryKey>,
-  getQuery: (req: Request, res: Response, next: NextFunction) => TDeepPartial<T> | Promise<TDeepPartial<T>>,
+  getQuery: (req: Request, res: Response, next: NextFunction) => TQueryFilter<T> | Promise<TQueryFilter<T>>,
   countOnlyOrKeyName: true | string = '_firstMatch',
 ) => {
   return (async (req: Request, res: Response, next: NextFunction) => {
@@ -126,7 +130,7 @@ export const firstMatch = <T extends {}, TPrimaryKey>(
 
 export const eitherExists = <T extends {}, TPrimaryKey>(
   repository: IBaseRepository<T, TPrimaryKey>,
-  getQueries: (req: Request, res: Response, next: NextFunction) => TDeepPartial<T>[] | Promise<TDeepPartial<T>[]>,
+  getQueries: (req: Request, res: Response, next: NextFunction) => TQueryFilter<T>[] | Promise<TQueryFilter<T>[]>,
 ) => {
   return (async (req: Request, res: Response, next: NextFunction) => {
     const queries = await getQueries(req, res, next);
@@ -141,7 +145,7 @@ export const eitherExists = <T extends {}, TPrimaryKey>(
 
 export const ensureNotExists = <T extends {}, TPrimaryKey>(
   repository: IBaseRepository<T, TPrimaryKey>,
-  getQuery: (req: Request, res: Response, next: NextFunction) => TDeepPartial<T> | Promise<TDeepPartial<T>>,
+  getQuery: (req: Request, res: Response, next: NextFunction) => TQueryFilter<T> | Promise<TQueryFilter<T>>,
   {
     existsMessage,
     onError,
@@ -160,7 +164,7 @@ export const ensureNotExists = <T extends {}, TPrimaryKey>(
         (error, entity) => onError(error, entity, next) :
         next,
     });
-    
+
     next();
   };
 };

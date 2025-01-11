@@ -116,7 +116,7 @@ export class BaseEntitiesController<
   tryDelete() {
     return this.tryAction(async () => {
       const id = this.entityId;
-      const success = await this.repository.delete(id);
+      const success = await this.repository.deleteById(id);
 
       if (!success) {
         this.throwNotFound();
@@ -129,7 +129,7 @@ export class BaseEntitiesController<
   trySoftDelete() {
     return this.tryAction(async () => {
       const id = this.entityId;
-      const success = await this.repository.softDelete(id);
+      const success = await this.repository.softDeleteById(id);
 
       if (!success) {
         this.throwNotFound();

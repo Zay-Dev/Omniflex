@@ -3,7 +3,7 @@ import { logger, Containers } from '@omniflex/core'
 
 import { TSQLiteConfig } from './types'
 
-export * from './repositories'
+export * from './repository'
 export * from '@omniflex/infra-sequelize-v6'
 
 export const getConnection = async (

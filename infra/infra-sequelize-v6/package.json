@@ -20,5 +20,7 @@
     "@omniflex/core": "0.1.0",
     "sequelize": "^6.37.5"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "sqlite3": "^5.1.7"
+  }
 }

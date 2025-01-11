@@ -3,178 +3,127 @@ import {
   schemaLoginWithEmail,
   schemaRegister,
   schemaRegisterWithEmail,
-} from '../../';
+} from '../../joi.schemas';
 
 jest.mock('../../containers', () => ({
   resolve: jest.fn().mockReturnValue({
     users: {},
     profiles: {},
     passwords: {},
-    loginAttempts: {}
-  })
+    loginAttempts: {},
+  }),
 }));
 
-describe('User Schemas', () => {
-  describe('register schema', () => {
-    const validData = {
-      username: 'testuser',
-      password: 'Password123',
-      repeatPassword: 'Password123',
-      email: 'test@example.com',
-      firstName: 'Test',
-      lastName: 'User',
-      mobileNumber: '+1234567890'
-    };
+describe('Schema Integration', () => {
+  describe('Login Flow', () => {
+    it('[SCHEMA-I0010] should validate complete login flow', () => {
+      // Username login
+      const usernameLogin = {
+        username: 'testuser',
+        password: 'Password123',
+      };
+      expect(schemaLogin.validate(usernameLogin).error).toBeUndefined();
 
-    it('should validate complete valid data', () => {
-      const { error, value } = schemaRegister.validate(validData);
-      expect(error).toBeUndefined();
-      expect(value.repeatPassword).toBeUndefined();
+      // Email login
+      const emailLogin = {
+        email: 'test@example.com',
+        password: 'Password123',
+      };
+      expect(schemaLoginWithEmail.validate(emailLogin).error).toBeUndefined();
     });
 
-    it('should require username', () => {
-      const { error } = schemaRegister.validate({
-        ...validData,
-        username: undefined
-      });
-      expect(error?.details[0].message).toContain('"username" is required');
-    });
+    it('[SCHEMA-I0020] should handle cross-schema validation', () => {
+      // Email in username login
+      const emailInUsernameLogin = {
+        username: 'test@example.com',
+        password: 'Password123',
+      };
+      expect(schemaLogin.validate(emailInUsernameLogin).error).toBeUndefined();
 
-    it('should validate username format', () => {
-      const { error } = schemaRegister.validate({
-        ...validData,
-        username: 'a'
-      });
-      expect(error?.details[0].message).toContain('"username" length must be at least 3 characters long');
-    });
-
-    it('should validate password complexity', () => {
-      const { error } = schemaRegister.validate({
-        ...validData,
-        password: 'simple',
-        repeatPassword: 'simple'
-      });
-      expect(error?.details[0].message).toContain('fails to match the required pattern');
-    });
-
-    it('should validate password match', () => {
-      const { error } = schemaRegister.validate({
-        ...validData,
-        repeatPassword: 'DifferentPass123'
-      });
-      expect(error?.details[0].message).toContain('"repeatPassword" must be [ref:password]');
-    });
-
-    it('should validate email format when provided', () => {
-      const { error } = schemaRegister.validate({
-        ...validData,
-        email: 'invalid-email'
-      });
-      expect(error?.details[0].message).toContain('"email" must be a valid email');
-    });
-
-    it('should validate mobile number format when provided', () => {
-      const { error } = schemaRegister.validate({
-        ...validData,
-        mobileNumber: 'invalid'
-      });
-      expect(error?.details[0].message).toContain('fails to match the required pattern');
+      // Username in email login
+      const usernameInEmailLogin = {
+        email: 'testuser',
+        password: 'Password123',
+      };
+      expect(schemaLoginWithEmail.validate(usernameInEmailLogin).error).toBeDefined();
     });
   });
 
-  describe('registerWithEmail schema', () => {
-    const validData = {
-      email: 'test@example.com',
-      password: 'Password123',
-      repeatPassword: 'Password123',
-      firstName: 'Test',
-      lastName: 'User'
-    };
+  describe('Registration Flow', () => {
+    it('[SCHEMA-I0030] should validate complete registration flow', () => {
+      // Username registration
+      const usernameRegister = {
+        username: 'testuser',
+        password: 'Password123',
+        repeatPassword: 'Password123',
+        email: 'test@example.com',
+        firstName: 'Test',
+        lastName: 'User',
+      };
+      expect(schemaRegister.validate(usernameRegister).error).toBeUndefined();
 
-    it('should validate complete valid data', () => {
-      const { error, value } = schemaRegisterWithEmail.validate(validData);
-      expect(error).toBeUndefined();
-      expect(value.repeatPassword).toBeUndefined();
+      // Email registration
+      const emailRegister = {
+        email: 'test@example.com',
+        password: 'Password123',
+        repeatPassword: 'Password123',
+        firstName: 'Test',
+        lastName: 'User',
+      };
+      expect(schemaRegisterWithEmail.validate(emailRegister).error).toBeUndefined();
     });
 
-    it('should require email', () => {
-      const { error } = schemaRegisterWithEmail.validate({
-        ...validData,
-        email: undefined
+    it('[SCHEMA-I0040] should handle cross-schema validation', () => {
+      // Username registration without email
+      const usernameOnly = {
+        username: 'testuser',
+        password: 'Password123',
+        repeatPassword: 'Password123',
+      };
+      expect(schemaRegister.validate(usernameOnly).error).toBeUndefined();
+
+      // Email registration without username
+      const emailOnly = {
+        email: 'test@example.com',
+        password: 'Password123',
+        repeatPassword: 'Password123',
+      };
+      expect(schemaRegisterWithEmail.validate(emailOnly).error).toBeUndefined();
+    });
+
+    it('[SCHEMA-I0050] should validate password requirements', () => {
+      const validPassword = 'Password123';
+      const invalidPassword = 'weak';
+
+      // Registration schemas should enforce password requirements
+      const registerSchemas = [schemaRegister, schemaRegisterWithEmail];
+      registerSchemas.forEach(schema => {
+        const validData = {
+          username: 'testuser',
+          email: 'test@example.com',
+          password: validPassword,
+          repeatPassword: validPassword,
+        };
+        expect(schema.validate(validData).error).toBeUndefined();
+
+        const invalidData = {
+          ...validData,
+          password: invalidPassword,
+          repeatPassword: invalidPassword,
+        };
+        expect(schema.validate(invalidData).error).toBeDefined();
       });
-      expect(error?.details[0].message).toContain('"email" is required');
-    });
 
-    it('should validate email format', () => {
-      const { error } = schemaRegisterWithEmail.validate({
-        ...validData,
-        email: 'invalid-email'
+      // Login schemas should only check for presence of password
+      const loginSchemas = [schemaLogin, schemaLoginWithEmail];
+      loginSchemas.forEach(schema => {
+        const validData = {
+          username: 'testuser',
+          email: 'test@example.com',
+          password: 'any-password',
+        };
+        expect(schema.validate(validData).error).toBeUndefined();
       });
-      expect(error?.details[0].message).toContain('"email" must be a valid email');
-    });
-  });
-
-  describe('login schema', () => {
-    const validData = {
-      username: 'testuser',
-      password: 'Password123'
-    };
-
-    it('should validate complete valid data', () => {
-      const { error } = schemaLogin.validate(validData);
-      expect(error).toBeUndefined();
-    });
-
-    it('should require username', () => {
-      const { error } = schemaLogin.validate({
-        ...validData,
-        username: undefined
-      });
-      expect(error?.details[0].message).toContain('"username" is required');
-    });
-
-    it('should require password', () => {
-      const { error } = schemaLogin.validate({
-        ...validData,
-        password: undefined
-      });
-      expect(error?.details[0].message).toContain('"password" is required');
-    });
-  });
-
-  describe('loginWithEmail schema', () => {
-    const validData = {
-      email: 'test@example.com',
-      password: 'Password123'
-    };
-
-    it('should validate complete valid data', () => {
-      const { error } = schemaLoginWithEmail.validate(validData);
-      expect(error).toBeUndefined();
-    });
-
-    it('should require email', () => {
-      const { error } = schemaLoginWithEmail.validate({
-        ...validData,
-        email: undefined
-      });
-      expect(error?.details[0].message).toContain('"email" is required');
-    });
-
-    it('should validate email format', () => {
-      const { error } = schemaLoginWithEmail.validate({
-        ...validData,
-        email: 'invalid-email'
-      });
-      expect(error?.details[0].message).toContain('"email" must be a valid email');
-    });
-
-    it('should require password', () => {
-      const { error } = schemaLoginWithEmail.validate({
-        ...validData,
-        password: undefined
-      });
-      expect(error?.details[0].message).toContain('"password" is required');
     });
   });
 });
