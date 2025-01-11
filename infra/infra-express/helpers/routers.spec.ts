@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express'
-import { createMockRequest, createMockResponse } from '../jest.setup'
+import { createMockRequest, createMockResponse } from '../test-utils'
 import { getExpressRouter, nextRouteIf } from './routers'
 
 describe('Router Helpers', () => {
@@ -127,4 +127,4 @@ describe('Router Helpers', () => {
       expect(next).not.toHaveBeenCalled()
     })
   })
-}) 
+})

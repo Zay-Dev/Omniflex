@@ -3,7 +3,7 @@ import { Containers } from '@omniflex/core';
 import { BaseError } from '@omniflex/core/types/error';
 import { errorHandler } from './error-handler';
 import { TInfraExpressLocals } from '../internal-types';
-import { TestUtils, errors } from '../jest.setup';
+import { TestUtils, errors } from '../test-utils';
 
 interface IErrorResponse {
   code: number;

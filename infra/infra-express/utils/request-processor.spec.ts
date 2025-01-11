@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { processRequest } from './request-processor';
-import { createMockRequest } from '../jest.setup';
+import { createMockRequest } from '../test-utils';
 
 describe('Request Processor', () => {
   describe('processRequest', () => {

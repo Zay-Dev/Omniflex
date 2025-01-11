@@ -1,5 +1,5 @@
 import { BaseExpressController } from './base-controller'
-import { createMockRequest, createMockResponse } from '../jest.setup'
+import { createMockRequest, createMockResponse } from '../test-utils'
 import { NextFunction } from 'express'
 import { TInfraExpressLocals } from '../internal-types'
 

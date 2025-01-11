@@ -1,7 +1,7 @@
 import { Model, DataTypes, Sequelize, ModelStatic, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize'
 import { BaseEntitiesController } from './base-entities-controller'
 import { SQLiteRepository } from '@omniflex/infra-sqlite'
-import { createMockRequest, createMockResponse } from '../jest.setup'
+import { createMockRequest, createMockResponse } from '../test-utils'
 import { NextFunction } from 'express'
 
 interface TestEntity {

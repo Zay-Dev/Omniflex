@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { createMockRequest, createMockResponse, createMockNext, createMockRepository, errors } from '../jest.setup';
+import { createMockRequest, createMockResponse, createMockNext, createMockRepository, errors } from '../test-utils';
 import * as middleware from './required-db-entries';
 import { BaseError } from '@omniflex/core/types/error';
 

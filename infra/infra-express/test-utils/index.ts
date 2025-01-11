@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { TInfraExpressLocals } from './internal-types';
+import { TInfraExpressLocals } from '../internal-types';
 import { BaseError, TErrorOptions } from '@omniflex/core/types/error';
 
 // Error classes for testing

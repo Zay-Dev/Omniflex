@@ -1,6 +1,6 @@
 import Joi from 'joi'
 import { errors } from '@omniflex/core'
-import { createMockRequest } from '../jest.setup'
+import { createMockRequest } from '../test-utils'
 import { validateRequestBody, validateRequestParams } from './joi'
 import { BaseError } from '@omniflex/core/types/error'
 
