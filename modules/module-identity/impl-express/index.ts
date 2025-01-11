@@ -1,2 +1,2 @@
-export * from './users.controller';
-export * from './register.validation';
+export * as Controllers from './controllers';
+export * as Validation from './validation';
