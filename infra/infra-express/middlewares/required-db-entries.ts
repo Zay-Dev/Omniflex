@@ -66,8 +66,12 @@ export const byId = <T extends {}, TPrimaryKey>(
   return (async (req: Request, res: Response, next: NextFunction) => {
     const id = await getId(req, res, next);
 
-    if (!repository.isValidPrimaryKey(id)) {
-      return next(errors.badRequest('Invalid ID'));
+    try {
+      if (!repository.isValidPrimaryKey(id)) {
+        return next(errors.badRequest('Invalid ID'));
+      }
+    } catch (error) {
+      return next(errors.badRequest('Invalid ID', { data: error }));
     }
 
     const countOnly = countOnlyOrKeyName === true;
