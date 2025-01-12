@@ -137,3 +137,44 @@ const results = await repository.find({
    - Consider database-specific operator interfaces
    - Implement operator validation per dialect
    - Add migration utilities for pattern matching 
+
+## Paranoid Mode Best Practices
+
+1. Using Paranoid Mode
+   - Let Sequelize handle soft delete behavior
+   - Don't explicitly query `deletedAt` field
+   - Use `paranoid: false` option to include soft-deleted records
+   - Default behavior (`paranoid: true`) automatically excludes soft-deleted records
+
+2. Recommended Patterns
+   ```typescript
+   // ✅ Recommended: Let paranoid mode handle soft deletes
+   const activeRecords = await repository.find({});
+   const allRecords = await repository.find({}, { paranoid: false });
+   ```
+
+3. Supported but Not Recommended
+   ```typescript
+   // ⚠️ Supported but not recommended:
+   // Explicit deletedAt queries work but may interfere with paranoid mode
+   const records = await repository.find({ 
+     deletedAt: { $eq: null }  // Works but not recommended
+   });
+   ```
+
+4. Why Avoid Explicit Queries?
+   - May interfere with Sequelize's paranoid mode behavior
+   - Makes code more complex than necessary
+   - Harder to maintain consistency
+   - May cause unexpected behavior with transactions
+
+5. Soft Delete Operations
+   - Use `softDelete()` methods for soft deletes
+   - Use `delete()` methods for hard deletes
+   - Use `restore()` methods to undelete soft-deleted records
+
+6. Testing Considerations
+   - Test default behavior (should exclude soft-deleted records)
+   - Test with `paranoid: false` (should include soft-deleted records)
+   - Test explicit queries if your codebase uses them
+   - Document any explicit deletedAt queries as non-recommended 
