@@ -53,4 +53,87 @@ To query for records including their deletion status:
 const allRecords = await repository.find({}, { 
   paranoid: false 
 })
-``` 
+```
+
+## Pattern Matching Across Databases
+
+### Issue: Inconsistent Pattern Matching Support
+
+Different databases have varying levels of support for pattern matching operations:
+
+1. **SQLite**
+   - Primary pattern matching through LIKE with % wildcards
+   - Case-sensitive by default
+   - Limited regex support (requires custom build)
+   - No direct support for REGEXP without extensions
+
+2. **PostgreSQL**
+   - Supports both LIKE and REGEXP/~ operators
+   - Case-insensitive LIKE with ILIKE
+   - Full regex support with ~ operator
+   - Different regex syntax than MySQL
+
+3. **MySQL**
+   - Supports both LIKE and REGEXP operators
+   - Case-insensitive LIKE by default
+   - Built-in regex support
+   - Different regex syntax than PostgreSQL
+
+### Impact on Repository Interface
+
+Our repository interface follows MongoDB-style operators, but database limitations create challenges:
+
+1. **MongoDB-style `$regex`**
+   - Requires RegExp object
+   - Maps to Sequelize's `Op.regexp`
+   - Not supported in SQLite without extensions
+   - Different syntax across PostgreSQL and MySQL
+
+2. **SQL-style `$like`**
+   - Uses % wildcards
+   - Maps to Sequelize's `Op.like`
+   - Universally supported
+   - Not a MongoDB operator
+
+### Best Practices
+
+1. **Pattern Matching in Tests**
+   - Use `$like` for SQLite integration tests
+   - Document that production may use `$regex` if supported
+   - Consider database-specific test suites
+
+2. **Production Considerations**
+   - Check database regex support before using `$regex`
+   - Use `$like` for universal compatibility
+   - Document pattern matching limitations
+
+3. **Interface Design**
+   - Consider separating core and database-specific operators
+   - Document operator support per database
+   - Provide clear migration paths
+
+### Example: Pattern Matching Behavior
+
+```typescript
+// SQLite (Integration Tests)
+const results = await repository.find({
+  field: { $like: 'test-%' }  // Uses % wildcard
+});
+
+// PostgreSQL/MySQL (Production)
+const results = await repository.find({
+  field: { $regex: /^test-/ }  // Uses regex pattern
+});
+```
+
+### Recommendations
+
+1. **Short-term**
+   - Keep both `$regex` and `$like` operators
+   - Document limitations in THINKING.md
+   - Add database-specific tests
+
+2. **Long-term**
+   - Consider database-specific operator interfaces
+   - Implement operator validation per dialect
+   - Add migration utilities for pattern matching 
