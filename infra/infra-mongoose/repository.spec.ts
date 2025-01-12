@@ -369,54 +369,163 @@ describe('MongooseBaseRepository', () => {
   });
 
   describe('deleteOne', () => {
-    it('[REPO-D0020] should hard delete one record', async () => {
+    it('[REPO-D1040] should delete with simple filter', async () => {
       const mockId = createObjectId();
-      await TestModel.create({ _id: mockId, name: 'test', isActive: false });
+      await TestModel.create({ _id: mockId, name: 'test', isActive: true });
+      await TestModel.create({ name: 'test2', isActive: true });
 
-      const result = await repository.deleteOne({ isActive: false });
+      const result = await repository.deleteOne({ name: 'test' });
 
       expect(result).toBe(true);
       const record = await repository.findById(mockId);
       expect(record).toBeNull();
+      
+      // Verify other records remain
+      const remaining = await repository.find({ isActive: true });
+      expect(remaining).toHaveLength(1);
+      expect(remaining[0].name).toBe('test2');
+    });
+
+    it('[REPO-D1050] should delete with ObjectId filter', async () => {
+      const refId = createObjectId();
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test1', refId });
+      await TestModel.create({ _id: mockId2, name: 'test2', refId });
+
+      const result = await repository.deleteOne({ refId });
+
+      expect(result).toBe(true);
+      // Verify only one document was deleted
+      const remaining = await repository.find({ refId });
+      expect(remaining).toHaveLength(1);
+    });
+
+    it('[REPO-D1060] should delete with operator filter', async () => {
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test1', isActive: true });
+      await TestModel.create({ _id: mockId2, name: 'test2', isActive: true });
+
+      const result = await repository.deleteOne({
+        name: { $regex: /test\d/ },
+        isActive: { $eq: true }
+      });
+
+      expect(result).toBe(true);
+      // Verify only one document was deleted
+      const remaining = await repository.find({ isActive: true });
+      expect(remaining).toHaveLength(1);
+    });
+
+    it('[REPO-D1070] should handle non-existent document', async () => {
+      const result = await repository.deleteOne({ name: 'non-existent' });
+
+      expect(result).toBe(false);
+    });
+
+    it('[REPO-D1080] should not delete soft-deleted documents', async () => {
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', deletedAt: new Date() });
+
+      const result = await repository.deleteOne({ _id: mockId });
+
+      expect(result).toBe(false);
+      // Verify document still exists
+      const record = await repository.findById(mockId, { paranoid: false });
+      expect(record).toBeTruthy();
     });
   });
 
   describe('delete', () => {
-    it('[REPO-D0030] should hard delete multiple records', async () => {
+    it('[REPO-D2010] should delete multiple documents', async () => {
       const mockId1 = createObjectId();
       const mockId2 = createObjectId();
-      await TestModel.create({ _id: mockId1, name: 'test1', isActive: false });
-      await TestModel.create({ _id: mockId2, name: 'test2', isActive: false });
+      await TestModel.create({ _id: mockId1, name: 'test1', isActive: true });
+      await TestModel.create({ _id: mockId2, name: 'test2', isActive: true });
+      await TestModel.create({ name: 'test3', isActive: false });
 
-      await repository.delete({ isActive: false });
+      const result = await repository.delete({ isActive: true });
 
-      const records = await repository.find({ isActive: false });
-      expect(records).toHaveLength(0);
+      expect(result).toBe(2);
+      const remaining = await repository.find({});
+      expect(remaining).toHaveLength(1);
+      expect(remaining[0].isActive).toBe(false);
     });
 
-    it('[REPO-D0031] should use shared query options when deleting', async () => {
+    it('[REPO-D2020] should delete with ObjectId filter', async () => {
+      const refId = createObjectId();
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test1', refId });
+      await TestModel.create({ _id: mockId2, name: 'test2', refId });
+      await TestModel.create({ name: 'test3' });
+
+      const result = await repository.delete({ refId });
+
+      expect(result).toBe(2);
+      const remaining = await repository.find({});
+      expect(remaining).toHaveLength(1);
+      expect(remaining[0].name).toBe('test3');
+    });
+
+    it('[REPO-D2030] should delete with operator filter', async () => {
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test1', isActive: true });
+      await TestModel.create({ _id: mockId2, name: 'test2', isActive: true });
+      await TestModel.create({ name: 'test3', isActive: false });
+
+      const result = await repository.delete({
+        name: { $regex: /test\d/ },
+        isActive: { $eq: true }
+      });
+
+      expect(result).toBe(2);
+      const remaining = await repository.find({});
+      expect(remaining).toHaveLength(1);
+      expect(remaining[0].isActive).toBe(false);
+    });
+
+    it('[REPO-D2040] should return correct delete count', async () => {
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test1', isActive: true });
+      await TestModel.create({ _id: mockId2, name: 'test2', isActive: true });
+      await TestModel.create({ name: 'test3', isActive: true });
+
+      const result = await repository.delete({ isActive: true });
+
+      expect(result).toBe(3);
+      const remaining = await repository.find({});
+      expect(remaining).toHaveLength(0);
+    });
+
+    it('[REPO-D2050] should handle no matching documents', async () => {
+      await TestModel.create({ name: 'test', isActive: true });
+
+      const result = await repository.delete({ name: 'non-existent' });
+
+      expect(result).toBe(0);
+      const remaining = await repository.find({});
+      expect(remaining).toHaveLength(1);
+    });
+
+    it('[REPO-D2060] should use shared query options', async () => {
       const mockId = createObjectId();
-      await TestModel.create({ _id: mockId, name: 'test', isActive: false });
-      
+      await TestModel.create({ _id: mockId, name: 'test', isActive: true });
+
       const spy = jest.spyOn(TestModel, 'deleteMany');
-      await repository.delete({ isActive: false });
-      
-      expect(spy).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining(repository['sharedQueryOptions'])
-      );
-      spy.mockRestore();
-    });
-
-    it('[REPO-D0032] should physically remove records from database', async () => {
-      const mockId = createObjectId();
-      await TestModel.create({ _id: mockId, name: 'test', isActive: false });
-
       await repository.delete({ _id: mockId });
 
-      // Verify record is not found even with paranoid mode disabled
-      const record = await repository.findById(mockId, { paranoid: false });
-      expect(record).toBeNull();
+      expect(spy).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({
+          translateAliases: true,
+          lean: expect.any(Object)
+        })
+      );
+      spy.mockRestore();
     });
   });
 
@@ -434,7 +543,7 @@ describe('MongooseBaseRepository', () => {
   });
 
   describe('restore', () => {
-    it('[REPO-S0010] should restore record by id', async () => {
+    it('[REPO-R1010] should restore record by id', async () => {
       const mockId = createObjectId();
       await TestModel.create({ _id: mockId, name: 'test', deletedAt: new Date() });
 
@@ -446,7 +555,7 @@ describe('MongooseBaseRepository', () => {
       expect(record!.deletedAt).toBeNull();
     });
 
-    it('[REPO-S0020] should restore multiple records', async () => {
+    it('[REPO-R1020] should restore multiple records', async () => {
       const mockId1 = createObjectId();
       const mockId2 = createObjectId();
       await TestModel.create({ _id: mockId1, name: 'test1', isActive: false, deletedAt: new Date() });
@@ -457,6 +566,100 @@ describe('MongooseBaseRepository', () => {
       const records = await repository.find({ isActive: false });
       expect(records).toHaveLength(2);
       expect(records.every(r => r.deletedAt === null)).toBe(true);
+    });
+
+    it('[REPO-R1030] should restore with ObjectId filter', async () => {
+      const refId = createObjectId();
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test1', refId, deletedAt: new Date() });
+      await TestModel.create({ _id: mockId2, name: 'test2', refId, deletedAt: new Date() });
+      await TestModel.create({ name: 'test3', deletedAt: new Date() });
+
+      const result = await repository.restore({ refId });
+
+      expect(result).toBe(2);
+      // Verify restored documents
+      const restored = await repository.find({ refId });
+      expect(restored).toHaveLength(2);
+      expect(restored.every(r => r.deletedAt === null)).toBe(true);
+      // Verify other documents remain deleted
+      const remaining = await repository.find({}, { paranoid: false });
+      expect(remaining).toHaveLength(3);
+      expect(remaining.filter(r => r.deletedAt !== null)).toHaveLength(1);
+    });
+
+    it('[REPO-R1040] should restore with operator filter', async () => {
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test1', isActive: true, deletedAt: new Date() });
+      await TestModel.create({ _id: mockId2, name: 'test2', isActive: true, deletedAt: new Date() });
+      await TestModel.create({ name: 'test3', isActive: false, deletedAt: new Date() });
+
+      const result = await repository.restore({
+        name: { $regex: /test\d/ },
+        isActive: { $eq: true }
+      });
+
+      expect(result).toBe(2);
+      // Verify restored documents
+      const restored = await repository.find({ isActive: true });
+      expect(restored).toHaveLength(2);
+      expect(restored.every(r => r.deletedAt === null)).toBe(true);
+      // Verify other documents remain deleted
+      const remaining = await repository.find({}, { paranoid: false });
+      expect(remaining).toHaveLength(3);
+      expect(remaining.filter(r => r.deletedAt !== null)).toHaveLength(1);
+    });
+
+    it('[REPO-R1050] should return correct restore count', async () => {
+      const repository = new MongooseBaseRepository<ITestModel>(TestModel);
+      await repository.create({ name: 'test1', isActive: true });
+      await repository.create({ name: 'test2', isActive: true });
+      await repository.create({ name: 'test3', isActive: true });
+      await repository.softDelete({ isActive: true });
+
+      const result = await repository.restore({ isActive: true });
+
+      expect(result).toBe(3);
+      const records = await repository.find({ isActive: true });
+      expect(records).toHaveLength(3);
+      expect(records.every(r => r.deletedAt === null)).toBe(true);
+    });
+
+    it('[REPO-R1060] should update non-deleted documents', async () => {
+      const repository = new MongooseBaseRepository<ITestModel>(TestModel);
+      await repository.create({ name: 'test1', isActive: true });
+      await repository.create({ name: 'test2', isActive: true });
+
+      const result = await repository.restore({ isActive: true });
+
+      expect(result).toBe(2);
+      const records = await repository.find({ isActive: true });
+      expect(records).toHaveLength(2);
+      expect(records.every(r => r.deletedAt === null)).toBe(true);
+    });
+
+    it('[REPO-R1070] should maintain document integrity', async () => {
+      const mockId = createObjectId();
+      const refId = createObjectId();
+      const now = new Date();
+      await TestModel.create({
+        _id: mockId,
+        name: 'test',
+        refId,
+        isActive: true,
+        deletedAt: now
+      });
+
+      await repository.restore({ _id: mockId });
+
+      const record = await repository.findById(mockId);
+      expect(record).toBeTruthy();
+      expect(record!.name).toBe('test');
+      expect(record!.refId!.equals(refId)).toBe(true);
+      expect(record!.isActive).toBe(true);
+      expect(record!.deletedAt).toBeNull();
     });
   });
 
