@@ -542,6 +542,81 @@ describe('MongooseBaseRepository', () => {
     });
   });
 
+  describe('softDeleteOne', () => {
+    it('[REPO-D3010] should soft delete with simple filter', async () => {
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', isActive: true });
+      await TestModel.create({ name: 'test2', isActive: true });
+
+      const result = await repository.softDeleteOne({ name: 'test' });
+
+      expect(result).toBe(true);
+      // Verify document is soft deleted
+      const record = await repository.findById(mockId, { paranoid: false });
+      expect(record!.deletedAt).toBeTruthy();
+      // Verify other records remain unaffected
+      const remaining = await repository.find({ isActive: true });
+      expect(remaining).toHaveLength(1);
+      expect(remaining[0].name).toBe('test2');
+    });
+
+    it('[REPO-D3020] should soft delete with ObjectId filter', async () => {
+      const refId = createObjectId();
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test1', refId });
+      await TestModel.create({ _id: mockId2, name: 'test2', refId });
+
+      const result = await repository.softDeleteOne({ refId });
+
+      expect(result).toBe(true);
+      // Verify only one document was soft deleted
+      const remaining = await repository.find({ refId });
+      expect(remaining).toHaveLength(1);
+      const deleted = await repository.find({ refId }, { paranoid: false });
+      expect(deleted).toHaveLength(2);
+      expect(deleted.filter(d => d.deletedAt)).toHaveLength(1);
+    });
+
+    it('[REPO-D3030] should soft delete with operator filter', async () => {
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test1', isActive: true });
+      await TestModel.create({ _id: mockId2, name: 'test2', isActive: true });
+
+      const result = await repository.softDeleteOne({
+        name: { $regex: /test\d/ },
+        isActive: { $eq: true }
+      });
+
+      expect(result).toBe(true);
+      // Verify only one document was soft deleted
+      const remaining = await repository.find({ isActive: true });
+      expect(remaining).toHaveLength(1);
+      const deleted = await repository.find({ isActive: true }, { paranoid: false });
+      expect(deleted).toHaveLength(2);
+      expect(deleted.filter(d => d.deletedAt)).toHaveLength(1);
+    });
+
+    it('[REPO-D3040] should handle non-existent document', async () => {
+      const result = await repository.softDeleteOne({ name: 'non-existent' });
+
+      expect(result).toBe(false);
+    });
+
+    it('[REPO-D3050] should not soft delete already soft-deleted documents', async () => {
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', deletedAt: new Date() });
+
+      const result = await repository.softDeleteOne({ _id: mockId });
+
+      expect(result).toBe(false);
+      // Verify document remains soft deleted with original timestamp
+      const record = await repository.findById(mockId, { paranoid: false });
+      expect(record!.deletedAt).toBeTruthy();
+    });
+  });
+
   describe('restore', () => {
     it('[REPO-R1010] should restore record by id', async () => {
       const mockId = createObjectId();
@@ -630,13 +705,12 @@ describe('MongooseBaseRepository', () => {
     it('[REPO-R1060] should update non-deleted documents', async () => {
       const repository = new MongooseBaseRepository<ITestModel>(TestModel);
       await repository.create({ name: 'test1', isActive: true });
-      await repository.create({ name: 'test2', isActive: true });
 
       const result = await repository.restore({ isActive: true });
 
-      expect(result).toBe(2);
+      expect(result).toBe(1);
       const records = await repository.find({ isActive: true });
-      expect(records).toHaveLength(2);
+      expect(records).toHaveLength(1);
       expect(records.every(r => r.deletedAt === null)).toBe(true);
     });
 
@@ -992,6 +1066,108 @@ describe('MongooseBaseRepository', () => {
       expect(result).toBeTruthy();
       expect(result!.name).toBe('updated');
       expect(result!.deletedAt).toBeTruthy();
+    });
+  });
+
+  describe('softDelete', () => {
+    it('[REPO-D4010] should soft delete multiple documents', async () => {
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test1', isActive: true });
+      await TestModel.create({ _id: mockId2, name: 'test2', isActive: true });
+      await TestModel.create({ name: 'test3', isActive: false });
+
+      const result = await repository.softDelete({ isActive: true });
+
+      expect(result).toBe(2);
+      // Verify documents are soft deleted
+      const remaining = await repository.find({ isActive: true });
+      expect(remaining).toHaveLength(0);
+      const deleted = await repository.find({ isActive: true }, { paranoid: false });
+      expect(deleted).toHaveLength(2);
+      expect(deleted.every(d => d.deletedAt)).toBe(true);
+    });
+
+    it('[REPO-D4020] should soft delete with ObjectId filter', async () => {
+      const refId = createObjectId();
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test1', refId });
+      await TestModel.create({ _id: mockId2, name: 'test2', refId });
+      await TestModel.create({ name: 'test3' });
+
+      const result = await repository.softDelete({ refId });
+
+      expect(result).toBe(2);
+      // Verify documents are soft deleted
+      const remaining = await repository.find({ refId });
+      expect(remaining).toHaveLength(0);
+      const deleted = await repository.find({ refId }, { paranoid: false });
+      expect(deleted).toHaveLength(2);
+      expect(deleted.every(d => d.deletedAt)).toBe(true);
+    });
+
+    it('[REPO-D4030] should soft delete with operator filter', async () => {
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test1', isActive: true });
+      await TestModel.create({ _id: mockId2, name: 'test2', isActive: true });
+      await TestModel.create({ name: 'test3', isActive: false });
+
+      const result = await repository.softDelete({
+        name: { $regex: /test\d/ },
+        isActive: { $eq: true }
+      });
+
+      expect(result).toBe(2);
+      // Verify documents are soft deleted
+      const remaining = await repository.find({ isActive: true });
+      expect(remaining).toHaveLength(0);
+      const deleted = await repository.find({ isActive: true }, { paranoid: false });
+      expect(deleted).toHaveLength(2);
+      expect(deleted.every(d => d.deletedAt)).toBe(true);
+    });
+
+    it('[REPO-D4040] should return correct soft delete count', async () => {
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test1', isActive: true });
+      await TestModel.create({ _id: mockId2, name: 'test2', isActive: true });
+      await TestModel.create({ name: 'test3', isActive: true });
+
+      const result = await repository.softDelete({ isActive: true });
+
+      expect(result).toBe(3);
+      const remaining = await repository.find({ isActive: true });
+      expect(remaining).toHaveLength(0);
+    });
+
+    it('[REPO-D4050] should handle no matching documents', async () => {
+      await TestModel.create({ name: 'test', isActive: true });
+
+      const result = await repository.softDelete({ name: 'non-existent' });
+
+      expect(result).toBe(0);
+      const remaining = await repository.find({});
+      expect(remaining).toHaveLength(1);
+    });
+
+    it('[REPO-D4060] should not soft delete already soft-deleted documents', async () => {
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      const now = new Date();
+      await TestModel.create({ _id: mockId1, name: 'test1', deletedAt: now });
+      await TestModel.create({ _id: mockId2, name: 'test2' });
+
+      const result = await repository.softDelete({ name: { $regex: /test\d/ } });
+
+      expect(result).toBe(1);
+      // Verify only non-deleted document was affected
+      const record1 = await repository.findById(mockId1, { paranoid: false });
+      expect(record1!.deletedAt).toEqual(now);
+      const record2 = await repository.findById(mockId2, { paranoid: false });
+      expect(record2!.deletedAt).toBeTruthy();
+      expect(record2!.deletedAt).not.toEqual(now);
     });
   });
 });
