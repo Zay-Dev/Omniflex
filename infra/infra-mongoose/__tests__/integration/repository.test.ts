@@ -1,8 +1,8 @@
 import { Schema, Types, UpdateQuery } from 'mongoose';
 import { TQueryOperators } from '@omniflex/core/types/repository';
 
-import { MongooseBaseRepository } from './repository';
-import { startMemoryServer, stopMemoryServer, clearDatabase, createModel, createObjectId } from './test-utils/mongoose.memory';
+import { MongooseBaseRepository } from '../../repository';
+import { startMemoryServer, stopMemoryServer, clearDatabase, createModel, createObjectId } from '../../test-utils/mongoose.memory';
 
 interface ITestModel {
   _id: Types.ObjectId;
