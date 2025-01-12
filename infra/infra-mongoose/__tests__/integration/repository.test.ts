@@ -1170,4 +1170,43 @@ describe('MongooseBaseRepository', () => {
       expect(record2!.deletedAt).not.toEqual(now);
     });
   });
+
+  describe('pattern matching operators', () => {
+    it('[REPO-T2010] should throw error when using $like operator', async () => {
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test-1' });
+
+      await expect(async () => {
+        await repository.find({
+          name: { $like: 'test-%' }
+        });
+      }).rejects.toThrow('Operator $like is not supported in MongoDB. Use $regex instead.');
+    });
+
+    it('[REPO-T2020] should verify error message guides to use $regex', async () => {
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test-1' });
+
+      await expect(async () => {
+        await repository.find({
+          name: { $like: 'test-%' }
+        });
+      }).rejects.toThrow(/\$regex/);
+    });
+
+    it('[REPO-T2030] should continue to support $regex operator', async () => {
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test-1' });
+      await TestModel.create({ _id: mockId2, name: 'test-2' });
+      await TestModel.create({ _id: createObjectId(), name: 'other-3' });
+
+      const results = await repository.find({
+        name: { $regex: /^test-/ }
+      });
+
+      expect(results).toHaveLength(2);
+      expect(results.map(r => r.name).sort()).toEqual(['test-1', 'test-2']);
+    });
+  });
 });
