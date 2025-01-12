@@ -1,4 +1,5 @@
-import { Schema, Types } from 'mongoose';
+import { Schema, Types, UpdateQuery } from 'mongoose';
+import { TQueryOperators } from '@omniflex/core/types/repository';
 
 import { MongooseBaseRepository } from './repository';
 import { startMemoryServer, stopMemoryServer, clearDatabase, createModel, createObjectId } from './test-utils/mongoose.memory';
@@ -294,10 +295,57 @@ describe('MongooseBaseRepository', () => {
       expect(records).toHaveLength(2);
       expect(records.every(r => r.name === 'test1' || r.name === 'test2')).toBe(true);
     });
+
+    it('[REPO-U0040] should handle operator-based updates', async () => {
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', isActive: true });
+
+      const update: UpdateQuery<ITestModel> = {
+        $set: { name: 'updated' },
+        isActive: false
+      };
+
+      const result = await repository.update({ _id: mockId }, update);
+
+      expect(result).toBe(1);
+      const record = await repository.findById(mockId);
+      expect(record!.name).toBe('updated');
+      expect(record!.isActive).toBe(false);
+    });
+
+    it('[REPO-U0041] should handle complex operator updates', async () => {
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test1', isActive: true });
+      await TestModel.create({ _id: mockId2, name: 'test2', isActive: true });
+
+      const update: UpdateQuery<ITestModel> = {
+        $set: { name: 'updated' },
+        $unset: { isActive: '' }
+      };
+
+      const result = await repository.update({ isActive: true }, update);
+
+      expect(result).toBe(2);
+      const records = await repository.find({});
+      expect(records).toHaveLength(2);
+      expect(records.every(r => r.name === 'updated')).toBe(true);
+      expect(records.every(r => r.isActive === undefined)).toBe(true);
+    });
+
+    it('[REPO-U0042] should return 0 when no records match filter', async () => {
+      const update: UpdateQuery<ITestModel> = {
+        $set: { isActive: false }
+      };
+
+      const result = await repository.update({ name: 'non-existent' }, update);
+
+      expect(result).toBe(0);
+    });
   });
 
   describe('deleteById', () => {
-    it('[REPO-D0010] should hard delete record by id', async () => {
+    it('[REPO-D1010] should delete existing document', async () => {
       const mockId = createObjectId();
       await TestModel.create({ _id: mockId, name: 'test' });
 
@@ -306,6 +354,17 @@ describe('MongooseBaseRepository', () => {
       expect(result).toBe(true);
       const record = await repository.findById(mockId);
       expect(record).toBeNull();
+    });
+
+    it('[REPO-D1020] should return false for non-existent document', async () => {
+      const mockId = createObjectId();
+      const result = await repository.deleteById(mockId);
+
+      expect(result).toBe(false);
+    });
+
+    it('[REPO-D1030] should handle invalid id format', async () => {
+      await expect(repository.deleteById('invalid-id' as any)).rejects.toBeTruthy();
     });
   });
 
@@ -488,6 +547,248 @@ describe('MongooseBaseRepository', () => {
         $eq: 'value',
         normalField: 'test'
       });
+    });
+  });
+
+  describe('count', () => {
+    it('[REPO-C0020] should count records with filter', async () => {
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test1', isActive: true });
+      await TestModel.create({ name: 'test2', isActive: true });
+      await TestModel.create({ name: 'test3', isActive: false });
+
+      const result = await repository.count({ isActive: true });
+
+      expect(result).toBe(2);
+    });
+
+    it('[REPO-C0030] should count records with ObjectId in filter', async () => {
+      const refId = createObjectId();
+      await TestModel.create({ name: 'test1', refId });
+      await TestModel.create({ name: 'test2', refId });
+      await TestModel.create({ name: 'test3' });
+
+      const result = await repository.count({ refId });
+
+      expect(result).toBe(2);
+    });
+
+    it('[REPO-C0040] should count records with operator filters', async () => {
+      const refId = createObjectId();
+      await TestModel.create({ name: 'test1', refId, isActive: true });
+      await TestModel.create({ name: 'test2', refId, isActive: false });
+
+      const result = await repository.count({
+        refId,
+        isActive: { $eq: true }
+      });
+
+      expect(result).toBe(1);
+    });
+
+    it('[REPO-C0050] should not count soft deleted records by default', async () => {
+      await TestModel.create({ name: 'test1', isActive: true });
+      await TestModel.create({ name: 'test2', isActive: true, deletedAt: new Date() });
+
+      const result = await repository.count({ isActive: true });
+
+      expect(result).toBe(1);
+    });
+
+    it('[REPO-C0060] should count soft deleted records with paranoid false', async () => {
+      await TestModel.create({ name: 'test1', isActive: true });
+      await TestModel.create({ name: 'test2', isActive: true, deletedAt: new Date() });
+
+      const result = await repository.count({ isActive: true }, { paranoid: false });
+
+      expect(result).toBe(2);
+    });
+  });
+
+  describe('updateOne', () => {
+    it('[REPO-U1010] should update single document', async () => {
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', isActive: true });
+
+      const result = await repository.updateOne(
+        { _id: mockId },
+        { name: 'updated' }
+      );
+
+      expect(result).toBeTruthy();
+      expect(result!._id.equals(mockId)).toBe(true);
+      expect(result!.name).toBe('updated');
+      expect(result!.isActive).toBe(true);
+    });
+
+    it('[REPO-U1020] should update first match only', async () => {
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test1', isActive: true });
+      await TestModel.create({ _id: mockId2, name: 'test2', isActive: true });
+
+      const result = await repository.updateOne(
+        { isActive: true },
+        { name: 'updated' }
+      );
+
+      expect(result).toBeTruthy();
+      const records = await repository.find({ isActive: true });
+      expect(records).toHaveLength(2);
+      expect(records.some(r => r.name === 'updated')).toBe(true);
+      expect(records.some(r => r.name === 'test2')).toBe(true);
+    });
+
+    it('[REPO-U1030] should return updated document', async () => {
+      const mockId = createObjectId();
+      const refId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', refId });
+
+      const result = await repository.updateOne(
+        { _id: mockId },
+        { name: 'updated', isActive: true }
+      );
+
+      expect(result).toBeTruthy();
+      expect(result!._id.equals(mockId)).toBe(true);
+      expect(result!.name).toBe('updated');
+      expect(result!.isActive).toBe(true);
+      expect(result!.refId!.equals(refId)).toBe(true);
+    });
+
+    it('[REPO-U1040] should update with simple field filters', async () => {
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', isActive: true });
+
+      const result = await repository.updateOne(
+        { name: 'test' },
+        { name: 'updated' }
+      );
+
+      expect(result).toBeTruthy();
+      expect(result!.name).toBe('updated');
+    });
+
+    it('[REPO-U1050] should update with ObjectId filters', async () => {
+      const mockId = createObjectId();
+      const refId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', refId });
+
+      const result = await repository.updateOne(
+        { refId },
+        { name: 'updated' }
+      );
+
+      expect(result).toBeTruthy();
+      expect(result!.name).toBe('updated');
+      expect(result!.refId!.equals(refId)).toBe(true);
+    });
+
+    it('[REPO-U1060] should update with operator filters', async () => {
+      const mockId1 = createObjectId();
+      const mockId2 = createObjectId();
+      const refId = createObjectId();
+      await TestModel.create({ _id: mockId1, name: 'test1', refId, isActive: true });
+      await TestModel.create({ _id: mockId2, name: 'test2', refId, isActive: false });
+
+      const result = await repository.updateOne(
+        { refId, isActive: { $eq: true } },
+        { name: 'updated' }
+      );
+
+      expect(result).toBeTruthy();
+      expect(result!.name).toBe('updated');
+      expect(result!.isActive).toBe(true);
+      
+      // Verify only one document was updated
+      const records = await repository.find({ refId });
+      expect(records).toHaveLength(2);
+      expect(records.filter(r => r.name === 'updated')).toHaveLength(1);
+    });
+
+    it('[REPO-U1070] should handle plain field updates', async () => {
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', isActive: true });
+
+      const result = await repository.updateOne(
+        { _id: mockId },
+        { name: 'updated', isActive: false }
+      );
+
+      expect(result).toBeTruthy();
+      expect(result!.name).toBe('updated');
+      expect(result!.isActive).toBe(false);
+    });
+
+    it('[REPO-U1080] should handle $set operator', async () => {
+      const mockId = createObjectId();
+      const refId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', refId });
+
+      const update: UpdateQuery<ITestModel> = {
+        $set: { name: 'updated', isActive: true }
+      };
+
+      const result = await repository.updateOne({ _id: mockId }, update);
+
+      expect(result).toBeTruthy();
+      expect(result!.name).toBe('updated');
+      expect(result!.isActive).toBe(true);
+      expect(result!.refId!.equals(refId)).toBe(true);
+    });
+
+    it('[REPO-U1090] should handle $unset operator', async () => {
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', isActive: true });
+
+      const update: UpdateQuery<ITestModel> = {
+        $unset: { isActive: '' }
+      };
+
+      const result = await repository.updateOne({ _id: mockId }, update);
+
+      expect(result).toBeTruthy();
+      expect(result!.name).toBe('test');
+      expect(result!.isActive).toBeUndefined();
+    });
+
+    it('[REPO-U1100] should return null for non-existent documents', async () => {
+      const mockId = createObjectId();
+      const result = await repository.updateOne(
+        { _id: mockId },
+        { name: 'updated' }
+      );
+
+      expect(result).toBeNull();
+    });
+
+    it('[REPO-U1110] should not update soft-deleted documents by default', async () => {
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', deletedAt: new Date() });
+
+      const result = await repository.updateOne(
+        { _id: mockId },
+        { name: 'updated' }
+      );
+
+      expect(result).toBeNull();
+      const record = await repository.findById(mockId, { paranoid: false });
+      expect(record!.name).toBe('test');
+    });
+
+    it('[REPO-U1120] should update soft-deleted documents with paranoid false', async () => {
+      const mockId = createObjectId();
+      await TestModel.create({ _id: mockId, name: 'test', deletedAt: new Date() });
+
+      const result = await repository.updateOne(
+        { _id: mockId },
+        { name: 'updated' },
+        { paranoid: false }
+      );
+
+      expect(result).toBeTruthy();
+      expect(result!.name).toBe('updated');
+      expect(result!.deletedAt).toBeTruthy();
     });
   });
 });
