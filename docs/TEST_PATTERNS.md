@@ -23,6 +23,42 @@ This ensures a good balance between test coverage, execution speed, and maintena
 - Written by: Developers
 - Example: Testing individual repository methods
 
+### Testing Modules with Global State
+
+When testing modules that maintain global state (like singleton containers or global configuration), use Jest's isolateModules to ensure test isolation:
+
+```typescript
+describe('ModuleWithGlobalState', () => {
+  let moduleUnderTest: typeof import('./module');
+
+  beforeEach(() => {
+    // Each test gets its own module instance with fresh global state
+    jest.isolateModules(() => {
+      moduleUnderTest = require('./module');
+    });
+  });
+
+  it('[TYPE-0010] should do something', () => {
+    // Test has its own isolated module instance
+    moduleUnderTest.doSomething();
+  });
+});
+```
+
+Benefits:
+1. True isolation between tests
+2. No production code changes needed
+3. Fresh global state for each test
+4. Prevents test interference
+5. Maintains singleton pattern in production
+
+Use this pattern when testing:
+- Dependency injection containers
+- Global configuration
+- Connection pools
+- Cached services
+- Any module with global state
+
 ### 2. Integration Tests (__tests__/*.test.ts) 
 - Located in `__tests__/integration` directory
 - Tests component interactions and technical integration

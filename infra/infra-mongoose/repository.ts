@@ -259,6 +259,7 @@ export class MongooseBaseRepository<T, TPrimaryKey = string>
           case '$in': transformed['$in'] = value; break;
           case '$nin': transformed['$nin'] = value; break;
           case '$regex': transformed['$regex'] = value; break;
+          case '$like': throw new Error('Operator $like is not supported in MongoDB. Use $regex instead.'); break;
           default: transformed[key] = value; break;
         }
       } else {

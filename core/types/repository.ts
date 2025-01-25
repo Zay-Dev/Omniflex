@@ -17,6 +17,7 @@ export type TQueryOperators<T> = {
   $in?: T[];
   $nin?: T[];
   $regex?: RegExp;
+  $like?: string;
 };
 
 export type TQueryCondition<T> = T | TQueryOperators<T>;

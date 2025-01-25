@@ -46,21 +46,7 @@ describe('SequelizeRepository', () => {
       await repository.delete({})
     })
 
-    it('[REPO-Q0010] should not return records when explicitly querying deletedAt: null', async () => {
-      // Arrange
-      const testRecord = await repository.create({ name: 'test' })
-      expect(testRecord).toBeDefined()
-
-      // Act
-      const result = await repository.find({
-        deletedAt: null
-      } as any)
-
-      // Assert
-      expect(result).toHaveLength(0)
-    })
-
-    it('[REPO-Q0020] should return records when not explicitly querying deletedAt', async () => {
+    it('[REPO-Q0020] should return non-deleted records by default', async () => {
       // Arrange
       const testRecord = await repository.create({ name: 'test' })
       expect(testRecord).toBeDefined()
@@ -73,21 +59,17 @@ describe('SequelizeRepository', () => {
       expect(result[0].name).toBe('test')
     })
 
-    it('[REPO-Q0030] should not return soft-deleted records with either query method', async () => {
+    it('[REPO-Q0030] should not return soft-deleted records by default', async () => {
       // Arrange
       const testRecord = await repository.create({ name: 'test' })
       expect(testRecord).toBeDefined()
       await repository.softDelete({ id: testRecord.id })
 
       // Act
-      const resultWithNull = await repository.find({
-        deletedAt: null
-      } as any)
-      const resultWithoutNull = await repository.find({})
+      const result = await repository.find({})
 
       // Assert
-      expect(resultWithNull).toHaveLength(0)
-      expect(resultWithoutNull).toHaveLength(0)
+      expect(result).toHaveLength(0)
     })
 
     it('[REPO-Q0040] should return soft-deleted records when paranoid is false', async () => {
@@ -98,6 +80,22 @@ describe('SequelizeRepository', () => {
 
       // Act
       const result = await repository.find({}, { paranoid: false })
+
+      // Assert
+      expect(result).toHaveLength(1)
+      expect(result[0].name).toBe('test')
+    })
+
+    it('[REPO-Q0050] supports explicit deletedAt queries (not recommended)', async () => {
+      // Arrange
+      const testRecord = await repository.create({ name: 'test' })
+      expect(testRecord).toBeDefined()
+
+      // Act - Note: This pattern works but is not recommended
+      // Use default paranoid behavior instead
+      const result = await repository.find({
+        deletedAt: { $eq: null }
+      } as any)
 
       // Assert
       expect(result).toHaveLength(1)

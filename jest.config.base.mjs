@@ -2,7 +2,7 @@ export default {
   transform: {},
   preset: 'ts-jest',
   testEnvironment: 'node',
-  setupFilesAfterEnv: ['<rootDir>/../jest.setup.ts'],
+  coverageReporters: ['text', 'text-summary'],
 
   testMatch: [
     // Unit tests co-located with source files

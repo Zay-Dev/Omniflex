@@ -108,7 +108,7 @@ export class SequelizeRepository<
     });
     if (count === 0) return null;
 
-    return this.findOne(filter);
+    return this.findOne(filter, { paranoid: options?.paranoid });
   }
 
   async update(filter: TQueryFilter<T>, data: Partial<T>, options?: Pick<TQueryOptions<T>, 'paranoid'>): Promise<number> {
@@ -206,7 +206,19 @@ export class SequelizeRepository<
   }
 
   protected transformOperators(operators: TQueryOperators<any>) {
-    if (!operators) return {};
+    if (operators === null || typeof operators !== 'object') {
+      throw new Error('Invalid operator format: operators must be an object');
+    }
+
+    // Handle direct values
+    if (Array.isArray(operators)) {
+      return { [Op.eq]: operators };
+    }
+
+    // Handle plain objects with operators
+    if (operators.constructor !== Object) {
+      return operators;
+    }
 
     const transformed = {};
     for (const [key, value] of Object.entries(operators)) {
@@ -222,6 +234,14 @@ export class SequelizeRepository<
         case '$in': transformed[Op.in] = value; break;
         case '$nin': transformed[Op.notIn] = value; break;
         case '$regex': transformed[Op.regexp] = value; break;
+        case '$like': 
+          if (typeof value !== 'string') {
+            throw new Error('Invalid $like pattern: pattern must be a string');
+          }
+          transformed[Op.like] = value;
+          break;
+        default:
+          throw new Error(`Unsupported operator: ${key}`);
       }
     }
     return transformed;
