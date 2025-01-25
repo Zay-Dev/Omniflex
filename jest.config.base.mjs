@@ -4,8 +4,6 @@ export default {
   testEnvironment: 'node',
   coverageReporters: ['text', 'text-summary'],
 
-  setupFilesAfterEnv: ['<rootDir>/../jest.setup.ts'],
-
   testMatch: [
     // Unit tests co-located with source files
     '**/*.spec.ts',

@@ -10,15 +10,19 @@ describe('Server Integration Tests', () => {
   let errorSpy: jest.SpyInstance
   
   beforeEach(async () => {
+    // Ensure clean state
+    await cleanupServers()
+    
     // Each test gets its own module instance with fresh global state
     jest.isolateModules(() => {
+      // Setup error spy first inside the isolated module
+      const { logger } = require('@omniflex/core')
+      errorSpy = jest.spyOn(logger, 'error')
+      errorSpy.mockClear()
+      
       const module = require('../../auto-server')
       AutoServer = module.AutoServer
     })
-    // Ensure clean state
-    await cleanupServers()
-    // Setup error spy
-    errorSpy = jest.spyOn(logger, 'error')
   })
 
   afterEach(async () => {
