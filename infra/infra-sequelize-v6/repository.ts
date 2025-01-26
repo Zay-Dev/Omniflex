@@ -206,12 +206,8 @@ export class SequelizeRepository<
   }
 
   protected transformOperators(operators: TQueryOperators<any>) {
-    if (operators === null || typeof operators !== 'object') {
-      throw new Error('Invalid operator format: operators must be an object');
-    }
-
-    // Handle direct values
-    if (Array.isArray(operators)) {
+    // Handle direct values or null
+    if (operators === null || typeof operators !== 'object' || Array.isArray(operators)) {
       return { [Op.eq]: operators };
     }
 
