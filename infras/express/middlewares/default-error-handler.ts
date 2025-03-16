@@ -13,6 +13,8 @@ export const getDefaultErrorHandler = (hideStack?: true) => {
     const status = parseStatusCode(error);
     const code = error instanceof errors.ServerError ? error.code : status;
 
+    res._error = error;
+
     res.status(status).json({
       code,
       status,

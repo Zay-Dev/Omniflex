@@ -4,4 +4,8 @@ process.on('uncaughtException', error => {
     `Uncaught Exception (${error?.message || 'N/a'}):`,
     error,
   );
+
+  try {
+    logger.error('Uncaught Exception', { error });
+  } catch { }
 });

@@ -17,6 +17,7 @@ type TFrontingOptions = {
 
   noExpressJson?: true;
   noResponseTime?: true;
+  morganFormat?: TOrFalse<string>;
 
   cors?: TOrFalse<cors.CorsOptions>;
   helmet?: TOrFalse<HelmetOptions>;
@@ -104,6 +105,9 @@ const defaultFrontingMiddlewares = (
     app.use(responseTime());
   options.noExpressJson !== true &&
     app.use(express.json());
+
+  options.morganFormat !== false &&
+    app.use(Middlewares.getMorganLogger(options.morganFormat || undefined));
 
   options.helmet !== false &&
     app.use(helmet(options.helmet || undefined));
