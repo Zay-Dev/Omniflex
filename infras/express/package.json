@@ -28,6 +28,7 @@
     "@omni-infra/types": "workspace:^",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "@types/express-serve-static-core": "^5.0.6",
     "@types/response-time": "^2.3.8"
   }
 }

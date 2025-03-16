@@ -3,6 +3,7 @@ import './uncaught-error-handler';
 import express from 'express';
 import type * as Types from './types';
 import * as Middlewares from './middlewares';
+import { bindUncaughtRouterErrorHandler } from './utils/router-error-handler';
 
 import cors from 'cors';
 import { v4 as uuid } from 'uuid';
@@ -31,6 +32,7 @@ type TFallbackOptions = {
 type TOptions = TFrontingOptions & TFallbackOptions & {
   app?: express.Express;
   routers: express.Router[];
+  uncaughtRouterErrorHandler?: TOrFalse<{ requestTimeoutInSeconds: number; }>;
 
   frontingMiddlewares?: Types.TMiddleware[];
   fallbackMiddlewares?: Types.TMiddleware[];
@@ -39,14 +41,24 @@ type TOptions = TFrontingOptions & TFallbackOptions & {
 export const preStart = ({
   app = express(),
   routers,
+  uncaughtRouterErrorHandler = false,
 
   frontingMiddlewares,
   fallbackMiddlewares,
+
   ...options
 }: TOptions) => {
   defaultFrontingMiddlewares(app, options, frontingMiddlewares || []);
 
-  routers.forEach(router => app.use(router));
+  routers.forEach(router => {
+    app.use(router);
+
+    uncaughtRouterErrorHandler !== false &&
+      bindUncaughtRouterErrorHandler(
+        router,
+        uncaughtRouterErrorHandler.requestTimeoutInSeconds,
+      );
+  });
 
   defaultFallbackMiddlewares(app, options, fallbackMiddlewares || []);
 
@@ -59,10 +71,6 @@ const defaultFallbackMiddlewares = (
   middlewares: Types.TMiddleware[],
 ) => {
   middlewares.forEach(middleware => app.use(middleware));
-
-  //(server.options?.middlewares?.after || [])
-  //  .concat(middleware.after || [])
-  //  .forEach(middleware => app.use(middleware));
 
   options.noDefault404 !== true &&
     app.use(Middlewares.createHandler(
