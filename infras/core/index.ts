@@ -1,0 +1,1 @@
+globalThis.logger = undefined!;

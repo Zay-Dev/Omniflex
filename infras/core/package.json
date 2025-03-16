@@ -1,0 +1,19 @@
+{
+  "name": "@omni-infra/core",
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@10.5.2",
+  "license": "SEE LICENSE IN LICENSE",
+  "exports": {
+    "./logger": {
+      "development": "./logger.ts",
+      "import": "./dist/logger.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc && tsc-alias"
+  },
+  "devDependencies": {
+    "@omni-infra/types": "workspace:^"
+  }
+}
