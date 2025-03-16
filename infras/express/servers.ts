@@ -22,6 +22,10 @@ type TFrontingOptions = {
 };
 
 type TFallbackOptions = {
+  hideErrorStack?: true;
+
+  noDefault404?: true;
+  noDefaultErrorHandler?: true;
 };
 
 type TOptions = TFrontingOptions & TFallbackOptions & {
@@ -60,8 +64,13 @@ const defaultFallbackMiddlewares = (
   //  .concat(middleware.after || [])
   //  .forEach(middleware => app.use(middleware));
 
-  //app.use((_, __, next) => next(errors.notFound()));
-  //app.use(errorHandler);
+  options.noDefault404 !== true &&
+    app.use(Middlewares.createHandler(
+      (_, __, next) => next(errors.notFound())
+    ));
+
+  options.noDefaultErrorHandler !== true &&
+    app.use(Middlewares.getDefaultErrorHandler(options.hideErrorStack));
 };
 
 const defaultFrontingMiddlewares = (
@@ -73,12 +82,12 @@ const defaultFrontingMiddlewares = (
     Object.assign(res.locals, {
       _required: {},
       getRequired: (key: string) => res.locals._required[key],
-    });
+    }) as Types.TOmniResponse;
 
     Object.assign(req, {
       _requestId: uuid(),
       _serverType: options.serverType,
-    });
+    } as Types.TOmniRequest);
 
     next();
   }));

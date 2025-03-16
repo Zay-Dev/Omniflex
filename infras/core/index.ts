@@ -1,1 +1,2 @@
-globalThis.logger = undefined!;
+import './errors';
+import './logger';
