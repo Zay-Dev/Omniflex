@@ -1,0 +1,28 @@
+{
+  "name": "@omni-infra/express",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "packageManager": "pnpm@10.5.2",
+  "license": "SEE LICENSE IN LICENSE",
+  "exports": {
+    "./*": {
+      "development": "./*.ts",
+      "import": "./dist/*.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc && tsc-alias"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "response-time": "^2.3.3"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/response-time": "^2.3.8"
+  }
+}
