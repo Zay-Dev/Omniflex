@@ -1,11 +1,14 @@
 {
   "name": "@omni-infra/express",
-  "version": "1.0.0",
-  "description": "",
+  "type": "module",
   "private": true,
   "packageManager": "pnpm@10.5.2",
   "license": "SEE LICENSE IN LICENSE",
   "exports": {
+    ".": {
+      "development": "./index.ts",
+      "import": "./dist/index.js"
+    },
     "./*": {
       "development": "./*.ts",
       "import": "./dist/*.js"

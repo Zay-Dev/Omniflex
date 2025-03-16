@@ -1,7 +1,5 @@
 {
   "name": "@omniflex/root",
-  "version": "1.0.0",
-  "description": "",
   "private": true,
   "packageManager": "pnpm@10.5.2",
   "license": "SEE LICENSE IN LICENSE",
@@ -12,5 +10,9 @@
     "start:server": "pnpm --filter ./apps/server start",
     "build:server": "pnpm --filter \"./infras/**\" --filter ./apps/server build",
     "tsc:server": "pnpm --filter \"./infras/**\" --filter ./apps/server exec tsc --noEmit"
+  },
+  "devDependencies": {
+    "tsc-alias": "^1.8.11",
+    "typescript": "^5.8.2"
   }
 }
