@@ -1,0 +1,16 @@
+{
+  "name": "@omniflex/root",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "packageManager": "pnpm@10.5.2",
+  "license": "SEE LICENSE IN LICENSE",
+  "scripts": {
+    "add:server": "pnpm --filter ./apps/server add",
+    "remove:server": "pnpm --filter ./apps/server remove",
+    "dev:server": "pnpm --filter ./apps/server dev",
+    "start:server": "pnpm --filter ./apps/server start",
+    "build:server": "pnpm --filter \"./infras/**\" --filter ./apps/server build",
+    "tsc:server": "pnpm --filter \"./infras/**\" --filter ./apps/server exec tsc --noEmit"
+  }
+}
