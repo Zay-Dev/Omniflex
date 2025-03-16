@@ -14,5 +14,8 @@
   "devDependencies": {
     "tsc-alias": "^1.8.11",
     "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "uuid": "^11.1.0"
   }
 }

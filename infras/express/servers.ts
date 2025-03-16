@@ -1,13 +1,19 @@
+import './uncaught-error-handler';
+
 import express from 'express';
 import type * as Types from './types';
+import * as Middlewares from './middlewares';
 
 import cors from 'cors';
+import { v4 as uuid } from 'uuid';
 import responseTime from 'response-time';
 import helmet, { HelmetOptions } from 'helmet';
 
 type TOrFalse<T> = false | T;
 
 type TFrontingOptions = {
+  serverType: string;
+
   noExpressJson?: true;
   noResponseTime?: true;
 
@@ -63,7 +69,19 @@ const defaultFrontingMiddlewares = (
   options: TFrontingOptions,
   middlewares: Types.TMiddleware[],
 ) => {
-  //app.use(requestPreparation(server.type));
+  app.use(Middlewares.createHandler((req, res, next) => {
+    Object.assign(res.locals, {
+      _required: {},
+      getRequired: (key: string) => res.locals._required[key],
+    });
+
+    Object.assign(req, {
+      _requestId: uuid(),
+      _serverType: options.serverType,
+    });
+
+    next();
+  }));
 
   options.noResponseTime !== true &&
     app.use(responseTime());
