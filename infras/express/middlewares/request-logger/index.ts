@@ -96,4 +96,4 @@ const createLogger = (format: string) => {
 
 export const getMorganLogger = (
   format: string = ':processed-request\nResponse: :status :response-time ms',
-) => createLogger(format);
+): any => createLogger(format);
