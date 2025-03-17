@@ -1,21 +1,25 @@
-import { Request, Response, NextFunction } from 'express';
+import express from 'express';
 
 export type TMiddleware<TOutput = any> = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
 ) => TOutput;
 
-export type TOmniRequest = Request & {
+export type TOmniRequest = express.Request & {
   _skipMorganLog?: true;
 
   _requestId: string;
   _serverType: string;
 };
 
-export type TOmniResponse = Response & {
+export type TOmniResponse = express.Response & {
   _error?: Error;
 
   _required: Record<string, any>;
   getRequired: <T = any>(key: string) => T;
+};
+
+export interface IHydratedRouter extends express.Router {
+  useMiddlewares: (middlewares: express.RequestHandler[]) => express.Router;
 };

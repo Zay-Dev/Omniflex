@@ -2,8 +2,9 @@ import './uncaught-error-handler';
 
 import express from 'express';
 import type * as Types from './types';
+
+import * as Routers from './routers';
 import * as Middlewares from './middlewares';
-import { bindUncaughtRouterErrorHandler } from './utils/router-error-handler';
 
 import cors from 'cors';
 import { v4 as uuid } from 'uuid';
@@ -32,16 +33,16 @@ type TFallbackOptions = {
 
 type TOptions = TFrontingOptions & TFallbackOptions & {
   app?: express.Express;
-  routers: express.Router[];
+  getRouters: () => express.Router[];
   uncaughtRouterErrorHandler?: TOrFalse<{ requestTimeoutInSeconds: number; }>;
 
   frontingMiddlewares?: Types.TMiddleware[];
   fallbackMiddlewares?: Types.TMiddleware[];
 };
 
-export const preStart = ({
+export const prepareApp = ({
   app = express(),
-  routers,
+  getRouters,
   uncaughtRouterErrorHandler = false,
 
   frontingMiddlewares,
@@ -51,11 +52,11 @@ export const preStart = ({
 }: TOptions) => {
   defaultFrontingMiddlewares(app, options, frontingMiddlewares || []);
 
-  routers.forEach(router => {
+  getRouters().forEach(router => {
     app.use(router);
 
     uncaughtRouterErrorHandler !== false &&
-      bindUncaughtRouterErrorHandler(
+      Routers.bindUncaughtRouterErrorHandler(
         router,
         uncaughtRouterErrorHandler.requestTimeoutInSeconds,
       );
@@ -103,6 +104,7 @@ const defaultFrontingMiddlewares = (
 
   options.noResponseTime !== true &&
     app.use(responseTime());
+
   options.noExpressJson !== true &&
     app.use(express.json());
 

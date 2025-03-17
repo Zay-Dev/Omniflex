@@ -1,5 +1,41 @@
+import { IHydratedRouter } from './types';
 import { Router, Request } from 'express';
-import { IRoute, ILayer } from 'express-serve-static-core';
+
+import {
+  ILayer,
+  IRoute,
+  PathParams,
+  RequestHandlerParams,
+} from 'express-serve-static-core';
+
+export const get = () => Router();
+
+export const getHydrated = () => {
+  const router = get() as IHydratedRouter;
+
+  router.useMiddlewares = (middlewares: RequestHandlerParams[]) => {
+    const nestedRouter = Router();
+    const methods = ['get', 'post', 'put', 'delete', 'patch'] as const;
+
+    router.use(nestedRouter);
+
+    methods
+      .forEach((method) => {
+        const fn = nestedRouter[method].bind(nestedRouter);
+
+        nestedRouter[method] = (path: PathParams, ...handlers: RequestHandlerParams[]) => {
+          return fn(path,
+            ...(middlewares || []).filter(Boolean),
+            ...(handlers || []).filter(Boolean),
+          );
+        };
+      });
+
+    return nestedRouter;
+  };
+
+  return router;
+};
 
 export const bindUncaughtRouterErrorHandler = (
   router: Router,
