@@ -75,14 +75,27 @@ export const initialize = <T extends string>(types: Iterable<T>) => {
   return {
     getOrCreateRouter,
 
-    getRouter: (serverType: T, { skipPathsPrint = false } = {}) => {
+    getRouter: (serverType: T, {
+      skipPathsPrint = false,
+      throwEmptyRouters = false,
+    } = {}) => {
       const manager = requireManager(serverType);
 
       const rootRouter = manager.rootRouter;
       const paths = manager.getPaths();
 
-      if (!skipPathsPrint) {
-        logger.info(`[${serverType}] ${paths.join(', ')}`);
+      if (paths.length) {
+        if (!skipPathsPrint) {
+          logger.debug(`[${serverType}] ${paths.join(', ')}`);
+        }
+      } else {
+        const message = `No routers are defined for server type '${serverType}'`;
+
+        if (throwEmptyRouters) {
+          throw getThrowable(message);
+        } else {
+          logger.warn(message);
+        }
       }
 
       return rootRouter;
