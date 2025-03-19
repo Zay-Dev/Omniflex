@@ -1,4 +1,17 @@
-import { Schema } from 'mongoose';
+import { Types, Model, Schema } from 'mongoose';
+
+export type TModel<T> = Model<T>;
+export type TSort<T> = Partial<Record<keyof T, 1 | -1>>;
+
+export const isObjectId = (id: any) => {
+  if (!id) return false;
+  if (typeof id !== 'string') return false;
+  if (!Types.ObjectId.isValid(id)) return false;
+
+  const castedId = new Types.ObjectId(id);
+
+  return castedId.toString() === id;
+};
 
 const toRequired = (type: Record<string, any>) => ({ ...type, required: true });
 

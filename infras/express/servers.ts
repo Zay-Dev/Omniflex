@@ -76,7 +76,7 @@ const defaultFallbackMiddlewares = (
 
   options.noDefault404 !== true &&
     app.use(Middlewares.createHandler(
-      (_, __, next) => next(errors.notFound())
+      ({ next }) => next(errors.notFound())
     ));
 
   options.noDefaultErrorHandler !== true &&
@@ -88,7 +88,7 @@ const defaultFrontingMiddlewares = (
   options: TFrontingOptions,
   middlewares: Types.TMiddleware[],
 ) => {
-  app.use(Middlewares.createHandler((req, res, next) => {
+  app.use(Middlewares.createHandler(({ req, res, next }) => {
     Object.assign(res.locals, {
       _required: {},
       getRequired: (key: string) => res.locals._required[key],

@@ -6,6 +6,12 @@ export type TMiddleware<TOutput = any> = (
   next: express.NextFunction,
 ) => TOutput;
 
+export type TExpressParams = {
+  req: express.Request;
+  res: express.Response;
+  next: express.NextFunction;
+};
+
 export type TOmniRequest = express.Request & {
   _skipMorganLog?: true;
 

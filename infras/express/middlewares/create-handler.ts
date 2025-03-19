@@ -1,8 +1,10 @@
-import { TMiddleware } from '../types';
+import { TMiddleware, TExpressParams } from '../types';
 
-export const createHandler = (callback: TMiddleware) => {
+type TCallback = (express: TExpressParams) => void | Promise<void>;
+
+export const createHandler = (callback: TCallback) => {
   const handler: TMiddleware = (req, res, next) => {
-    callback(req, res, next)?.catch(next);
+    callback({ req, res, next });
   };
 
   return handler;
