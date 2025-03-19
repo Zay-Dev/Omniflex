@@ -78,6 +78,14 @@ const errors = {
       ...options
     });
   },
+
+  unprocessableEntity: (message: string = "Unprocessable Entity", options?: TPartialOptions) => {
+    return new ServerError({
+      message,
+      code: 422,
+      ...options
+    });
+  },
 };
 
 globalThis.errors = errors;

@@ -73,7 +73,7 @@ export const queryById = <T,>(
   extendedQuery: RootFilterQuery<T> = {},
 ) => {
   if (!isObjectId(id)) {
-    throw new Error('Invalid id format');
+    throw errors.badRequest('Invalid id format');
   }
 
   return model.findOne({
@@ -95,7 +95,7 @@ export const atLeastOne = async<T,>(
   const length = await baseQuery.clone().countDocuments();
 
   if (length < 1) {
-    throw new Error(`[${modelName}] expecting at least one result, but got 0`);
+    throw errors.notFound(`[${modelName}] expecting at least one result, but got 0`);
   }
 
   return await baseQuery.lean<T[]>();
@@ -114,10 +114,25 @@ export const hasCount = async<T,>(
   const length = await baseQuery.clone().countDocuments();
 
   if (length != count) {
-    throw new Error(`[${modelName}] expecting length ${count}, but got ${length}`);
+    if (count <= 0) {
+      throw errors.notFound(`[${modelName}] expecting length ${count}, but got ${length}`);
+    }
+
+    throw errors.unprocessableEntity(`[${modelName}] expecting length ${count}, but got ${length}`);
   }
 
   return count > 0 ? await baseQuery.lean<T[]>() : [];
+};
+
+export const hasExactOne = async<T,>(
+  model: TModel<T>,
+  query: RootFilterQuery<T>,
+  {
+    modelName = model.modelName,
+    ...options
+  }: TMayError & TSortable<T> & TPageable = {},
+) => {
+  return (await hasCount(1, model, query, { modelName, ...options }))[0];
 };
 
 export const requiredFirst = async<T,>(
