@@ -9,7 +9,7 @@ const hydrateParams = (express: TExpressParams) => {
   const params = {
     ...express,
 
-    try: async <T,>(callback: () => Promise<T>) => {
+    try: async <T,>(callback: () => T | Promise<T>) => {
       try {
         return await callback();
       } catch (ex) {
@@ -17,7 +17,8 @@ const hydrateParams = (express: TExpressParams) => {
         return undefined;
       }
     },
-    tryWithBody: async <T, TBody>(callback: (body: TBody) => Promise<T>) => {
+
+    tryWithBody: async <T, TBody>(callback: (body: TBody) => T | Promise<T>) => {
       try {
         return await callback(req.body);
       } catch (ex) {
@@ -33,6 +34,16 @@ const hydrateParams = (express: TExpressParams) => {
 export const createHandler = (callback: TCallback) => {
   const handler: TMiddleware = (req, res, next) => {
     callback(hydrateParams({ req, res, next }));
+  };
+
+  return handler;
+};
+
+export const createHandlerWithTry = (callback: TCallback) => {
+  const handler: TMiddleware = (req, res, next) => {
+    const params = hydrateParams({ req, res, next });
+
+    params.try(async () => await callback(params));
   };
 
   return handler;
