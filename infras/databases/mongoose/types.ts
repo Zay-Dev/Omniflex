@@ -3,17 +3,25 @@ import { Types, Model, Schema } from 'mongoose';
 export type TModel<T> = Model<T>;
 export type TSort<T> = Partial<Record<keyof T, 1 | -1>>;
 
-export const isObjectId = (id: any) => {
+export const isObjectId = (
+  id: Parameters<typeof Types.ObjectId.isValid>[0],
+) => {
   if (!id) return false;
-  if (typeof id !== 'string') return false;
+
+  const validType = ['string', 'object'].includes(typeof id);
+
+  if (!validType) return false;
   if (!Types.ObjectId.isValid(id)) return false;
 
   const castedId = new Types.ObjectId(id);
 
-  return castedId.toString() === id;
+  return `${castedId}` === `${id}`;
 };
 
-const toRequired = (type: Record<string, any>) => ({ ...type, required: true });
+const toRequired = <T extends Record<string, any>>(type: T) => ({
+  ...type,
+  required: true,
+}) as T & { required: true; };
 
 export const optionalInteger = () => ({
   type: Number,

@@ -13,4 +13,9 @@ const transform = {
 
 config.transform = transform;
 
+config.moduleNameMapper = {
+  '^@omni-infra/core': '<rootDir>/core',
+  '^@omni-infra/core/(.*)$': '<rootDir>/core/$1',
+};
+
 export default config;
