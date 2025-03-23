@@ -59,7 +59,9 @@ export const queryBy = <T,>(
 ) => {
   return pipe(
     model.find({
+      deletedAt: null,
       isDeleted: { $ne: true },
+
       ...defaultQuery,
     }),
     getSortPipeFn(options),
@@ -78,7 +80,9 @@ export const queryById = <T,>(
 
   return model.findOne({
     _id: id,
+    deletedAt: null,
     isDeleted: { $ne: true },
+
     ...extendedQuery,
   });
 };

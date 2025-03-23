@@ -3,26 +3,36 @@ import { TMiddleware, TExpressParams } from '../types';
 type THydratedParams = TExpressParams & ReturnType<typeof hydrateParams>;
 type TCallback = (express: THydratedParams) => any;
 
+type TTryOptions = {
+  onError?: (error: any, express: TExpressParams) => any | Promise<any>;
+};
+
 const hydrateParams = (express: TExpressParams) => {
   const { req, res, next } = express;
 
   const params = {
     ...express,
 
-    try: async <T,>(callback: () => T | Promise<T>) => {
+    try: async <T,>(
+      callback: () => T | Promise<T>,
+      { onError = (error) => error }: TTryOptions = {},
+    ) => {
       try {
         return await callback();
-      } catch (ex) {
-        next(ex);
+      } catch (error) {
+        next(await onError(error, params));
         return undefined;
       }
     },
 
-    tryWithBody: async <T, TBody>(callback: (body: TBody) => T | Promise<T>) => {
+    tryWithBody: async <T, TBody>(
+      callback: (body: TBody) => T | Promise<T>,
+      { onError = (error) => error }: TTryOptions = {},
+    ) => {
       try {
         return await callback(req.body);
-      } catch (ex) {
-        next(ex);
+      } catch (error) {
+        next(await onError(error, params));
         return undefined;
       }
     },

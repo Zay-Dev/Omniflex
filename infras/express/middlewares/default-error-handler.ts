@@ -10,20 +10,10 @@ export const getDefaultErrorHandler = (hideStack?: true) => {
     req: Types.TOmniRequest,
     res: Types.TOmniResponse,
   ) => {
-    const status = parseStatusCode(error);
-    const code = error instanceof errors.ServerError ? error.code : status;
+    const jsonified = jsonifityError(error, req, hideStack);
 
     res._error = error;
-
-    res.status(status).json({
-      code,
-      status,
-
-      message: error.message,
-
-      ...getBasicResponse(req),
-      ...getErrorResponseBody(error, hideStack),
-    });
+    res.status(jsonified.status).json(jsonified);
   };
 
   return (
@@ -37,6 +27,25 @@ export const getDefaultErrorHandler = (hideStack?: true) => {
       req as Types.TOmniRequest,
       res as Types.TOmniResponse,
     );
+  };
+};
+
+export const jsonifityError = (
+  error: TError,
+  req: Types.TOmniRequest,
+  hideStack?: true,
+) => {
+  const status = parseStatusCode(error);
+  const code = error instanceof errors.ServerError ? error.code : status;
+
+  return {
+    code,
+    status,
+
+    message: error.message,
+
+    ...getBasicResponse(req),
+    ...getErrorResponseBody(error, hideStack),
   };
 };
 
