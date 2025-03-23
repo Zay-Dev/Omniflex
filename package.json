@@ -10,11 +10,16 @@
     "start:server": "pnpm --filter ./apps/server start",
     "build:server": "pnpm --parallel --filter \"./infras/**\" --filter ./apps/server build",
     "tsc:server": "pnpm --filter \"./infras/**\" --filter ./apps/server exec tsc --noEmit",
+    "test:server": "pnpm jest ./infras -c ./infras/jest.config.mjs && pnpm --filter ./apps/server exec jest",
     "eslint:server": "pnpm --no-bail --parallel --filter \"./infras/**\" --filter ./apps/server exec eslint --fix"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "eslint": "^9.23.0",
     "eslint-plugin-unused-imports": "^4.1.4",
+    "jest": "^29.7.0",
+    "jest-silent-reporter": "^0.6.0",
+    "ts-jest": "^29.2.6",
     "tsc-alias": "^1.8.11",
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.27.0"
