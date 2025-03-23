@@ -29,3 +29,8 @@ export type TOmniResponse = express.Response & {
 export interface IHydratedRouter extends express.Router {
   useMiddlewares: (middlewares: express.RequestHandler[]) => express.Router;
 };
+
+export type TUser = {
+  __tokenType: string;
+  __identifier: string;
+};
