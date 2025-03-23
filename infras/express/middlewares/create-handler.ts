@@ -42,18 +42,18 @@ const hydrateParams = (express: TExpressParams) => {
 };
 
 export const createHandler = (callback: TCallback) => {
-  const handler: TMiddleware = (req, res, next) => {
-    callback(hydrateParams({ req, res, next }));
+  const handler: TMiddleware = async (req, res, next) => {
+    await callback(hydrateParams({ req, res, next }));
   };
 
   return handler;
 };
 
 export const createHandlerWithTry = (callback: TCallback) => {
-  const handler: TMiddleware = (req, res, next) => {
+  const handler: TMiddleware = async (req, res, next) => {
     const params = hydrateParams({ req, res, next });
 
-    params.try(async () => await callback(params));
+    await params.try(async () => await callback(params));
   };
 
   return handler;

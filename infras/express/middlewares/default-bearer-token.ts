@@ -16,8 +16,8 @@ export const defaultBearerToken = <T extends TUser>({
   validateToken,
   tokenType = ACCESS_TOKEN_TYPE,
   ...options
-}: TOptions<T>) =>
-  createHandler(async (express) => {
+}: TOptions<T>) => {
+  return createHandler(async (express) => {
     try {
       const token = extractToken(express.req.headers.authorization);
 
@@ -28,18 +28,20 @@ export const defaultBearerToken = <T extends TUser>({
       }
 
       const user = await options.verify(token);
-      if (user.__tokenType != ACCESS_TOKEN_TYPE) {
+      if (user.__tokenType != tokenType) {
         return express.next(errors.unauthorized());
       }
 
-      const validToken = validateToken ? await validateToken(user, token) : true;
-      if (!validToken) {
-        return express.next(errors.unauthorized());
+      if (validateToken) {
+        if (!await validateToken(user, token)) {
+          return express.next(errors.unauthorized());
+        }
       }
 
-      const validUser = validateRole ? await validateRole(user) : true;
-      if (!validUser) {
-        return express.next(errors.forbidden());
+      if (validateRole) {
+        if (!await validateRole(user)) {
+          return express.next(errors.forbidden());
+        }
       }
 
       express.res.locals.user = user;
@@ -49,6 +51,7 @@ export const defaultBearerToken = <T extends TUser>({
       express.next(errors.unauthorized());
     }
   });
+};
 
 export const useUser = <T extends TUser>({ res }: TExpressParams) => {
   return res.locals.user as T;
