@@ -76,7 +76,7 @@ const defaultFallbackMiddlewares = (
 
   options.noDefault404 !== true &&
     app.use(Middlewares.createHandler(
-      ({ next }) => next(errors.notFound())
+      ({ next }) => next(errors.notFound()),
     ));
 
   options.noDefaultErrorHandler !== true &&

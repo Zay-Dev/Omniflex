@@ -1,4 +1,4 @@
-import "@omni-infra/core";
+import '@omni-infra/core';
 
 export type * as Types from './types';
 

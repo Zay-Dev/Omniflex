@@ -1,4 +1,6 @@
-import "./";
+/* eslint-disable no-var */
+
+import './';
 import { ILogger } from '@omni-infra/types/logger';
 
 type TGetThrowable = (message: string) => Error;

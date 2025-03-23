@@ -1,7 +1,7 @@
 import { createHandler } from './create-handler';
-import { TUser, TExpressParams, } from '../types';
+import { TUser, TExpressParams } from '../types';
 
-export const ACCESS_TOKEN_TYPE = "access-token";
+export const ACCESS_TOKEN_TYPE = 'access-token';
 
 type TOptions<TUser> = {
   optional?: true;
@@ -45,7 +45,7 @@ export const defaultBearerToken = <T extends TUser>({
       express.res.locals.user = user;
       return express.next();
     } catch (error: any) {
-      logger.error("Auth", { error });
+      logger.error('Auth', { error });
       express.next(errors.unauthorized());
     }
   });
@@ -55,5 +55,5 @@ export const useUser = <T extends TUser>({ res }: TExpressParams) => {
 };
 
 const extractToken = (token: string | null | undefined) => {
-  return (token || "").substring(7);
+  return (token || '').substring(7);
 };

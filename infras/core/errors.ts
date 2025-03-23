@@ -1,3 +1,5 @@
+/* eslint-disable no-var */
+
 type TErrors = typeof errors;
 
 type TErrorOptions = {
@@ -35,7 +37,7 @@ const errors = {
     return new ServerError({
       code: 401,
       message: 'Unauthorized',
-      ...options
+      ...options,
     });
   },
 
@@ -43,31 +45,31 @@ const errors = {
     return new ServerError({
       code: 403,
       message: 'Forbidden',
-      ...options
+      ...options,
     });
   },
 
-  notFound: (message: string = "Not Found", options?: TPartialOptions) => {
+  notFound: (message: string = 'Not Found', options?: TPartialOptions) => {
     return new ServerError({
       message,
       code: 404,
-      ...options
+      ...options,
     });
   },
 
-  badRequest: (message: string = "Bad Request", options?: TPartialOptions) => {
+  badRequest: (message: string = 'Bad Request', options?: TPartialOptions) => {
     return new ServerError({
       message,
       code: 400,
-      ...options
+      ...options,
     });
   },
 
-  conflict: (message: string = "Conflict", options?: TPartialOptions) => {
+  conflict: (message: string = 'Conflict', options?: TPartialOptions) => {
     return new ServerError({
       message,
       code: 409,
-      ...options
+      ...options,
     });
   },
 
@@ -75,15 +77,15 @@ const errors = {
     return new ServerError({
       code,
       message,
-      ...options
+      ...options,
     });
   },
 
-  unprocessableEntity: (message: string = "Unprocessable Entity", options?: TPartialOptions) => {
+  unprocessableEntity: (message: string = 'Unprocessable Entity', options?: TPartialOptions) => {
     return new ServerError({
       message,
       code: 422,
-      ...options
+      ...options,
     });
   },
 };

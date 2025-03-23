@@ -100,7 +100,7 @@ error (${error?.message || 'N/a'}):
 ${stringifiedError}
 
 body:
-${handle.toString()}`
+${handle.toString()}`,
           );
 
           return next(errors.custom('Unexpected Error.', 500));

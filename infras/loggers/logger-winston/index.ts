@@ -20,7 +20,7 @@ const myFormat = printf(({ level, message, timestamp }) => {
 });
 
 export const createLogger = ({
-  level = "silly",
+  level = 'silly',
   transports = [],
   noConsole = false,
 }: {
@@ -35,14 +35,14 @@ export const createLogger = ({
       format: combine(
         colorize(),
         timestamp(),
-        myFormat
+        myFormat,
       ),
 
       transports: [
         ...transports,
         !noConsole ? createConsole() : null,
       ].filter(Boolean) as any,
-    })
+    }),
   );
 
   return logger;

@@ -81,7 +81,7 @@ const createLogger = (format: string) => {
 
         const level = getLogLevel(status, path);
         logger[level](message.trim());
-      }
+      },
     },
     skip: (_req: Request, res: any) => {
       const req = _req as Types.TOmniRequest;

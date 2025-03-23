@@ -49,7 +49,7 @@ const maskSensitiveValue = (
       }
 
       const isKeySensitive = SENSITIVE_KEYS.some(
-        sensitive => key.toLowerCase().includes(sensitive.toLowerCase())
+        sensitive => key.toLowerCase().includes(sensitive.toLowerCase()),
       );
 
       if (typeof value === 'string') {

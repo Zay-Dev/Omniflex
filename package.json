@@ -8,12 +8,16 @@
     "remove:server": "pnpm --filter ./apps/server remove",
     "dev:server": "pnpm --filter ./apps/server dev",
     "start:server": "pnpm --filter ./apps/server start",
-    "build:server": "pnpm --filter \"./infras/**\" --filter ./apps/server build",
-    "tsc:server": "pnpm --filter \"./infras/**\" --filter ./apps/server exec tsc --noEmit"
+    "build:server": "pnpm --parallel --filter \"./infras/**\" --filter ./apps/server build",
+    "tsc:server": "pnpm --filter \"./infras/**\" --filter ./apps/server exec tsc --noEmit",
+    "eslint:server": "pnpm --no-bail --parallel --filter \"./infras/**\" --filter ./apps/server exec eslint --fix"
   },
   "devDependencies": {
+    "eslint": "^9.23.0",
+    "eslint-plugin-unused-imports": "^4.1.4",
     "tsc-alias": "^1.8.11",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.27.0"
   },
   "dependencies": {
     "dayjs": "^1.11.13",
