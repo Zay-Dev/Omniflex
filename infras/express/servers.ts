@@ -89,11 +89,6 @@ const defaultFrontingMiddlewares = (
   middlewares: Types.TMiddleware[],
 ) => {
   app.use(Middlewares.createHandler(({ req, res, next }) => {
-    Object.assign(res.locals, {
-      _required: {},
-      getRequired: (key: string) => res.locals._required[key],
-    }) as Types.TOmniResponse;
-
     Object.assign(req, {
       _requestId: uuid(),
       _serverType: options.serverType,

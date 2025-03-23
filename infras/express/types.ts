@@ -21,9 +21,6 @@ export type TOmniRequest = express.Request & {
 
 export type TOmniResponse = express.Response & {
   _error?: Error;
-
-  _required: Record<string, any>;
-  getRequired: <T = any>(key: string) => T;
 };
 
 export interface IHydratedRouter extends express.Router {
