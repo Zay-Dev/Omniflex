@@ -8,7 +8,7 @@ type TOptions<TUser> = {
   tokenType?: string;
   verify: (token: string) => Promise<TUser>;
   validateRole?: (user: TUser) => boolean | Promise<boolean>;
-  validateToken?: (token: string) => boolean | Promise<boolean>;
+  validateToken?: (user: TUser, token: string) => boolean | Promise<boolean>;
 };
 
 export const defaultBearerToken = <T extends TUser>({
@@ -32,7 +32,7 @@ export const defaultBearerToken = <T extends TUser>({
         return express.next(errors.unauthorized());
       }
 
-      const validToken = validateToken ? await validateToken(token) : true;
+      const validToken = validateToken ? await validateToken(user, token) : true;
       if (!validToken) {
         return express.next(errors.unauthorized());
       }
