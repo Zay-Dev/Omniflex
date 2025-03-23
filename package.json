@@ -16,6 +16,7 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
+    "dayjs": "^1.11.13",
     "uuid": "^11.1.0"
   }
 }
