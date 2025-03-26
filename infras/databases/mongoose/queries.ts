@@ -38,15 +38,12 @@ export const getSortPipeFn = <T,>({ sort = {} }: TSortable<T>) => {
 };
 
 export const getPaginatePipeFn = ({ page, pageSize }: TPageable) => {
-  const parsedPage = parseInt(`${page}`, 10);
-  const parsedPageSize = parseInt(`${pageSize}`, 10);
-
   return <T,>(query: TQuery<T>) => {
-    if (!parsedPage || !parsedPageSize) return query;
-    if (parsedPage < 1 || parsedPageSize < 1) return query;
+    if (!page || !pageSize) return query;
+    if (page < 1 || pageSize < 1) return query;
 
-    const skip = (parsedPage - 1) * parsedPageSize;
-    const limit = parsedPageSize;
+    const skip = (page - 1) * pageSize;
+    const limit = pageSize;
 
     return query.skip(skip).limit(limit);
   };

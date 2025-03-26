@@ -2,6 +2,8 @@ export default {
   transform: {},
   preset: 'ts-jest',
   testEnvironment: 'node',
+
+  reporters: ["jest-silent-reporter"],
   coverageReporters: ['text', 'text-summary'],
 
   testMatch: [
