@@ -164,7 +164,7 @@ AutoTest.Net/
 .sass-cache/
 
 # Installshield output folder
-[Ee]xpress/
+#[Ee]xpress/
 
 # DocProject is a documentation generator add-in
 DocProject/buildhelp/
@@ -390,6 +390,7 @@ lerna-debug.log*
 # Dependency lock files
 package-lock.json
 yarn.lock
+pnpm-lock.yaml
 
 .vite/
 .next/

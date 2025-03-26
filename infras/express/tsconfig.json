@@ -1,0 +1,7 @@
+{
+  "extends": "../../tsconfig.infras.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "./dist"
+  }
+}
