@@ -1,10 +1,28 @@
-import { TMiddleware, TExpressParams } from '../types';
+import type { TMiddleware, TExpressParams } from '../types';
 
 type THydratedParams = TExpressParams & ReturnType<typeof hydrateParams>;
 type TCallback = (express: THydratedParams) => any;
 
 type TTryOptions = {
   onError?: (error: any, express: TExpressParams) => any | Promise<any>;
+};
+
+export const createHandler = (callback: TCallback) => {
+  const handler: TMiddleware = async (req, res, next) => {
+    await callback(hydrateParams({ req, res, next }));
+  };
+
+  return handler;
+};
+
+export const createHandlerWithTry = (callback: TCallback) => {
+  const handler: TMiddleware = async (req, res, next) => {
+    const params = hydrateParams({ req, res, next });
+
+    await params.try(async () => await callback(params));
+  };
+
+  return handler;
 };
 
 const hydrateParams = (express: TExpressParams) => {
@@ -23,20 +41,22 @@ const hydrateParams = (express: TExpressParams) => {
     pageSize,
 
     deletedOne: () => { res.status(204).end(); },
-    respondOne: async (data: any) => { res.json(await data); },
+    respondOne: async <T = any>(data: T | Promise<T>) => {
+      res.json(await data);
+    },
 
-    patchedOne: async (data: any) => {
+    patchedOne: async <T = any>(data: T | Promise<T>) => {
       res.status(200);
       await params.respondOne(data);
     },
 
-    createdOne: async (data: any) => {
+    createdOne: async <T = any>(data: T | Promise<T>) => {
       res.status(201);
       await params.respondOne(data);
     },
 
-    respondMany: async (
-      dataOrDataPromise: any[] | Promise<any[]>,
+    respondMany: async <T = any>(
+      dataOrDataPromise: T[] | Promise<T[]>,
       count?: number,
       { skipHydrate = false } = {},
     ) => {
@@ -82,22 +102,4 @@ const hydrateParams = (express: TExpressParams) => {
   };
 
   return params;
-};
-
-export const createHandler = (callback: TCallback) => {
-  const handler: TMiddleware = async (req, res, next) => {
-    await callback(hydrateParams({ req, res, next }));
-  };
-
-  return handler;
-};
-
-export const createHandlerWithTry = (callback: TCallback) => {
-  const handler: TMiddleware = async (req, res, next) => {
-    const params = hydrateParams({ req, res, next });
-
-    await params.try(async () => await callback(params));
-  };
-
-  return handler;
 };
