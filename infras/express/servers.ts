@@ -11,6 +11,9 @@ import { v4 as uuid } from 'uuid';
 import responseTime from 'response-time';
 import helmet, { HelmetOptions } from 'helmet';
 
+import { doubleCsrf, DoubleCsrfConfigOptions } from 'csrf-csrf';
+import cookieParser, { CookieParseOptions } from 'cookie-parser';
+
 type TOrFalse<T> = false | T;
 
 type TFrontingOptions = {
@@ -22,6 +25,15 @@ type TFrontingOptions = {
 
   cors?: TOrFalse<cors.CorsOptions>;
   helmet?: TOrFalse<HelmetOptions>;
+
+  cookieParser: {
+    secret: string;
+    options?: CookieParseOptions,
+  };
+
+  doubleCsrf?: TOrFalse<DoubleCsrfConfigOptions & {
+    cookiePrefix?: 'Host' | 'Secure';
+  }>;
 };
 
 type TFallbackOptions = {
@@ -111,6 +123,30 @@ const defaultFrontingMiddlewares = (
 
   options.cors !== false &&
     app.use(cors(options.cors || undefined));
+
+  app.use(cookieParser(
+    options.cookieParser.secret,
+    options.cookieParser.options,
+  ));
+
+  if (!!options.doubleCsrf) {
+    const cookiePrefix = options.doubleCsrf.cookiePrefix || '';
+    const cookieNameBody = options.doubleCsrf.cookieName || 'psifi.x-csrf-token';
+    const cookieName = `__${cookiePrefix}-${cookieNameBody}`;
+
+    const { generateToken, doubleCsrfProtection } = doubleCsrf({
+      ...options.doubleCsrf,
+      cookieName,
+    });
+
+    app.use(doubleCsrfProtection);
+
+    app.get('/__/csrf-token', (req, res) => {
+      res.json({
+        csrfToken: generateToken(req, res),
+      });
+    });
+  }
 
   middlewares.forEach(middleware => app.use(middleware));
 };
