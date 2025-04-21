@@ -1,25 +1,66 @@
 import type { TMiddleware, TExpressParams } from '../types';
 
 type THydratedParams = TExpressParams & ReturnType<typeof hydrateParams>;
-type TCallback = (express: THydratedParams) => any;
+
+export type TCallback<
+  T = any,
+  TValidatedDoc = never,
+> = (
+  express: THydratedParams,
+  doc: TValidatedDoc,
+) => T | Promise<T>;
 
 type TTryOptions = {
   onError?: (error: any, express: TExpressParams) => any | Promise<any>;
 };
 
-export const createHandler = (callback: TCallback) => {
+export function createHandler<TValidatedDoc>(
+  validate: TCallback<TValidatedDoc>,
+  callback: TCallback<void, TValidatedDoc>,
+): TMiddleware;
+
+export function createHandler(callback: TCallback): TMiddleware;
+
+export function createHandler<TValidatedDoc>(
+  validateOrCallback: TCallback<TValidatedDoc>,
+  callback?: TCallback<void, TValidatedDoc>,
+) {
   const handler: TMiddleware = async (req, res, next) => {
-    await callback(hydrateParams({ req, res, next }));
+    const params = hydrateParams({ req, res, next });
+
+    const doc = await params.try(async () => {
+      return await validateOrCallback(params, undefined as never);
+    });
+
+    if (doc && callback) {
+      await callback(params, doc);
+    }
   };
 
   return handler;
 };
 
-export const createHandlerWithTry = (callback: TCallback) => {
+export function createHandlerWithTry<TValidatedDoc>(
+  validate: TCallback<TValidatedDoc>,
+  callback: TCallback<void, TValidatedDoc>,
+): TMiddleware;
+
+export function createHandlerWithTry(callback: TCallback): TMiddleware;
+
+export function createHandlerWithTry<TValidatedDoc>(
+  validateOrCallback: TCallback<TValidatedDoc>,
+  callback?: TCallback<void, TValidatedDoc>,
+) {
   const handler: TMiddleware = async (req, res, next) => {
     const params = hydrateParams({ req, res, next });
 
-    await params.try(async () => await callback(params));
+    await params.try(async () => {
+      const doc = await validateOrCallback(params, undefined as never);
+
+      if (callback) {
+        await callback(params, doc);
+      }
+    });
   };
 
   return handler;

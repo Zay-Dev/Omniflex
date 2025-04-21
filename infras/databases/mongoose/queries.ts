@@ -68,15 +68,17 @@ export const queryBy = <T,>(
 
 export const queryById = <T,>(
   model: TModel<T>,
-  id: Types.ObjectId,
+  id: Types.ObjectId | string,
   extendedQuery: RootFilterQuery<T> = {},
 ) => {
   if (!isObjectId(id)) {
     throw errors.badRequest('Invalid id format');
   }
 
+  const _id = new Types.ObjectId(id);
+
   return model.findOne({
-    _id: id,
+    _id,
     deletedAt: null,
     isDeleted: { $ne: true },
 
