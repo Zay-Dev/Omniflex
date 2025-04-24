@@ -1,6 +1,6 @@
 import type { TMiddleware, TExpressParams } from '../types';
 
-type THydratedParams = TExpressParams & ReturnType<typeof hydrateParams>;
+export type THydratedParams = TExpressParams & ReturnType<typeof hydrateParams>;
 
 export type TCallback<
   T = any,

@@ -44,17 +44,13 @@ export const defaultBearerToken = <T extends TUser>({
         }
       }
 
-      express.res.locals.user = user;
+      (express.res.locals as any).user = user;
       return express.next();
     } catch (error: any) {
       logger.error('Auth', { error });
       express.next(errors.unauthorized());
     }
   });
-};
-
-export const useUser = <T extends TUser>({ res }: TExpressParams) => {
-  return res.locals.user as T;
 };
 
 const extractToken = (token: string | null | undefined) => {

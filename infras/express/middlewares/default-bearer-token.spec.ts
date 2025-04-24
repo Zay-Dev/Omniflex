@@ -250,19 +250,4 @@ describe('Express/Middlewares/DefaultBearerToken', () => {
       expect(mockNext.mock.calls[0][0].code).toBe(401);
     });
   });
-
-  describe('useUser', () => {
-    it('[Express/Middlewares/DefaultBearerToken-0130] should return user from res.locals', () => {
-      const user = {
-        __tokenType: ACCESS_TOKEN_TYPE,
-        __identifier: 'test-user',
-      };
-
-      mockRes.locals.user = user;
-
-      const result = useUser({ res: mockRes } as TExpressParams);
-
-      expect(result).toBe(user);
-    });
-  });
 });
