@@ -81,7 +81,9 @@ const hydrateParams = (express: TExpressParams) => {
     page,
     pageSize,
 
-    deletedOne: () => { res.status(204).end(); },
+    ok: () => res.status(204).end(),
+    deletedOne: () => res.status(204).end(),
+
     respondOne: async <T = any>(data: T | Promise<T>) => {
       res.json(await data);
     },
@@ -102,19 +104,20 @@ const hydrateParams = (express: TExpressParams) => {
       { skipHydrate = false } = {},
     ) => {
       const data = await dataOrDataPromise;
-      const total = count ?? data.length;
-      const base = { data, total };
+      const total = count || data.length;
+
+      res.header('X-Total-Count', `${total}`);
 
       if (skipHydrate !== true) {
-        base.data = data.map((item, i) => {
+        return res.json(data.map((item, i) => {
           return {
             __index: i,
             ...item,
           };
-        });
+        }));
       }
 
-      res.json(base);
+      res.json(data);
     },
 
     try: async <T,>(
