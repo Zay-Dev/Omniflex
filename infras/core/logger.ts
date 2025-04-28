@@ -5,8 +5,6 @@ import { ILogger } from '@omni-infra/types/logger';
 
 type TGetThrowable = (message: string) => Error;
 
-const consoleLogger = console.log.bind(null, "console-logger: ");
-
 globalThis.logger = {
   error: console.error,
   info: console.info,

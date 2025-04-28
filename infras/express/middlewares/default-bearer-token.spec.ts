@@ -1,6 +1,6 @@
 import '@omni-infra/core';
 import { Request, Response } from 'express';
-import { defaultBearerToken, useUser, ACCESS_TOKEN_TYPE } from './default-bearer-token';
+import { defaultBearerToken, ACCESS_TOKEN_TYPE } from './default-bearer-token';
 import * as CreateHandler from './create-handler';
 import { TExpressParams } from '../types';
 
