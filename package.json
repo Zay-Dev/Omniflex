@@ -17,7 +17,7 @@
     "dev:server": "pnpm --filter ./apps/server dev",
     "start:server": "pnpm --filter ./apps/server start",
     "build:server": "pnpm --parallel --filter \"./infras/**\" --filter shared --filter ./apps/server build",
-    "tsc:server": "pnpm --filter \"./infras/**\" --filter shared --filter ./apps/server exec tsc --noEmit",
+    "tsc:server": "pnpm --parallel --filter \"./infras/**\" --filter shared --filter ./apps/server exec tsc --noEmit",
     "test:server": "pnpm jest ./infras -c ./infras/jest.config.mjs && pnpm --filter ./apps/server exec jest",
     "coverage:server": "pnpm jest --coverage ./infras -c ./infras/jest.config.mjs && pnpm --filter ./apps/server exec jest --coverage",
     "eslint:server": "pnpm --no-bail --parallel --filter \"./infras/**\" --filter shared --filter ./apps/server exec eslint --fix"

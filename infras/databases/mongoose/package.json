@@ -20,5 +20,8 @@
   "dependencies": {
     "@omni-infra/core": "workspace:^",
     "mongoose": "^8.12.1"
+  },
+  "devDependencies": {
+    "@omni-infra/types": "workspace:^"
   }
 }
