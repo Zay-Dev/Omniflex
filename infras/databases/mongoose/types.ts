@@ -45,6 +45,11 @@ export const toRequiredStringEnum = (values: string[]) => ({
   enum: values,
 });
 
+export const toOptionalStringEnum = (values: string[]) => ({
+  ...optionalString(),
+  enum: values,
+});
+
 export const optionalDate = () => ({ type: Date });
 export const requiredDate = () => toRequired(optionalDate());
 

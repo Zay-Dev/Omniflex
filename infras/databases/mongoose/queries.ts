@@ -1,8 +1,16 @@
+import type { QueryWithHelpers, HydratedDocument } from 'mongoose';
+
 import { Types, RootFilterQuery } from 'mongoose';
 import { TSort, TModel, isObjectId } from './types';
 
-type TFind<T> = TModel<T>['find'];
-type TQuery<T> = ReturnType<TFind<T>>;
+type TQuery<T> = QueryWithHelpers<
+  Array<HydratedDocument<T>>,
+  HydratedDocument<T>,
+  {},
+  T,
+  'find',
+  {}
+>;
 
 type TSortable<T> = {
   sort?: TSort<T>;
@@ -55,7 +63,7 @@ export const queryBy = <T,>(
   options: TSortable<T> & TPageable = {},
 ) => {
   return pipe(
-    model.find({
+    model.find<HydratedDocument<T>>({
       deletedAt: null,
       isDeleted: { $ne: true },
 
@@ -104,27 +112,48 @@ export const atLeastOne = async<T,>(
   return await baseQuery.lean<T[]>();
 };
 
-export const hasCount = async<T,>(
+type THasCountParameters<T,
+  TNoLean extends (boolean | undefined) = boolean | undefined
+> = Parameters<(
   count: number,
   model: TModel<T>,
   query: RootFilterQuery<T>,
+  options?: TMayError & TSortable<T> & TPageable & { noLean?: TNoLean; },
+) => never>;
+
+export async function hasCount<T>(
+  ...args: THasCountParameters<T, false | undefined>
+): Promise<T[]>;
+
+export async function hasCount<T>(
+  ...args: THasCountParameters<T, true>
+): Promise<{ query: TQuery<T>; }>;
+
+export async function hasCount<T>(...[
+  count,
+  model,
+  query,
   {
+    noLean,
     modelName = model.modelName,
+
     ...options
-  }: TMayError & TSortable<T> & TPageable = {},
-) => {
+  } = {},
+]: THasCountParameters<T>) {
   const baseQuery = queryBy(model, query, options);
   const length = await baseQuery.clone().countDocuments();
 
   if (length != count) {
-    if (count <= 0) {
+    if (length < count) {
       throw errors.notFound(`[${modelName}] expecting length ${count}, but got ${length}`);
     }
 
     throw errors.unprocessableEntity(`[${modelName}] expecting length ${count}, but got ${length}`);
   }
 
-  return count > 0 ? await baseQuery.lean<T[]>() : [];
+  if (noLean) return { query: baseQuery };
+
+  return await baseQuery.lean<T[]>();
 };
 
 export const hasExactOne = async<T,>(

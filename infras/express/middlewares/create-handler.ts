@@ -3,12 +3,12 @@ import type { TMiddleware, TExpressParams } from '../types';
 export type THydratedParams = TExpressParams & ReturnType<typeof hydrateParams>;
 
 export type TCallback<
-  T = any,
+  TReturn = any,
   TValidatedDoc = never,
 > = (
   express: THydratedParams,
   doc: TValidatedDoc,
-) => T | Promise<T>;
+) => TReturn | Promise<TReturn>;
 
 type TTryOptions = {
   onError?: (error: any, express: TExpressParams) => any | Promise<any>;
@@ -93,9 +93,14 @@ const hydrateParams = (express: TExpressParams) => {
       await params.respondOne(data);
     },
 
-    createdOne: async <T = any>(data: T | Promise<T>) => {
+    createdOne: async <T = any>(data?: T | Promise<T>) => {
       res.status(201);
-      await params.respondOne(data);
+
+      if (data) {
+        await params.respondOne(data);
+      }
+
+      return res.end();
     },
 
     respondMany: async <T = any>(
