@@ -66,7 +66,7 @@ export function createHandlerWithTry<TValidatedDoc>(
   return handler;
 };
 
-const hydrateParams = (express: TExpressParams) => {
+export const hydrateParams = (express: TExpressParams) => {
   const { req, res, next } = express;
 
   const parsedPage = parseInt(`${req.query?.page}`, 10);
@@ -86,21 +86,6 @@ const hydrateParams = (express: TExpressParams) => {
 
     respondOne: async <T = any>(data: T | Promise<T>) => {
       res.json(await data);
-    },
-
-    patchedOne: async <T = any>(data: T | Promise<T>) => {
-      res.status(200);
-      await params.respondOne(data);
-    },
-
-    createdOne: async <T = any>(data?: T | Promise<T>) => {
-      res.status(201);
-
-      if (data) {
-        await params.respondOne(data);
-      }
-
-      return res.end();
     },
 
     respondMany: async <T = any>(
@@ -123,6 +108,26 @@ const hydrateParams = (express: TExpressParams) => {
       }
 
       res.json(data);
+    },
+
+    patchedOne: async <T = any>(data?: T | Promise<T>) => {
+      res.status(200);
+
+      if (data) {
+        await params.respondOne(data);
+      }
+
+      return res.end();
+    },
+
+    createdOne: async <T = any>(data?: T | Promise<T>) => {
+      res.status(201);
+
+      if (data) {
+        await params.respondOne(data);
+      }
+
+      return res.end();
     },
 
     try: async <T,>(
