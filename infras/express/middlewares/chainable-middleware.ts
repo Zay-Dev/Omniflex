@@ -11,6 +11,8 @@ type THandler<TOutput, TInput = never> =
   (express: THydratedParams) => TOutput | Promise<TOutput> :
   (express: THydratedParams, input: TInput) => TOutput | Promise<TOutput>;
 
+export type { Chainable };
+
 class Chainable<TOutput = void, TInput = void> {
   private readonly OUTPUT_TYPE: Awaited<TOutput> = null!;
 

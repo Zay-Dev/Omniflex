@@ -1,4 +1,11 @@
-import express from 'express';
+import type express from 'express';
+
+declare global {
+  type TFromRequest<T> = (req: express.Request) => T;
+  type TStringFromRequest = TFromRequest<string>;
+  type TNumberFromRequest = TFromRequest<number>;
+  type TBooleanFromRequest = TFromRequest<boolean>;
+}
 
 export type TMiddleware<TOutput = any> = (
   req: express.Request,

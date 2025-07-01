@@ -1,7 +1,7 @@
 {
   "name": "@omniflex/root",
   "private": true,
-  "packageManager": "pnpm@10.8.0",
+  "packageManager": "pnpm@10.12.4",
   "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "dev": "pnpm concurrently \"pnpm dev:server\" \"pnpm dev:web\"",
