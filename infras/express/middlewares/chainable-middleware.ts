@@ -40,15 +40,17 @@ class Chainable<TOutput = void, TInput = void> {
     return (req, res, next) => {
       const express = hydrateParams({ req, res, next });
 
-      switch (this._handlers.length) {
-        case 0:
-          return express.next(errors.custom('No handler provided'));
+      express.try(async () => {
+        switch (this._handlers.length) {
+          case 0:
+            return express.next(errors.custom('No handler provided'));
 
-        case 1:
-          return this._handlers[0](express);
-      }
+          case 1:
+            return await this._handlers[0](express);
+        }
 
-      this._processHandlers(express);
+        await this._processHandlers(express);
+      });
     };
   }
 
