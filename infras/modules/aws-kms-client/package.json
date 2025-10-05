@@ -1,0 +1,22 @@
+{
+  "name": "@omni-infra-modules/aws-kms-client",
+  "type": "module",
+  "exports": {
+    ".": {
+      "development": "./index.ts",
+      "import": "./dist/index.js"
+    },
+    "./*": {
+      "development": "./*.ts",
+      "import": "./dist/*.js"
+    }
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "scripts": {
+    "build": "tsc && tsc-alias"
+  },
+  "packageManager": "pnpm@10.12.4",
+  "dependencies": {
+    "@aws-sdk/client-kms": "^3.901.0"
+  }
+}
