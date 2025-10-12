@@ -167,6 +167,14 @@ export const hasExactOne = async<T,>(
   return (await hasCount(1, model, query, { modelName, ...options }))[0];
 };
 
+export const optionalFirst = async<T,>(
+  model: TModel<T>,
+  query: RootFilterQuery<T>,
+  options: TMayError & TSortable<T> & TPageable = {},
+): Promise<T | null> => {
+  return (await queryBy(model, query, options))[0];
+};
+
 export const requiredFirst = async<T,>(
   model: TModel<T>,
   query: RootFilterQuery<T>,
