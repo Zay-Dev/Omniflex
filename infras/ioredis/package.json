@@ -1,0 +1,27 @@
+{
+  "name": "@omni-infra/ioredis",
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@10.12.4",
+  "license": "SEE LICENSE IN LICENSE",
+  "exports": {
+    ".": {
+      "development": "./index.ts",
+      "import": "./dist/index.js"
+    },
+    "./*": {
+      "development": "./*.ts",
+      "import": "./dist/*.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc && tsc-alias"
+  },
+  "devDependencies": {
+    "@types/node": "^18.19.123"
+  },
+  "dependencies": {
+    "@omni-infra/core": "workspace:*",
+    "ioredis": "^5.8.1"
+  }
+}
