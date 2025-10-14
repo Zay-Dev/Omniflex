@@ -14,6 +14,14 @@ import helmet, { HelmetOptions } from 'helmet';
 import { doubleCsrf, DoubleCsrfConfigOptions } from 'csrf-csrf';
 import cookieParser, { CookieParseOptions } from 'cookie-parser';
 
+declare global {
+  namespace Express {
+    class Locals {
+      rawBody?: Buffer;
+    }
+  }
+}
+
 type TOrFalse<T> = false | T;
 
 type TFrontingOptions = {
@@ -113,7 +121,11 @@ const defaultFrontingMiddlewares = (
     app.use(responseTime());
 
   options.noExpressJson !== true &&
-    app.use(express.json());
+    app.use(express.json({
+      verify: (_, res, buffer) => {
+        res['locals'].rawBody = buffer;
+      },
+    }));
 
   options.morganFormat !== false &&
     app.use(Middlewares.getMorganLogger(options.morganFormat || undefined));
