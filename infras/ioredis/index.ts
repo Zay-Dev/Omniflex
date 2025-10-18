@@ -1,8 +1,10 @@
 import type { RedisOptions, Cluster } from 'ioredis';
 
 import '@omni-infra/core';
-
 import Redis from 'ioredis';
+
+import { monitorHealth } from './health-monitor';
+import { getEventsAdapter } from './events-adapter';
 
 export type TRedisClient = Awaited<ReturnType<typeof connect>>;
 
@@ -29,12 +31,12 @@ export const connect = async (config: TRedisConfig) => {
     const redis = await new Promise<Redis | Cluster>(
       (resolve, reject) => {
         const callback = (_redis: Cluster | Redis) => {
-          const redis: Redis = _redis as any as Redis;
+          const events = getEventsAdapter(_redis);
 
-          redis
+          events
             .once('error', reject)
             .once('connect', () => {
-              redis.removeListener('error', reject);
+              events.removeListener('error', reject);
               resolve(_redis);
             });
         };
@@ -55,7 +57,9 @@ export const connect = async (config: TRedisConfig) => {
     );
 
     await redis.ping();
-    logger.info('Redis connected', { tags: 'Redis.ping'});
+    logger.info('Redis connected', { tags: 'Redis.ping' });
+
+    monitorHealth(redis);
 
     return redis;
   } catch (error: any) {
