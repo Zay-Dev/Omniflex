@@ -73,6 +73,7 @@ class ProcessedRequest {
   public path: string;
   public method: string;
   public url: string;
+  public route: string;
 
   constructor(req: Request) {
     this.body = maskSensitiveValue(deepClone(req.body));
@@ -80,9 +81,15 @@ class ProcessedRequest {
     this.params = maskSensitiveValue(deepClone(req.params));
     this.headers = maskSensitiveValue(deepClone(req.headers));
 
-    this.path = req.path;
-    this.method = req.method;
     this.url = req.url;
+    this.method = req.method;
+
+    this.route = [
+      req.baseUrl,
+      req.route?.path || '',
+    ].filter(Boolean).join('');
+
+    this.path = req.path;
   }
 }
 

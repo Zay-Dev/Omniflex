@@ -37,6 +37,8 @@ morgan.token('processed-request',
 
     sections.push(formatSection('Request Details', {
       path: processed.path,
+      route: processed.route,
+
       method: processed.method,
       timestamp: new Date().toISOString(),
 
@@ -46,6 +48,10 @@ morgan.token('processed-request',
 
     if (processed.headers && Object.keys(processed.headers).length) {
       sections.push(formatSection('Headers', processed.headers));
+    }
+
+    if (processed.params && Object.keys(processed.params).length) {
+      sections.push(formatSection('Params', processed.params));
     }
 
     if (processed.query && Object.keys(processed.query).length) {
