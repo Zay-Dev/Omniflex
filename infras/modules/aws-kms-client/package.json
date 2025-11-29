@@ -16,6 +16,9 @@
     "build": "tsc && tsc-alias"
   },
   "packageManager": "pnpm@10.12.4",
+  "devDependencies": {
+    "@types/node": "^18.19.123"
+  },
   "dependencies": {
     "@aws-sdk/client-kms": "^3.901.0"
   }
