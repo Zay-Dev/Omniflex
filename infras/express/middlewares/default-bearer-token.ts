@@ -1,5 +1,5 @@
 import { createHandler } from './create-handler';
-import { TUser, TExpressParams } from '../types';
+import { TUser } from '../types';
 
 export const ACCESS_TOKEN_TYPE = 'access-token';
 

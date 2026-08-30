@@ -24,10 +24,12 @@ declare global {
 
 type TOrFalse<T> = false | T;
 
+type TExpressJsonOptions = NonNullable<Parameters<typeof express.json>[0]>;
+
 type TFrontingOptions = {
   serverType: string;
 
-  noExpressJson?: true;
+  expressJson?: TOrFalse<TExpressJsonOptions>;
   noResponseTime?: true;
   morganFormat?: TOrFalse<string>;
 
@@ -120,12 +122,18 @@ const defaultFrontingMiddlewares = (
   options.noResponseTime !== true &&
     app.use(responseTime());
 
-  options.noExpressJson !== true &&
+  if (options.expressJson !== false) {
+    const expressJsonOptions = options.expressJson ?? {};
+    const { verify: callerVerify, ...jsonOptions } = expressJsonOptions;
+
     app.use(express.json({
-      verify: (_, res, buffer) => {
-        res['locals'].rawBody = buffer;
+      ...jsonOptions,
+      verify: (req, res, buffer, encoding) => {
+        (res as express.Response).locals.rawBody = buffer;
+        callerVerify?.(req, res, buffer, encoding);
       },
     }));
+  }
 
   options.morganFormat !== false &&
     app.use(Middlewares.getMorganLogger(options.morganFormat || undefined));
